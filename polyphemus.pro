@@ -148,7 +148,7 @@ HEADERS  += constants.h\
 
 
 
-#BLABBLABBLAAAA
+#TEMP EDIT
 
 #two configuration: release and debug
 CONFIG(release,debug|release){
