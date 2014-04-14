@@ -150,6 +150,8 @@ HEADERS  += constants.h\
 
 #BLABBLABBLAAAA
 
+#RODELLLLLLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
 #two configuration: release and debug
 CONFIG(release,debug|release){
     INCLUDEPATH += /home/abuntu/build_with_Qt/release/include
