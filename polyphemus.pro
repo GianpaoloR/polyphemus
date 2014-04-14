@@ -149,8 +149,9 @@ HEADERS  += constants.h\
 
 
 #RODELLLLLLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-
 # MASTER EDIT
+# TEMP EDIT
+# MERGED!
 
 #two configuration: release and debug
 CONFIG(release,debug|release){
