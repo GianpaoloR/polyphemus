@@ -148,9 +148,9 @@ HEADERS  += constants.h\
 
 
 
-#BLABBLABBLAAAA
-
 #RODELLLLLLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+# MASTER EDIT
 
 #two configuration: release and debug
 CONFIG(release,debug|release){
