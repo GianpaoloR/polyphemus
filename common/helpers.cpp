@@ -522,9 +522,8 @@ void eyeColourEvaluation(Mat image) {
  */
 void flatField(cv::Mat& image)
 {
-#ifdef FLATFIELD_DEBUG
     int h=0;
-#endif
+
 
     //std::cout<<"FLATFIELD: image: "<<image.cols <<" x "<< image.rows<<std::endl;
 
@@ -533,27 +532,25 @@ void flatField(cv::Mat& image)
     int dim;
     cv::Mat flatField, correctedImage;
     //    flatField = cv::Mat(image.rows, image.cols, image.type());
-#ifdef FLATFIELD_DEBUG
-    std::cout<<"FLATFIELD "<<h++<<std::endl;
-#endif
+    if(flatfieldDebug) std::cout<<"FLATFIELD "<<h++<<std::endl;
 
     cv::cvtColor(image, flatField, CV_RGB2HSV);
-#ifdef FLATFIELD_DEBUG
-    std::cout<<"FLATFIELD "<<h++<<std::endl;
-#endif
+
+    if(flatfieldDebug) std::cout<<"FLATFIELD "<<h++<<std::endl;
+
     //correctedImage = cv::Mat(flatField.rows, flatField.cols, flatField.type());
     flatField.copyTo(correctedImage);
-#ifdef FLATFIELD_DEBUG
-    std::cout<<"FLATFIELD "<<h++<<std::endl;
-#endif
+
+    if(flatfieldDebug) std::cout<<"FLATFIELD "<<h++<<std::endl;
+
     split(flatField, fields);
-#ifdef FLATFIELD_DEBUG
-    std::cout<<"FLATFIELD "<<h++<<std::endl;
-#endif
+
+    if(flatfieldDebug) std::cout<<"FLATFIELD "<<h++<<std::endl;
+
     split(correctedImage, correctedFields);
-#ifdef FLATFIELD_DEBUG
-    std::cout<<"FLATFIELD "<<h++<<std::endl;
-#endif
+
+    if(flatfieldDebug) std::cout<<"FLATFIELD "<<h++<<std::endl;
+
     //Build mask size
     if (image.rows > image.cols) {
         dim = 3 * (image.rows / 4);
@@ -562,38 +559,36 @@ void flatField(cv::Mat& image)
         dim = 3 * (image.cols / 4);
     }
     blur(fields[2], fields[2], cv::Size(dim, dim), cv::Point(-1, -1));
-#ifdef FLATFIELD_DEBUG
-    std::cout<<"FLATFIELD "<<h++<<std::endl;
-#endif
+
+    if(flatfieldDebug) std::cout<<"FLATFIELD "<<h++<<std::endl;
+
     GaussianBlur(fields[2], fields[2], cv::Size(31, 31), 0);
-#ifdef FLATFIELD_DEBUG
-    std::cout<<"FLATFIELD "<<h++<<std::endl;
-#endif
+
+    if(flatfieldDebug) std::cout<<"FLATFIELD "<<h++<<std::endl;
 
     //cv::namedWindow("Flat field", CV_WINDOW_NORMAL);
     //imshow("Flat field", fields[2]);
 
     media = mean(fields[2]);
-#ifdef FLATFIELD_DEBUG
-    std::cout<<"FLATFIELD "<<h++<<std::endl;
-#endif
+
+    if(flatfieldDebug) std::cout<<"FLATFIELD "<<h++<<std::endl;
+
     divide(correctedFields[2], fields[2], correctedFields[2], media.val[0], -1);
-#ifdef FLATFIELD_DEBUG
-    std::cout<<"FLATFIELD "<<h++<<std::endl;
-#endif
+
+    if(flatfieldDebug) std::cout<<"FLATFIELD "<<h++<<std::endl;
 
     //medianBlur(correctedFields[2], correctedFields[2], 5);          //TODO: to evaluate, delete the pixel coloured error
     //    namedWindow("Flat fielded V channel", CV_WINDOW_NORMAL);
     //    imshow("Flat fielded V channel", correctedFields[2]);
 
     merge(correctedFields, correctedImage);
-#ifdef FLATFIELD_DEBUG
-    std::cout<<"FLATFIELD "<<h++<<std::endl;
-#endif
+
+    if(flatfieldDebug) std::cout<<"FLATFIELD "<<h++<<std::endl;
+
     cv::cvtColor(correctedImage, image, CV_HSV2RGB);
-#ifdef FLATFIELD_DEBUG
-    std::cout<<"FLATFIELD "<<h++<<std::endl;
-#endif
+
+    if(flatfieldDebug) std::cout<<"FLATFIELD "<<h++<<std::endl;
+
     //cv::namedWindow("Corrected image", CV_WINDOW_NORMAL);
     //cv::imshow("Corrected image", image);
 }

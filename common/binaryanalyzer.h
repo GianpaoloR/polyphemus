@@ -6,6 +6,7 @@
 #include <iomanip>
 #include "common/cvInclusions.h"
 #include "frameHandler/guihandler.h"
+#include "pupilDetection/twinkle.h"
 
 #define NOISE_SIZE 0
 #define ERVAL 150
@@ -75,7 +76,7 @@ public:
     std::vector<setInformation> filterSets(std::vector<setInformation> orig, std::vector<double> prob, std::vector<double> thresholds);
 
     //Path finders
-    setInformation twinkle(cv::Mat mat, Point *pupil, setInformation *pupilSet);
+    setInformation twinkleMethod(cv::Mat mat, Point *pupil, setInformation *pupilSet);
     Point moveMask(int k, Mat img, Point p, int *dirChosen);
 
     //Utilities
@@ -101,6 +102,7 @@ private:
     Size nextSearchArea(Point* tl, Point last, Point previous, bool left);
     //--------------------------------------------------
     guiHandler* gui;
+    twinkle* tw;
     std::vector<cv::Mat> frames;
     int mat_id;
     int setId, lastFatherId;

@@ -1332,7 +1332,7 @@ void pupilDetection::sobelCorners(bool left)
     waitKey(0);
     */
 
-    bin->twinkle(gradients, pupil, set);
+    bin->twinkleMethod(gradients, pupil, set);
 
     //std::cout<<"SOBELCORNERS: TWINKLE DONE."<<std::endl;
 

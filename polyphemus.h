@@ -2,6 +2,7 @@
 #define POLYPHEMUS_H
 
 #include "constants.h"
+#include "initFlags.h"
 
 #ifdef WEBSERVICE
 #include "clientServer/server.h"

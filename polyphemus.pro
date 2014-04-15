@@ -70,7 +70,8 @@ SOURCES += main.cpp\
     stasm4_1/stasm/stasm.cpp \
     stasm4_1/stasm/stasm_lib.cpp \
     stasm4_1/stasm/MOD_1/facedet.cpp \
-    stasm4_1/stasm/MOD_1/initasm.cpp
+    stasm4_1/stasm/MOD_1/initasm.cpp \
+    pupilDetection/twinkle.cpp
 
 HEADERS  += constants.h\
     framehandler.h \
@@ -144,19 +145,14 @@ HEADERS  += constants.h\
     stasm4_1/stasm/stasm_lib_ext.h \
     stasm4_1/stasm/stasm_lib.h \
     stasm4_1/stasm/MOD_1/facedet.h \
-    stasm4_1/stasm/MOD_1/initasm.h
-
-
-
-#RODELLLLLLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-# MASTER EDIT
-# TEMP EDIT
-# MERGED!
+    stasm4_1/stasm/MOD_1/initasm.h \
+    initFlags.h \
+    pupilDetection/twinkle.h
 
 #two configuration: release and debug
 CONFIG(release,debug|release){
-    INCLUDEPATH += /home/abuntu/build_with_Qt/release/include
-    LIBS += -L/home/abuntu/build_with_Qt/release/lib \
+ INCLUDEPATH += /Installs/opencv_binaries/Release/include
+    LIBS += -L/Installs/opencv_binaries/Release/lib \
     #if library name is lib[name].lib, you should write -l[name]
     -lopencv_core \
     -lopencv_highgui \
@@ -176,9 +172,6 @@ CONFIG(release,debug|release){
 
 CONFIG(debug,debug|release){
      #DEFINES += "DEBUG"
-     #DEFINES += "RETRIEVEDESKTOP_DEBUG"
-     #DEFINES += "PREPROCESS_DEBUG"
-     #DEFINES += "FLATFIELD_DEBUG"
      #DEFINES += "TOGRAYSCALE_DEBUG"
      #DEFINES += "SETGRAYFRAME_DEBUG"
      #DEFINES += "GETGRAYFRAME_DEBUG"
@@ -216,8 +209,8 @@ CONFIG(debug,debug|release){
      #DEFINES += "AUTOMATIC_TEST"
      #DEFINES += "ONLY_REAL_PUPIL"
 
-     INCLUDEPATH += /home/abuntu/build_with_Qt/debug/include
-     LIBS += -L/home/abuntu/build_with_Qt/debug/lib \
+INCLUDEPATH += /Installs/opencv_binaries/Debug/include
+     LIBS += -L/Installs/opencv_binaries/Debug/lib \
     #if library name is lib[name].lib, you should write -l[name]
     -lopencv_core \
     -lopencv_highgui \
@@ -242,10 +235,10 @@ QMAKE_CXXFLAGS -= -O2
 QMAKE_CXXFLAGS -= -O3
 
 
-CONFIG(debug, debug|release) {
-    QMAKE_CXXFLAGS+=-pg
-    QMAKE_LFLAGS+=-pg
-}
+#CONFIG(debug, debug|release) {
+#    QMAKE_CXXFLAGS+=-pg
+#    QMAKE_LFLAGS+=-pg
+#}
 
 OTHER_FILES += \
     otherCode.txt

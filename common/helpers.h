@@ -3,6 +3,7 @@
 
 #include "constants.h"
 #include "cvInclusions.h"
+#include "initFlags.h"
 
 #include <iostream>
 #include <queue>

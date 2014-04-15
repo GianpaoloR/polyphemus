@@ -201,9 +201,8 @@ void polyphemus::retrieveDesktop()
     hRes = desktop->width();
 #endif
 
-#ifdef RETRIEVE_DESKTOP_DEBUG
-    std::cout<<"Desktop SIZE: ["<<screenWidth<<" x "<<screenHeight<<"]"<<std::endl;
-#endif
+    //Debug print
+    if(retrieveDesktopDebug) std::cout<<"Desktop SIZE: ["<<screenWidth<<" x "<<screenHeight<<"]"<<std::endl;
 
     headRotation->setScreenSize(screenWidth, screenHeight);
     gE->setScreenResolution(screenWidth, screenHeight);
@@ -293,20 +292,18 @@ void polyphemus::init(std::string face, std::string eyePair, std::string singleE
 
 void polyphemus::preProcessFrame()
 {
-    #ifdef PREPROCESS_DEBUG
-    std::cout<<"PREPROCESSFRAME: cols = "<<fH->getFrame().cols<<", rows = "<<fH->getFrame().rows<<std::endl;
-    #endif
+    if(preprocessDebug) std::cout<<"PREPROCESSFRAME: cols = "<<fH->getFrame().cols<<", rows = "<<fH->getFrame().rows<<std::endl;
+
     if (!profiling) {
         fH->mirror();
     }
-    #ifdef PREPROCESS_DEBUG
-    std::cout<<"PREPROCESSFRAME: cols = "<<fH->getFrame().cols<<", rows = "<<fH->getFrame().rows<<std::endl;
-    #endif
+
+    if(preprocessDebug) std::cout<<"PREPROCESSFRAME: cols = "<<fH->getFrame().cols<<", rows = "<<fH->getFrame().rows<<std::endl;
 
     fH->preProcessFrame(); //QUESTA FUNZIONE E' PESANTISSIMA! PERCHE'?
-    #ifdef PREPROCESS_DEBUG
-    std::cout<<"PREPROCESSFRAME: cols = "<<fH->getFrame().cols<<", rows = "<<fH->getFrame().rows<<std::endl;
-    #endif
+
+    if(preprocessDebug) std::cout<<"PREPROCESSFRAME: cols = "<<fH->getFrame().cols<<", rows = "<<fH->getFrame().rows<<std::endl;
+
     rH->setGrayFrame(toGrayScale(fH->getFrame()));
 }
 
@@ -832,7 +829,9 @@ void polyphemus::setPupilData()
 //Main function called to track gaze.
 void polyphemus::trackGaze()
 {
+    #ifdef TEST_MODE
     char interruptChar;
+    #endif
 
 
     #ifdef TRACKGAZE_DEBUG

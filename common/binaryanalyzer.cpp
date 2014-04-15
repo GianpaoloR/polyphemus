@@ -8,6 +8,7 @@ binaryAnalyzer::binaryAnalyzer()
     setId = 0;
     oneIsLast = true;
     overallSets.clear();
+    tw = new twinkle();
 }
 
 //SetDebugGui: enables gui for debugger
@@ -67,145 +68,7 @@ cv::Mat binaryAnalyzer::open(const cv::Mat& roi)
     return m2;
 }
 
-//Dilate: apply dilation morphologic algorithm
-cv::Mat binaryAnalyzer::twinkleDilate(const cv::Mat& roi)  //Work on neighborhood to define point
-{
-    #define NMASK 4
-    #define SIZE 3
-    int maskH[SIZE][SIZE] = {{128,128,128},
-                            { 255,  0,255},
-                            { 128,128,128}};  //128 stands for don't care
 
-    int maskV[SIZE][SIZE] = {{128, 255, 128},
-                             {128,   0, 128},
-                             {128, 255, 128}};
-
-    int maskDiagDown[SIZE][SIZE] = {{255, 128, 128},
-                                    {128,   0, 128},
-                                    {128, 128, 255}};
-
-    int maskDiagUp[SIZE][SIZE] = {{128, 128, 255},
-                                  {128,   0, 128},
-                                  {255, 128, 128}};
-
-    int mask[NMASK][SIZE][SIZE] = {{{255, 128, 128},
-                                    {128,   0, 128},
-                                    {128, 128, 255}},
-
-                                   {{128, 128, 255},
-                                    {128,   0, 128},
-                                    {255, 128, 128}},
-
-                                   {{128,128,128},
-                                    {255,  0,255},
-                                    {128,128,128}},
-
-                                   {{128, 255, 128},
-                                    {128,   0, 128},
-                                    {128, 255, 128}}};
-
-
-    cv::Mat diffRoi = cv::Mat::zeros(roi.rows, roi.cols, CV_8U);
-    cv::Mat completeRoi = cv::Mat::zeros(roi.rows, roi.cols, CV_8U);
-    cv::Mat partialReturnRoi = cv::Mat::zeros(roi.rows, roi.cols, CV_8U);
-    cv::Mat returnRoi = cv::Mat::zeros(roi.rows, roi.cols, CV_8U);
-    cv::Mat currentRoi = roi;
-    bool changeVal;
-    int grayVal = 0;
-
-    //Only diagonal dilation
-    for(int m=0; m<4; m++)
-    {
-        grayVal +=51;
-        for(int i=0; i<currentRoi.rows; i++)
-        {
-            for(int j=0; j<currentRoi.cols; j++)
-            {
-                if(currentRoi.at<uchar>(i,j) == mask[m][SIZE/2][SIZE/2])
-                {
-                    int k1min = i-SIZE/2;
-                    int k1Max = i+SIZE/2;
-                    int k2min = j-SIZE/2;
-                    int k2Max = j+SIZE/2;
-                    changeVal = false;
-                    if(k1min >= 0 && k1Max<currentRoi.rows && k2min >=0 && k2Max<currentRoi.cols)
-                    {
-                        changeVal = true;
-                        for(int k1=k1min; k1<=k1Max; k1++)
-                        {
-                            for(int k2=k2min; k2<=k2Max; k2++)
-                            {
-                                if(mask[m][k1-i+SIZE/2][k2-j+SIZE/2] != 128) //ignore don't care
-                                {
-                                    if(currentRoi.at<uchar>(k1,k2) != mask[m][k1-i+SIZE/2][k2-j+SIZE/2]) changeVal = false;
-                                }
-                            }
-                        }
-                    }
-                    if(changeVal)
-                    {
-                        diffRoi.at<uchar>(i,j) = grayVal; //grayVal; --> grayVal to see differences (partial), 128; to prepare for algorithm, expression
-                    }
-                }
-            }
-        }
-
-        if(m==1) //First merge
-        {
-            for(int i=0;i<roi.rows; i++)
-            {
-                for(int j=0; j<roi.cols; j++)
-                {
-                    if(diffRoi.at<uchar>(i,j) > 0)
-                    {
-                        partialReturnRoi.at<uchar>(i,j) = 255-roi.at<uchar>(i,j);
-                    }
-                    else
-                    {
-                        partialReturnRoi.at<uchar>(i,j) = roi.at<uchar>(i,j);
-                    }
-                }
-            }
-            currentRoi = partialReturnRoi;
-//            char*pName = "partial";
-//            namedWindow(pName, CV_WINDOW_NORMAL);
-//            imshow(pName, currentRoi);
-//            waitKey(0);
-        }
-    }
-
-
-    for(int i=0;i<currentRoi.rows; i++)
-    {
-        for(int j=0; j<currentRoi.cols; j++)
-        {
-            if(diffRoi.at<uchar>(i,j) > 0)
-            {
-                completeRoi.at<uchar>(i,j) = diffRoi.at<uchar>(i,j);
-            }
-            else
-            {
-                completeRoi.at<uchar>(i,j) = currentRoi.at<uchar>(i,j);
-            }
-
-            if(diffRoi.at<uchar>(i,j) > 128)
-            {
-                returnRoi.at<uchar>(i,j) = 255-currentRoi.at<uchar>(i,j);
-            }
-            else
-            {
-                returnRoi.at<uchar>(i,j) = currentRoi.at<uchar>(i,j);
-            }
-        }
-    }
-
-//    char*dName = "Differences";
-//    namedWindow(dName, CV_WINDOW_NORMAL);
-//    imshow(dName, completeRoi);
-//    waitKey(0);
-
-    return returnRoi;
-}
 
 //Dilate: apply dilation morphologic algorithm
 cv::Mat binaryAnalyzer::dilate(const cv::Mat& roi)
@@ -802,7 +665,7 @@ Size binaryAnalyzer::nextSearchArea(Point* tl, Point last, Point previous, bool 
 {
     int dx = last.x-previous.x;
     int dy = last.y-previous.y;
-    double grad;
+    //double grad;
     Size s;
 
     //---------Special cases: vertical sliding-----------
@@ -810,14 +673,14 @@ Size binaryAnalyzer::nextSearchArea(Point* tl, Point last, Point previous, bool 
     {
         if(dy<0)
         {
-            grad = DBL_MAX;
+            //grad = DBL_MAX;
             std::cout<<"TWINKLE: GRADIENT IS MAX"<<std::endl;
             tl->x = last.x-1;
             tl->y = last.y-3;
         }
         else
         {
-            grad = DBL_MIN;
+            //grad = DBL_MIN;
             std::cout<<"TWINKLE: GRADIENT IS MIN"<<std::endl;
             tl->x = last.x-1;
             tl->y = last.y +1;
@@ -869,7 +732,7 @@ int checkNext(int k, bool next, std::vector<bool>& checked, cv::Mat mat, int i, 
     if(debug)
     {
         std::cout<<"CheckNext: entered with following checked vector:"<<std::endl;
-        for(int c=0; c<checked.size();c++) std::cout<<"- " <<checked[c]<<" ";
+        for(uint c=0; c<checked.size();c++) std::cout<<"- " <<checked[c]<<" ";
         std::cout<<std::endl;
     }
 
@@ -948,7 +811,7 @@ int checkNext(int k, bool next, std::vector<bool>& checked, cv::Mat mat, int i, 
     if(debug)
     {
         std::cout<<"CheckNext: exiting with follow checked vector:"<<std::endl;
-        for(int c=0; c<checked.size();c++) std::cout<<"- " <<checked[c]<<" ";
+        for(uint c=0; c<checked.size();c++) std::cout<<"- " <<checked[c]<<" ";
         std::cout<<std::endl;
     }
 
@@ -969,7 +832,7 @@ void binaryAnalyzer::handleContours(cv::Mat mat)
 
     /// Draw contours
     Mat contoursImage = Mat::zeros( mat.size(), CV_8UC3 );
-    for( int i = 0; i< contours.size(); i++ )
+    for( uint i = 0; i< contours.size(); i++ )
      {
        Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
        drawContours( contoursImage, contours, i, color, 1, 8, hierarchy, 0, Point() );
@@ -1039,7 +902,7 @@ std::vector<Point> binaryAnalyzer::labelPoints(cv::Mat mat)
                             }
 
                             std::cout<<"End of recursion: checked vector is ";
-                            for(int c=0; c<checked.size();c++) std::cout << checked[c] << " - ";
+                            for(uint c=0; c<checked.size();c++) std::cout << checked[c] << " - ";
                             std::cout<<std::endl;
 
                             if(recAns > labelCount[i*mat.cols+j])
@@ -1070,7 +933,7 @@ std::vector<Point> binaryAnalyzer::labelPoints(cv::Mat mat)
 
     //cv::Mat cornerImg(mat.rows, mat.cols, CV_8U);
     cv::Mat cornerImg = Mat::zeros(mat.rows, mat.cols, CV_8U);
-    for(int i=0; i<corners.size(); i++)
+    for(uint i=0; i<corners.size(); i++)
     {
         cornerImg.at<uchar>(corners[i]) = 255;
     }
@@ -1108,15 +971,15 @@ std::vector<binaryAnalyzer::setInformation> binaryAnalyzer::fillSetCornerData(cv
 
     std::vector<binaryAnalyzer::setInformation> sets = this->findSets(mat, false);
 
-    for(int i=0; i<sets.size(); i++)
+    for(uint i=0; i<sets.size(); i++)
     {
         Mat m=Mat::zeros(mat.rows, mat.cols, CV_8U);
         std::cout<<"Set "<< i<<": "<< sets[i].nPoints << " punti."<<std::endl;
 
-        for(int j=0; j<sets[i].elem.size(); j++)
+        for(uint j=0; j<sets[i].elem.size(); j++)
         {
             m.at<uchar>(sets[i].elem[j].y, sets[i].elem[j].x) = 150;
-            for(int c=0; c<corners.size(); c++)
+            for(uint c=0; c<corners.size(); c++)
             {
                 if(sets[i].elem[j] == corners[c])
                 {
@@ -1146,7 +1009,7 @@ std::vector<binaryAnalyzer::setInformation> binaryAnalyzer::fillSetCornerData(cv
 binaryAnalyzer::setInformation binaryAnalyzer::getBiggestSet(std::vector<binaryAnalyzer::setInformation> sets, int* index)
 {
     int bSet, bSize = INT_MIN;
-    for(int i=0; i<sets.size(); i++)
+    for(uint i=0; i<sets.size(); i++)
     {
         if(sets[i].nPoints > bSize)
         {
@@ -1167,12 +1030,12 @@ binaryAnalyzer::setInformation binaryAnalyzer::getNearestSet(int startingIndex, 
     bool valid = true;
 
 
-    for(int c=0; c<sets[startingIndex].corners.size(); c++)
+    for(uint c=0; c<sets[startingIndex].corners.size(); c++)
     {
         std::cout<<"---------\n----------\nCorner di partenza: "<< c << std::endl;
         valid = true;
         //Check if this corner also is in the limbus set. If it is, step over (don't consider corners in the limbus).
-        for(int k1=0; k1<pupilSet->elem.size(); k1++)
+        for(uint k1=0; k1<pupilSet->elem.size(); k1++)
         {
             if(sets[startingIndex].corners[c] == pupilSet->elem[k1])
             {
@@ -1183,12 +1046,12 @@ binaryAnalyzer::setInformation binaryAnalyzer::getNearestSet(int startingIndex, 
 
         if(valid)
         {
-            for(int i=0; i<sets.size(); i++)
+            for(uint i=0; i<sets.size(); i++)
             {
                 if(i!=startingIndex)
                 {
                     std::cout<<"--------\nSet di confronto: "<<i<<", nCorner = "<<sets[i].corners.size()<<std::endl;
-                    for(int j=0; j<sets[i].corners.size(); j++)
+                    for(uint j=0; j<sets[i].corners.size(); j++)
                     {
                         std::cout<<"Corner di confronto: "<<j<<std::endl;
                         d = sqrt((sets[startingIndex].corners[c].x - sets[i].corners[j].x)*(sets[startingIndex].corners[c].x - sets[i].corners[j].x) + (sets[startingIndex].corners[c].y -sets[i].corners[j].y)*(sets[startingIndex].corners[c].y -sets[i].corners[j].y));
@@ -1632,7 +1495,7 @@ std::vector<binaryAnalyzer::setInformation> binaryAnalyzer::filterSets(std::vect
 
 
 
-binaryAnalyzer::setInformation binaryAnalyzer::twinkle(cv::Mat mat, Point* pupil, binaryAnalyzer::setInformation* pupilSet)
+binaryAnalyzer::setInformation binaryAnalyzer::twinkleMethod(cv::Mat mat, Point* pupil, binaryAnalyzer::setInformation* pupilSet)
 {
 
     binaryAnalyzer::setInformation twinkleSet;
@@ -1651,7 +1514,7 @@ binaryAnalyzer::setInformation binaryAnalyzer::twinkle(cv::Mat mat, Point* pupil
     cv::waitKey(0);
 
     //Phase 2: Dilate horizontally and vertically
-    cv::Mat dMat = this->twinkleDilate(tMat);
+    cv::Mat dMat = tw->twinkleDilate(tMat);
     char* wNameD = "Twinkle Dilation";
     namedWindow(wNameD, CV_WINDOW_NORMAL);
     imshow(wNameD, dMat);
