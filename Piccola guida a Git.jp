@@ -1,0 +1,316 @@
+Piccola guida a Git ver 1.2 - 15 aprile 2014
+
+
+Questa guida è articolata in due parti. La seconda parte è un riassunto della prima e contiene i comandi tipici corredati da brevi didascalie. La prima parte è la descrizione very very verbose della stessa procedura, può essere un punto di partenza se si incappa in qualche problema!
+
+--------------------------------
+ PARTE 1 - VERBOSE DESCRIPTION
+--------------------------------
+ 
+	Tipico scenario di lavoro
+
+Decido di lavorare su un particolare problema, diciamo "Rilevamento occhi". Le mie precedenti modifiche erano già state committate, ma nel frattempo qualcun altro può aver fatto evolvere ulteriormente il progetto.
+La prima cosa da fare è portarmi all'interno della cartella associata al repository (nel nostro caso, la sede del progetto polyphemus).
+Per precauzione, è bene azzerare il precedente collegamento al server remoto, altrimenti al momento del checkout potrebbero venir fuori dei messaggi di errore. Supponendo che "origin" sia il nome del collegamento al server remoto, lanciate:
+
+	git pull origin
+	git reset --hard origin 
+	
+A questo punto scaricate in locale il lavoro aggiornato online, in un branch DIVERSO da quello master, che creerete sul momento (nel mio caso, gli ho dato nome "rilev"):
+
+        git checkout -b rilev
+
+Il terminale mi risponderà segnalando che il file .pro.user è stato cambiato e che la cartella "polyphemus" che ho in locale rappresenta la fotocopia del neonato branch "rilev".
+E' importante recepire che il comando "git checkout" ha come effetto quello di trasformare il contenuto locale della cartella di progetto, ALLINEANDOLO con la situazione del branch passato come argomento. Il branch può essere uno già esistente oppure non esistere ancora: l'opzione -b permette appunto di crearne uno nuovo, e in tal caso lo fa creando una copia del branch "master".
+
+Output del terminale:
+-----------------
+M	polyphemus.pro.user
+Switched to a new branch 'rilev'
+-----------------
+
+A questo punto si sono ottenuti due effetti:
+1) è stato creato LOCALMENTE un nuovo branch di nome "rilev" (questo branch non esisterà sul server finché non sarà fatto un push; non è detto che questo sia necessario, ma lo vedremo in seguito)
+2) la cartella di progetto ora riflette il branch "rilev", non più quello master (che è quello principale). Dal momento che "rilev" prima non esisteva, però, git ha creato "rilev" come fork di "master" (quindi a parte il .pro.user non è ancora cambiato niente nel codice).
+
+
+Apriamo Qt Creator e carichiamo il nostro progetto. Noterete che, sebbene la cartella sia la stessa, il nome del progetto nell'albero di visualizzazione è diventato "polyphemus (rilev)". Questo è un buon modo per capire su che branch si sta lavorando in un dato momento. Se non c'è niente tra parentesi, fate attenzione: significa che avete fatto un checkout del master (il che non va bene); ripetete i passi precedenti per aprirvi un branch temporaneo diverso.
+
+Rimettete a posto il .pro, secondo i vostri setting personali (path INCLUDEPATH e LIBS). Sarebbe bene che ognuno di noi tenesse un file personale del tipo "myPro.pro" a portata di mano, in modo da sostituirlo rapidamente).
+
+Fate un clean, lanciate qmake se necessario per aggiornare il .pro e ricompilate il progetto.
+
+Lavorate sui file come se nulla fosse. La cosa buona è che NON dovrete fare attenzione a quali file andrete a modificare, se ne ricorderà Git a tempo debito :)
+
+Supponiamo che, ad un certo punto, abbiate finito e siate parzialmente soddisfatti delle modifiche apportate, ma non siano ancora definitive. Sulla parte restante ci lavorerete in un secondo momento, diciamo domani. Dovete aggiornare il branch "rilev", il che significa committare le modifiche apportate finora SU QUESTO BRANCH SECONDARIO.
+Fare il commit sul branch "rilev" è necessario. Se non fate il commit e domani riprendete il lavoro col classico "git checkout rilev", vi ritroverete in mano un branch che riparte da zero (ossia dalla versione master), e tutte le modifiche che avete fatto oggi andranno, ebbene sì, perdute. E' FONDAMENTALE COMMITTARE LE MODIFICHE PRIMA DI FARE QUALSIASI CHECKOUT!!! Questo perché, come si è detto, la cartella di progetto è diventata "liquida": assume di volta in volta le sembianze del branch di cui fate il checkout.
+Prima di chiudere e andarvene a dormire, digitate quindi:
+
+	git status
+
+Questo produrrà un output che vi mostrerà nel dettaglio tutti i file che sono stati "toccati" dalle vostre modifiche.
+Di seguito, vediamo un esempio concreto di output:
+
+# Sul branch rilev
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#	nuovo file:   initFlags.h
+#	nuovo file:   pupilDetection/twinkle.cpp
+#	nuovo file:   pupilDetection/twinkle.h
+#	nuovo file:   pupilDetection/twinkle2.cpp
+#	nuovo file:   pupilDetection/twinkle2.h
+#	nuovo file:   twinkle.cpp
+#	nuovo file:   twinkle.h
+#
+# Changes not staged for commit:
+#   (use "git add/rm <file>..." to update what will be committed)
+#   (use "git checkout -- <file>..." to discard changes in working directory)
+#
+#	modificato:   common/binaryanalyzer.cpp
+#	modificato:   common/binaryanalyzer.h
+#	modificato:   common/helpers.cpp
+#	modificato:   common/helpers.h
+#	modificato:   initFlags.h
+#	modificato:   polyphemus.cpp
+#	modificato:   polyphemus.h
+#	modificato:   polyphemus.pro
+#	modificato:   polyphemus.pro.user
+#	modificato:   pupilDetection/pupildetection.cpp
+#	modificato:   pupilDetection/twinkle.cpp
+#	modificato:   pupilDetection/twinkle.h
+#	eliminato:    pupilDetection/twinkle2.cpp
+#	eliminato:    pupilDetection/twinkle2.h
+#	eliminato:    twinkle.cpp
+#	eliminato:    twinkle.h
+#
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	CMakeLists.txt
+#	Debug/
+#	Profiles/
+#	Release/
+#	otherCode.txt
+#	res/
+
+Come vedete, l'output ha tre sezioni principali:
+
+Sezione 1: file che attualmente verrebbero committati (si trovano nell'"insieme di commit"; sono i file "staged", o "parcheggiati"). In questo caso, troviamo svariate voci "nuovo file" perché ho creato la classe twinkle prima inesistente e un file di flag. Qt Creator è abbastanza intelligente: se rileva che il progetto è sotto Git, al momento della creazione di un nuovo file lo aggiunge da solo all'insieme di commit. Fermandoci per ora all'analisi di questa sezione di output, noto che NON voglio includere i due file "twinkle2" nel commit. Sono file temporanei, che ho creato, usato e rimosso. Non devono esistere nella versione on line del progetto, quindi devo toglierli dall'insieme di commit. A tale scopo lancio il comando:
+
+	git reset HEAD pupilDetection/twinkle2.*
+
+Nemmeno i file twinkle.cpp e .h vanno bene, perché dopo un primo momento li ho tolti dal progetto e ne ho creati di nuovi nella cartella pupilDetection. Quindi solo quelli in pupilDetection sono giusti, gli altri vanno rimossi. Procedo ancora: 
+	git reset HEAD twinkle.*
+
+Rilanciando
+
+	git status
+
+noterò un output diverso (riporto qui solo la sezione 1):
+
+---------------------------------
+# Sul branch rilev
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#	nuovo file:   initFlags.h
+#	nuovo file:   pupilDetection/twinkle.cpp
+#	nuovo file:   pupilDetection/twinkle.h
+----------------------------------
+
+Ok, ora questa sezione è a posto. Passiamo alla sezione 2. Questa elenca tutti i file che hanno subìto modifiche ma NON sono compresi tra quelli che si vuole committare ("unstaged", non parcheggiati). Quasi tutti andrebbero invece committati. Devo aggiungerli all'insieme di commit. Il comando da usare è
+	
+	git add <nomeFile>
+
+Fate molta attenzione a non digitare, per fare più in fretta, una cosa tipo:
+
+	NO --> git add *
+
+Questa è una boiata: inserisce TUTTI i file nella cartella (compresi i .o nella versione Debug e quella Release) e vi costringe poi a lavorare di reset.
+Usate piuttosto comandi come
+
+	git add pupilDetection/*
+
+e via dicendo.
+Controllate il nuovo status (git status) per accertarvi che le cose progrediscano come vorreste. Riporto l'output che "mi va bene":
+
+---------------------------------
+Sul branch jp
+# Changes to be committed:
+#   (use "git reset HEAD <file>..." to unstage)
+#
+#	modificato:   common/binaryanalyzer.cpp
+#	modificato:   common/binaryanalyzer.h
+#	modificato:   common/helpers.cpp
+#	modificato:   common/helpers.h
+#	nuovo file:   initFlags.h
+#	modificato:   polyphemus.cpp
+#	modificato:   polyphemus.h
+#	modificato:   polyphemus.pro
+#	modificato:   polyphemus.pro.user
+#	modificato:   pupilDetection/pupildetection.cpp
+#	nuovo file:   pupilDetection/twinkle.cpp
+#	nuovo file:   pupilDetection/twinkle.h
+---------------------------------
+
+La sezione 1 si è arricchita dei file che prima erano in sezione 2; la sezione 2 è semplicemente sparita (ma non è detto che questo accada tutte le volte, dipende da che file modificate).
+
+Chiudiamo con la sezione 3: essa riporta tutti i file (o le cartelle) che, modificati o meno, NON SONO NEMMENO TRACCIATI da Git. Ossia, la loro evoluzione nel tempo viene completamente ignorata. Ad esempio, nel mio output (che riporto sotto) si vedono le cartelle Debug e Release, che contengono tutti i .o e gli eseguibili. Nella fase di inizializzazione, Git si era accorto che queste cartelle erano inutili e le ha marcate come "untracked"
+
+Output sezione 3:
+---------------------------------
+# Untracked files:
+#   (use "git add <file>..." to include in what will be committed)
+#
+#	CMakeLists.txt
+#	Debug/
+#	Profiles/
+#	Release/
+#	otherCode.txt
+#	res/
+---------------------------------
+
+Esistono comandi per non fare vedere a schermo l'elenco degli untracked; personalmente consiglio di tenerlo, perché credo sia meglio per tenere d'occhio i file "secondari". Se si decide di tracciare un file untracked, la procedura è la stessa, si usa git add; ecco perché non è una buona idea lanciare git add * ! ;)
+
+Una volta che si è soddisfatti dell'output di git status, si può procedere con il commit sul branch:
+
+	git commit -m "Primo commit: modifiche parziali"
+
+L'opzione -m abilita la scrittura di un breve messaggio descrittivo, è consigliabile usarla. Il commit modifica effettivamente il branch; un futuro checkout manterrà le modifiche appena committate. Memento: siamo sempre sul branch LOCALE!
+
+Supponiamo infine che giunga l'indomani; riprendiamo a lavorare sul branch "rilev" con
+
+	git checkout rilev
+
+L'opzione -b non è necessaria perché rilev è un branch che esiste già.
+Modifichiamo altri file, lavoriamo e terminiamo le modifiche che volevamo apportare.
+Come nel caso precedente, verifichiamo con  git status, git add e git reset HEAD <nomeFile> che tutto sia a posto per un nuovo commit e poi committiamo:
+
+	git commit -m "Secondo commit: terminate modifiche."
+
+Visto che il nostro lavoro sul rilevamento occhi è terminato, vorremmo che queste modifiche apparissero on line agli altri membri del gruppo; vorremmo cioè ripercuoterle sul progetto master.
+ATTENZIONE! Fate molta attenzione a seguire per bene i passi seguenti o rischiate di sovrascrivere a tutti i collaboratori il progetto master senza tener conto delle modifiche da loro apportate!
+
+Per prima cosa occorre spostarsi sul branch master:
+
+	git checkout master
+
+Ora la vostra cartella di progetto riflette il "vecchio" master (ma le vostre modifiche esistono tranquillamente nel branch locale "rilev").
+Occorre effettuare un merge:
+	
+	git merge rilev
+
+Il comando git merge prende il contenuto del branch passato come argomento (rilev), ne estrapola le modifiche e le immette nel branch in cui si trova in quel momento (in questo caso, master).
+Nella stragrande maggioranza dei casi questo processo è innocuo e non genera conflitti. Nel nostro caso potrebbe farlo se qualcun altro nel frattempo ha modificato gli stessi file che abbiamo modificato noi. Vedremo come risolvere i conflitti manualmente in un'altra occasione.
+Qui supponiamo che il merge vada a buon fine senza bisogno del nostro intervento, perché nessuno ha modificato gli stessi file nel frattempo. Ecco di seguito l'output:
+
+-------------------------------------
+Aggiornamento di f598464..997487d
+Fast-forward
+ common/binaryanalyzer.cpp         | 175 ++++---------------------------------
+ common/binaryanalyzer.h           |   4 +-
+ common/helpers.cpp                |  65 +++++++-------
+ common/helpers.h                  |   1 +
+ initFlags.h                       |  52 +++++++++++
+ polyphemus.cpp                    |  23 +++--
+ polyphemus.h                      |   1 +
+ polyphemus.pro                    |  33 +++----
+ polyphemus.pro.user               |   2 +-
+ pupilDetection/pupildetection.cpp |   2 +-
+ pupilDetection/twinkle.cpp        | 145 ++++++++++++++++++++++++++++++
+ pupilDetection/twinkle.h          |  13 +++
+ 12 files changed, 290 insertions(+), 226 deletions(-)
+ create mode 100644 initFlags.h
+ create mode 100644 pupilDetection/twinkle.cpp
+ create mode 100644 pupilDetection/twinkle.h
+--------------------------------------
+
+L'indicazione "fast-forward" mi fa capire che nessuno ha effettuato altri commit sul branch master da quando io ne ho fatto la fork sul branch rilev. Ottima cosa, tutto fila liscio.
+Trovate un elenco dei file aggiunti, cancellati o modificati, seguiti da una serie di + e - che rappresentano le inserzioni e eliminazioni di linee all'interno del file. Alla voce "create mode" trovate l'indicazione dei file che sono stati aggiunti al repository e che in precedenza non erano tracciati.
+
+NOTARE CHE IL MERGE EQUIVALE A UN COMMIT, solo che è più consapevole e permette di sospendere il commit se si rilevano conflitti; usare un classico git commit ignorerebbe qualunque cosa sia avvenuta nel frattempo sul branch master e lo sovrascriverebbe (a quel punto il linciaggio da parte degli altri componenti del team sarebbe lecito).
+
+Come nel caso di rilev, anche in questo caso le modifiche committate sono ancora a livello locale. Abbiamo preparato il nuovo master, ma non è ancora online.
+
+Il comando da lanciare è
+
+	git push <nomeServer> <nomeBranch>
+
+(dove <nomeServer> è il nome che sostituisce per comodità l'url del repository (in genere "origin", o un altro identificativo aggiunto col comando git remote add, come segue:
+
+	git remote add myServer master    )
+
+Vi saranno chiesti username e password (a patto che siate abilitati alla scrittura sul repository). L'output sarà simile al seguente:
+
+-----------------------------------------------
+Username for 'https://github.com': GianpaoloR
+Password for 'https://GianpaoloR@github.com': 
+Counting objects: 28, done.
+Delta compression using up to 2 threads.
+Compressing objects: 100% (16/16), done.
+Writing objects: 100% (16/16), 3.12 KiB, done.
+Total 16 (delta 13), reused 0 (delta 0)
+To https://github.com/GianpaoloR/polyphemus.git
+   f598464..997487d  master -> master
+-----------------------------------------------
+
+Andando sul repository via internet, dovreste riscontrare l'avvenuto commit.
+
+Rimuovete il vecchio branch locale con
+	git branch -d rilev
+
+--------------------------------------------------------------------
+--------------------------------------------------------------------
+
+----------------------------------------
+ PARTE 2 - RIASSUNTO DEI COMANDI TIPICI
+----------------------------------------
+
+Ok, ora che (non) avete letto la pappardella, veniamo alle cose alla Ketrod, ossia la serie di comandi da usare dimenticandosene il perché. Vai Ketrod!
+
+0) Supponendo che "origin" sia il vostro nome per il collegamento al server, lanciate i comandi:
+	git pull origin
+	git reset --hard origin 
+
+1) Iniziate a lavorare in locale facendo una copia del master:
+	git checkout -b branchTemporaneo
+
+[1bis) Modificate il .pro sostituendo i path per OpenCV e altre librerie con quelli idonei nel vostro ambiente]
+
+2) Lavorate, lavorate, lavorate...
+
+3) Verificate quali file avete modificato, creato o rimosso rispetto alla versione di cui avete fatto il checkout
+	git status
+
+4) Aggiungete i file desiderati all'insieme di commit (staging area)
+	git add <nomeFile>
+
+5) Alternate "git status" e "git add <nomeFile>" finché non avete riempito opportunamente la staging area.
+
+6) Committate localmente sul branch secondario:
+	git commit -m "Vostro messaggio di commit"
+
+7) Passate al branch master:
+	git checkout master
+
+8) Effettuate il merge delle vostre modifiche:
+	git merge branchTemporaneo
+
+Sinceratevi che il merge sia andato a buon fine analizzando l'output! Risolvete manualmente eventuali conflitti se vi viene richiesto.
+
+Se non è richiesto un intervento manuale, questo merge equivale al commit. Altrimenti, dopo aver risolto i conflitti, effettuate un altro commit come al punto 6).
+
+9) Trasferite il vostro commit sul server remoto:
+	git push origin master
+
+10) Assicuratevi che il server remoto rifletta le vostre modifiche (andate sulla pagina del repository on line)
+
+11) Rimuovete il vecchio branch locale, ora inutile:
+	git branch -d branchTemporaneo
+
+--------------------
+Done!
+
+Questa guida è offerta spassionatamente da Nibbio Notturno. Ulteriori modifiche potranno essere apportate dall'autore in futuro.
+Segnalate eventuali incoerenze o mancanze all'autore, saranno ben accette!
