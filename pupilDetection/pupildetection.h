@@ -4,6 +4,7 @@
 #include "common/cvInclusions.h"
 #include "common/helpers.h"
 #include "common/binaryanalyzer.h"
+#include "twinkle.h"
 #include "pupilgui.h"
 #include "pupilrois.h"
 
@@ -113,9 +114,12 @@ private:
     //Local gui
     pupilGui* eyeGui;
 
+    //Twinkle reference
+    twinkle* tw;
+
     //Binary sets
-    binaryAnalyzer::setInformation *leftPupilSet, *rightPupilSet;
-    binaryAnalyzer::setInformation *leftRefinedSet, *rightRefinedSet;
+    setInformation *leftPupilSet, *rightPupilSet;
+    setInformation *leftRefinedSet, *rightRefinedSet;
 
     //Internal pupil finders
     cv::Point* greatCatch(bool left);

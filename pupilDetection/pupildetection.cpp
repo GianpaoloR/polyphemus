@@ -13,8 +13,8 @@ pupilDetection::pupilDetection(binaryAnalyzer *bin)
 
     leftPupilSet = NULL;
     rightPupilSet = NULL;
-    leftRefinedSet = new binaryAnalyzer::setInformation();
-    rightRefinedSet = new binaryAnalyzer::setInformation();
+    leftRefinedSet = new setInformation();
+    rightRefinedSet = new setInformation();
 
     leftFound = false;
     rightFound = false;
@@ -22,6 +22,8 @@ pupilDetection::pupilDetection(binaryAnalyzer *bin)
     this->bin = bin;
 
     this->pupilrH = new pupilRois();
+
+    this->tw = new twinkle();
 
     //UO
 #ifndef WEBSERVICE
@@ -678,7 +680,8 @@ cv::Point* pupilDetection::greatCatch(bool left)
     bool dilate = false;
     bool showROIs = false;
     bool maintain = true;
-    binaryAnalyzer::setInformation* set;
+    setInformation* set;
+
     if(left)
     {
         sname << "LEFT";
@@ -747,7 +750,7 @@ cv::Point* pupilDetection::greatCatch(bool left)
     //--------------------------------------------//
     bin->clearOverallSets();
     //std::vector<binaryAnalyzer::setInformation> sets = bin->findSets(erodedROI, false);
-    std::vector<binaryAnalyzer::setInformation> sets = bin->findSets(invROI, false);
+    std::vector<setInformation> sets = bin->findSets(invROI, false);
 
     #ifdef GREATCATCH_DEBUG
     for(uint i=0; i<sets.size(); i++)
@@ -771,7 +774,7 @@ cv::Point* pupilDetection::greatCatch(bool left)
     }
     #endif
 
-    std::vector<binaryAnalyzer::setInformation> filteredSets = bin->removeBorderSets(sets, r, c);
+    std::vector<setInformation> filteredSets = bin->removeBorderSets(sets, r, c);
     #ifdef GREATCATCH_DEBUG
     std::cout<<"Rimasti "<<filteredSets.size() << " set dopo l'eliminazione ai bordi."<<std::endl;
     #endif
@@ -796,7 +799,7 @@ cv::Point* pupilDetection::greatCatch(bool left)
     if(set) free(set);
     if(chosen>=0)
     {
-        set = new binaryAnalyzer::setInformation(filteredSets[chosen]);
+        set = new setInformation(filteredSets[chosen]);
         pupil = new cv::Point(filteredSets[chosen].center);
         //pupil = new cv::Point(filteredSets[chosen].centroid);
     }
@@ -1248,7 +1251,7 @@ void pupilDetection::sobelCorners(bool left)
 
     cv::Mat roi, blurredRoi, sobelRoi, gradients, firstDer, secondDer;
     char *window_name, *roiWnd, *firstDerWnd, *secondDerWnd, *eqWnd;
-    binaryAnalyzer::setInformation *set;
+    setInformation *set;
 
     cv::Point* pupil;
     if(left)
@@ -1332,7 +1335,7 @@ void pupilDetection::sobelCorners(bool left)
     waitKey(0);
     */
 
-    bin->twinkleMethod(gradients, pupil, set);
+    tw->twinkleMethod(gradients, pupil, set);
 
     //std::cout<<"SOBELCORNERS: TWINKLE DONE."<<std::endl;
 

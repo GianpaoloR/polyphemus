@@ -48,6 +48,27 @@ cv::Rect MatchingMethod( cv::Mat& img_display, cv::Mat templ );
 
 void debugPrint(string msg);
 
+struct setInformation
+{
+    int id;
+    int nPoints;
+    int width;
+    int height;
+    cv::Point center;
+    cv::Point centroid;
+    std::vector<cv::Point> elem;
+    std::vector<int> sons;
+    std::vector<Point> corners;
+};
+
+enum direction
+{
+    LEFT,
+    RIGHT,
+    UP,
+    DOWN
+};
+
 
 
 #endif
