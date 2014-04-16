@@ -59,10 +59,10 @@ public:
     void setInitRightEyeHighLeft(cv::Rect rightEye);
 
     //Get high-left point
-    cv::Rect& getInitMouthHighLeft();
+    Rect &getInitMouthHighLeft();
     cv::Rect& getInitNoseHighLeft();
     cv::Rect& getInitLeftEyeHighLeft();
-    cv::Rect& getInitRightEyeHighLeft();
+    Rect& getInitRightEyeHighLeft();
 
     //Set high-left point
     void setInitMouthLowRight(cv::Rect mouth);
@@ -147,6 +147,7 @@ public:
 
 private:
     cv::Mat grayFrame;
+    cv::Rect fakeRect;
 
     //Face
     cv::Rect faceHaarRect;

@@ -897,7 +897,7 @@ CGI_varlist *
 CGI_get_post(CGI_varlist *v, const char *_template) {
     const char *env;
     char *buf;
-    int len;
+    uint len;
 
     const char *content_type = "application/x-www-form-urlencoded";
 

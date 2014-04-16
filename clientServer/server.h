@@ -31,6 +31,7 @@
 #include "../common/roiHandler.h"
 
 #define PRIVILEGES 0777
+#define WRONG_VAL 0
 
 class Server {
 public:

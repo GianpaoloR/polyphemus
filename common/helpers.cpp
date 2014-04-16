@@ -688,12 +688,3 @@ cv::Rect MatchingMethod( cv::Mat& img_display, cv::Mat templ )
 
     return cv::Rect (matchLoc, Point( matchLoc.x + templ.cols , matchLoc.y + templ.rows ));
 }
-
-void debugPrint(string msg)
-{
-#ifndef WEBSERVICE
-#ifdef DEBUG
-    std::cout<<msg<<std::endl;
-#endif
-#endif
-}

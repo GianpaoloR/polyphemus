@@ -200,7 +200,7 @@ int Server::getInfoInt(std::string key) {
     if (iter != infoInt.end()) {
         return iter->second;
     }
-    return NULL;
+    return WRONG_VAL;
 }
 
 long long Server::getInfoLonglong(std::string key) {
@@ -208,7 +208,7 @@ long long Server::getInfoLonglong(std::string key) {
     if (iter != infoLonglong.end()) {
         return iter->second;
     }
-    return NULL;
+    return WRONG_VAL;
 }
 
 double Server::getInfoDouble(std::string key) {
@@ -216,7 +216,7 @@ double Server::getInfoDouble(std::string key) {
     if (iter != infoDouble.end()) {
         return iter->second;
     }
-    return NULL;
+    return WRONG_VAL;
 }
 
 std::string Server::getInfoString(std::string key) {

@@ -10,7 +10,7 @@ class twinkle
 public:
     twinkle();
     cv::Mat twinkleDilate(const cv::Mat& roi);  //Work on neighborhood to define point
-    setInformation twinkleMethod(Mat mat, Point *pupil, setInformation *pupilSet);
+    setInformation twinkleMethod(Mat mat, Point *pupil);//, setInformation *pupilSet);
 
 private:
     void findLimbusContour(cv::Mat mat, Point* pupil);

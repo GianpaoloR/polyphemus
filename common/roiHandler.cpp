@@ -28,6 +28,8 @@ roiHandler::roiHandler()
     itHasDistanceMouthCenter = false;
     itHasDistanceEyes = false;
     itHasDistanceNoseCenter = false;
+
+    fakeRect = Rect(0,0,0,0);
 }
 
 void roiHandler::setGrayFrame(cv::Mat m)
@@ -587,6 +589,7 @@ cv::Rect& roiHandler::getInitMouthLowRight()
     {
         return MouthHaarRectLowRightInit;
     }
+    else return fakeRect;
 }
 
 cv::Rect& roiHandler::getInitNoseLowRight()
@@ -595,6 +598,7 @@ cv::Rect& roiHandler::getInitNoseLowRight()
     {
         return NoseHaarRectLowRightInit;
     }
+    else return fakeRect;
 }
 
 cv::Rect& roiHandler::getInitLeftEyeLowRight()
@@ -603,6 +607,7 @@ cv::Rect& roiHandler::getInitLeftEyeLowRight()
     {
         return leftEyeHaarRectLowRightInit;
     }
+    else return fakeRect;
 }
 
 cv::Rect& roiHandler::getInitRightEyeLowRight()
@@ -611,6 +616,7 @@ cv::Rect& roiHandler::getInitRightEyeLowRight()
     {
         return RightEyeHaarRectLowRightInit;
     }
+    else return fakeRect;
 }
 
 
@@ -621,6 +627,7 @@ cv::Rect& roiHandler::getInitMouthCenter()
     {
         return MouthHaarRectCenterInit;
     }
+    else return fakeRect;
 }
 
 cv::Rect& roiHandler::getInitNoseCenter()
@@ -629,6 +636,7 @@ cv::Rect& roiHandler::getInitNoseCenter()
     {
         return NoseHaarRectCenterInit;
     }
+    else return fakeRect;
 }
 
 cv::Rect& roiHandler::getInitLeftEyeCenter()
@@ -637,6 +645,7 @@ cv::Rect& roiHandler::getInitLeftEyeCenter()
     {
         return leftEyeHaarRectCenterInit;
     }
+    else return fakeRect;
 }
 
 cv::Rect& roiHandler::getInitRightEyeCenter()
@@ -645,6 +654,7 @@ cv::Rect& roiHandler::getInitRightEyeCenter()
     {
         return RightEyeHaarRectCenterInit;
     }
+    else return fakeRect;
 }
 
 //Get HighLeft point
@@ -654,6 +664,7 @@ cv::Rect& roiHandler::getInitMouthHighLeft()
     {
         return MouthHaarRectHighLeftInit;
     }
+    else return fakeRect;
 }
 
 cv::Rect& roiHandler::getInitNoseHighLeft()
@@ -662,6 +673,7 @@ cv::Rect& roiHandler::getInitNoseHighLeft()
     {
         return NoseHaarRectHighLeftInit;
     }
+    else return fakeRect;
 }
 
 cv::Rect& roiHandler::getInitLeftEyeHighLeft()
@@ -670,6 +682,7 @@ cv::Rect& roiHandler::getInitLeftEyeHighLeft()
     {
         return leftEyeHaarRectHighLeftInit;
     }
+    else return fakeRect;
 }
 
 cv::Rect& roiHandler::getInitRightEyeHighLeft()
@@ -677,7 +690,8 @@ cv::Rect& roiHandler::getInitRightEyeHighLeft()
     if (itHasRightEyeHighLeftInit)
     {
         return RightEyeHaarRectHighLeftInit;
-    }
+    }    
+    else return fakeRect;
 }
 
 

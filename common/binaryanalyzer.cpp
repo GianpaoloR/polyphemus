@@ -618,7 +618,7 @@ std::vector<setInformation> binaryAnalyzer::getOverallSets()
 
 setInformation binaryAnalyzer::getBiggestSet(std::vector<setInformation> sets, int* index)
 {
-    int bSet, bSize = INT_MIN;
+    int bSet = -1, bSize = INT_MIN;
     for(uint i=0; i<sets.size(); i++)
     {
         if(sets[i].nPoints > bSize)

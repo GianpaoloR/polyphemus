@@ -367,17 +367,17 @@ cv::Point* pupilDetection::blackHoleV2(bool left)
 {
     #define MASK_SIZE 5
     cv::Mat eyeROI;//, eyeROIThresholded;
-    double avgLight;
+    //double avgLight;
 
     if(left)
     {
         eyeROI = pupilrH->getLeftROI();
-        avgLight = leftAvgLight;
+        //avgLight = leftAvgLight;
     }
     else
     {
         eyeROI = pupilrH->getRightROI();
-        avgLight = rightAvgLight;
+        //avgLight = rightAvgLight;
     }
 
 //    int mask1[MASK_SIZE][MASK_SIZE] = {0, 0, 0, 0, 0,
@@ -423,7 +423,7 @@ cv::Point* pupilDetection::blackHoleV2(bool left)
     //Check for the pixel whose distance is maximum. That value is needed to normalize others.
     int minDelta = INT_MAX;
     int maxDelta = INT_MIN;
-    int bestX, bestY;  //in distance matrix!! Not in the image!!
+    int bestX = -1, bestY = -1;  //in distance matrix!! Not in the image!!
 
     for(x=0;x<eyeROI.rows-4;x++)
     {
@@ -633,7 +633,7 @@ cv::Point* pupilDetection::blackHole(bool left)
     {
         double finalX = 0;
         double finalY = 0;
-        for (int i=0; i<candidates.size();i++)
+        for (uint i=0; i<candidates.size();i++)
         {
             finalX+=candidates[i].x;
             finalY+=candidates[i].y;
@@ -900,7 +900,7 @@ cv::Point* pupilDetection::upholster(bool left)
     #endif
 
     cv::Mat roi;
-    double avgLight;
+    //double avgLight;
     cv::Point* newPupil = new cv::Point();
 
     //Prepare data
@@ -909,7 +909,7 @@ cv::Point* pupilDetection::upholster(bool left)
         if(left)
         {
             roi = pupilrH->getLeftROI();
-            avgLight = this->leftAvgLight;
+            //avgLight = this->leftAvgLight;
             *newPupil = *leftPupil;
             #ifdef UPHOLSTER_WINDOWS
             name = "Tappezzando...LEFT";
@@ -918,7 +918,7 @@ cv::Point* pupilDetection::upholster(bool left)
         else
         {
             roi = pupilrH->getRightROI();
-            avgLight = this->rightAvgLight;
+            //avgLight = this->rightAvgLight;
             *newPupil = *rightPupil;
             #ifdef UPHOLSTER_WINDOWS
             name = "Tappezzando...RIGHT";
@@ -1250,7 +1250,7 @@ void pupilDetection::sobelCorners(bool left)
     std::cout<<"SOBELCORNERS: ENTERED"<<std::endl;
 
     cv::Mat roi, blurredRoi, sobelRoi, gradients, firstDer, secondDer;
-    char *window_name, *roiWnd, *firstDerWnd, *secondDerWnd, *eqWnd;
+    string window_name, roiWnd, firstDerWnd, secondDerWnd, eqWnd;
     setInformation *set;
 
     cv::Point* pupil;
@@ -1280,8 +1280,6 @@ void pupilDetection::sobelCorners(bool left)
     int scale = 1;
     int delta = 0;
     int ddepth = -1;//CV_16S;
-
-    int c;
 
     GaussianBlur(roi, blurredRoi, Size(3,3), 0, 0, BORDER_DEFAULT );
 
@@ -1335,7 +1333,7 @@ void pupilDetection::sobelCorners(bool left)
     waitKey(0);
     */
 
-    tw->twinkleMethod(gradients, pupil, set);
+    tw->twinkleMethod(gradients, pupil);//, set);
 
     //std::cout<<"SOBELCORNERS: TWINKLE DONE."<<std::endl;
 

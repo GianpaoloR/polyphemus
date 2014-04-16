@@ -34,11 +34,12 @@ void twinkle::handleContours(cv::Mat mat)
 
 std::vector<double> twinkle::assignThresholdProbability(int rows, setInformation eyeSet)
 {
-    double pAvg = 0, pMax=DBL_MIN, pPoint, dist;
+    //double pAvg = 0, pPoint, dist;
+    double pMax=DBL_MIN;
     //double distRange = ((double)(m.rows))/2;  //Mat center is not correct; should be eyeSet vertical center
     int eyeH = rows, eyeL = 0;
 
-    for(int i=0; i<eyeSet.elem.size();i++)
+    for(uint i=0; i<eyeSet.elem.size();i++)
     {
         if(eyeSet.elem[i].y > eyeL) eyeL = eyeSet.elem[i].y;
         if(eyeSet.elem[i].y < eyeH) eyeH = eyeSet.elem[i].y;
@@ -82,7 +83,7 @@ std::vector<double> twinkle::assignSetsProbability(std::vector<setInformation> s
 {
     double center = pData[1];
     std::vector<double> setP;
-    for(int i=0; i<sets.size(); i++)
+    for(uint i=0; i<sets.size(); i++)
     {
         setP.push_back(computeProbability(sets[i], center, totRows));
     }
@@ -93,8 +94,8 @@ std::vector<double> twinkle::assignSetsProbability(std::vector<setInformation> s
 
 double twinkle::computeProbability(setInformation set, double center, int totRows)
 {
-    double dist, distAvg, pPoint, pAvg=0;
-    for(int i=0; i<set.elem.size();i++)
+    double dist, distAvg; //, pPoint, pAvg=0;
+    for(uint i=0; i<set.elem.size();i++)
     {
         dist = abs(set.elem[i].y - center);
 
@@ -139,7 +140,7 @@ std::vector<setInformation> twinkle::filterSets(std::vector<setInformation> orig
     t = alpha*thresholds[0];
 
     std::cout<<"Threshold is "<<t<<std::endl;
-    for(int i=0; i<orig.size(); i++)
+    for(uint i=0; i<orig.size(); i++)
     {
         if(prob[i] <= t)
         {
@@ -150,7 +151,7 @@ std::vector<setInformation> twinkle::filterSets(std::vector<setInformation> orig
     return ans;
 }
 
-setInformation twinkle::twinkleMethod(cv::Mat mat, Point* pupil, setInformation* pupilSet)
+setInformation twinkle::twinkleMethod(cv::Mat mat, Point* pupil)//, setInformation* pupilSet)
 {
 
     setInformation twinkleSet;
@@ -164,14 +165,14 @@ setInformation twinkle::twinkleMethod(cv::Mat mat, Point* pupil, setInformation*
     tMat = bin->thresholdImg(mat, t);
 
 
-    char* wNameT = "Twinkle Threshold";
+    string wNameT = "Twinkle Threshold";
     namedWindow(wNameT, CV_WINDOW_NORMAL);
     imshow(wNameT, tMat);
     cv::waitKey(0);
 
     //Phase 2: Dilate horizontally and vertically
     cv::Mat dMat = twinkleDilate(tMat);
-    char* wNameD = "Twinkle Dilation";
+    string wNameD = "Twinkle Dilation";
     namedWindow(wNameD, CV_WINDOW_NORMAL);
     imshow(wNameD, dMat);
     cv::waitKey(0);
@@ -195,7 +196,7 @@ setInformation twinkle::twinkleMethod(cv::Mat mat, Point* pupil, setInformation*
     int eyeSetIndex;
     setInformation eyeSet = bin->getBiggestSet(*sets, &eyeSetIndex);
     Mat m = Mat::zeros(dMat.rows, dMat.cols, CV_8U);
-    for(int i=0; i<eyeSet.elem.size();i++)
+    for(uint i=0; i<eyeSet.elem.size();i++)
     {
         m.at<uchar>(eyeSet.elem[i]) = 255;
     }
@@ -209,7 +210,7 @@ setInformation twinkle::twinkleMethod(cv::Mat mat, Point* pupil, setInformation*
     std::vector<double> pData = assignThresholdProbability(rows, eyeSet);  //pData[0] = max probability for eyeSet points; pData[1] = avg probability for eyeSet
     std::cout<<"pData[0] = pMax = "<<pData[0]<<"; pData[1] = eyeCenter = "<<pData[1]<<std::endl;
     std::vector<double> setsProb = assignSetsProbability(*sets, pData, rows);
-    for(int i=0; i<setsProb.size(); i++)
+    for(uint i=0; i<setsProb.size(); i++)
     {
         std::cout<<"Prob for set "<<i<<": " << setsProb[i]<<std::endl;
     }
