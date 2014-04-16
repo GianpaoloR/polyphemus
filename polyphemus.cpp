@@ -1009,11 +1009,8 @@ void polyphemus::trackGaze()
         std::cout<<"TRACKGAZE: OK "<<h++<<": FINDNEWFACES"<<std::endl;
         #endif
 
-        //KE
-
         //detectAndSetUpperBody();
-        stasm();
-        //KE
+
         if(facesFound)
         {
 
@@ -1021,9 +1018,15 @@ void polyphemus::trackGaze()
             std::cout<<"TRACKGAZE: OK "<<h++<<": FACESFOUND IF PASSED"<<std::endl;
             #endif
 
+
             processFaceData();
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": PROCESSFACEDATA"<<std::endl;
+            #endif
+
+            stasm();
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": STASM"<<std::endl;
             #endif
 
             detectEyesWithHaar();
@@ -1533,13 +1536,16 @@ void polyphemus::stasm()
 {
     static const char* path = "../polyphemus/stasm4_1/data/testface.jpg";
     cv::Mat_<unsigned char> img;
-    img = rH->getGrayFrame();
+    img = rH->getFaceROI(); //face is already found, use it; stasm detect faces will simply return the whole img rectangle
+
+    cv::Mat img2;
+    img.copyTo(img2);
 
     int foundface;
     float landmarks[2* stasm_NLANDMARKS]; // x,y coords
 
     if (!stasm_search_single(&foundface, landmarks,
-            (char*)img.data, img.cols, img.rows, path, "../polyphemus/stasm4_1/data"))
+            (char*)img2.data, img2.cols, img2.rows, path, "../polyphemus/stasm4_1/data"))
 
     {
 #ifndef WEBSERVICE

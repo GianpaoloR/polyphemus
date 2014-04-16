@@ -98,4 +98,6 @@ static const char* const STASM_VERSION = "4.1.0"
 #include "shape17.h"
 #include "startshape.h"
 
+#include "opencv/highgui.h"
+
 #endif // STASM_H

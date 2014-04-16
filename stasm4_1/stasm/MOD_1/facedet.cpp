@@ -44,52 +44,80 @@ void DetectFaces(          // all face rects into detpars
     vec_DetPar&  detpars,  // out
     const Image& img,      // in
     int          minwidth) // in: as percent of img width
-{
+{   
+
+    //Polyphemus version: we already have the face, returns the whole image rectangle
+    bool changedForPolyphemus = true;
+
     CV_Assert(!facedet_g.empty()); // check that OpenFaceDetector_ was called
 
-    int leftborder = 0, topborder = 0; // border size in pixels
-    Image bordered_img(BORDER_FRAC == 0?
-                       img: EnborderImg(leftborder, topborder, img));
-
-    // Detection results are very slightly better with equalization
-    // (tested on the MUCT images, which are not pre-equalized), and
-    // it's quick enough to equalize (roughly 10ms on a 1.6 GHz laptop).
-
-    Image equalized_img; cv::equalizeHist(bordered_img, equalized_img);
-
-    CV_Assert(minwidth >= 1 && minwidth <= 100);
-
-    // TODO smallest bioid faces are about 80 pixels width, hence 70 below
-    const int minpix =
-        MAX(minwidth <= 5? 70: 100, cvRound(img.cols * minwidth / 100.));
-
-    // the params below are accurate but slow
-    static const double SCALE_FACTOR   = 1.1;
-    static const int    MIN_NEIGHBORS  = 3;
-    static const int    DETECTOR_FLAGS = 0;
-
-    vec_Rect facerects = // all face rects in image
-        Detect(equalized_img, facedet_g, NULL,
-               SCALE_FACTOR, MIN_NEIGHBORS, DETECTOR_FLAGS, minpix);
-
-    // copy face rects into the detpars vector
-
-    detpars.resize(NSIZE(facerects));
-    for (int i = 0; i < NSIZE(facerects); i++)
+    if(changedForPolyphemus)
     {
-        Rect* facerect = &facerects[i];
-        DetPar detpar; // detpar constructor sets all fields INVALID
-        // detpar.x and detpar.y is the center of the face rectangle
-        detpar.x = facerect->x + facerect->width / 2.;
-        detpar.y = facerect->y + facerect->height / 2.;
-        detpar.x -= leftborder; // discount the border we added earlier
-        detpar.y -= topborder;
-        detpar.width  = double(facerect->width);
-        detpar.height = double(facerect->height);
-        detpar.yaw = 0; // assume face has no yaw in this version of Stasm
+        //JP
+        cv::namedWindow("StasmFace", CV_WINDOW_NORMAL);
+        cv::imshow("StasmFace", img);//cv::Mat(img, Rect(0,0,img.cols, img.rows)));
+        //PJ
+        //if (img.cols != 800 || img.rows != 600) // sanity check
+        //Err("Image must be 800x600 (your image is %dx%d)", img.cols, img.rows);
+        DetPar detpar;
+        detpar.x = img.cols / 2.; // approximate center of face
+        detpar.y = img.rows / 2.;
+        detpar.width = img.cols; // approximate size of face
+        detpar.height = img.rows;
+        detpar.yaw = 0;
         detpar.eyaw = EYAW00;
-        detpars[i] = detpar;
+        detpars.resize(1);
+        detpars[0] = detpar;
+
+        //minwidth = 40;
     }
+    else
+    {
+
+        int leftborder = 0, topborder = 0; // border size in pixels
+        Image bordered_img(BORDER_FRAC == 0?
+                           img: EnborderImg(leftborder, topborder, img));
+
+        // Detection results are very slightly better with equalization
+        // (tested on the MUCT images, which are not pre-equalized), and
+        // it's quick enough to equalize (roughly 10ms on a 1.6 GHz laptop).
+
+        Image equalized_img; cv::equalizeHist(bordered_img, equalized_img);
+
+        CV_Assert(minwidth >= 1 && minwidth <= 100);
+
+        // TODO smallest bioid faces are about 80 pixels width, hence 70 below
+        const int minpix =
+            MAX(minwidth <= 5? 70: 100, cvRound(img.cols * minwidth / 100.));
+
+        // the params below are accurate but slow
+        static const double SCALE_FACTOR   = 1.1;
+        static const int    MIN_NEIGHBORS  = 3;
+        static const int    DETECTOR_FLAGS = 0;
+
+        vec_Rect facerects = // all face rects in image
+            Detect(equalized_img, facedet_g, NULL,
+                   SCALE_FACTOR, MIN_NEIGHBORS, DETECTOR_FLAGS, minpix);
+
+        // copy face rects into the detpars vector
+        detpars.resize(NSIZE(facerects));
+        for (int i = 0; i < NSIZE(facerects); i++)
+        {
+            Rect* facerect = &facerects[i];
+            DetPar detpar; // detpar constructor sets all fields INVALID
+            // detpar.x and detpar.y is the center of the face rectangle
+            detpar.x = facerect->x + facerect->width / 2.;
+            detpar.y = facerect->y + facerect->height / 2.;
+            detpar.x -= leftborder; // discount the border we added earlier
+            detpar.y -= topborder;
+            detpar.width  = double(facerect->width);
+            detpar.height = double(facerect->height);
+            detpar.yaw = 0; // assume face has no yaw in this version of Stasm
+            detpar.eyaw = EYAW00;
+            detpars[i] = detpar;
+        }
+    }
+
 }
 // order by increasing distance from left marg, and dist from top marg within that
 
@@ -179,6 +207,7 @@ void FaceDet::DetectFaces_( // call once per image to find all the faces
     void*        user)      // in: unused (match virt func signature)
 {
     CV_Assert(user == NULL);
+
     DetectFaces(detpars_, img, minwidth);
     char tracepath[SLEN];
     sprintf(tracepath, "%s_00_unsortedfacedet.bmp", Base(imgpath));
