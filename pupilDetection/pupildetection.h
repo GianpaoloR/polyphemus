@@ -9,7 +9,6 @@
 #include "pupilrois.h"
 
 
-
 #ifdef FINDPUPILS_TEST
 ///<summary>Enum value to switch active-cam collection of data from an eye to another.</summary>
 enum testInfo
@@ -92,6 +91,8 @@ private:
 
     detectionMethodEnum detectionMethod;
     refinementMethodEnum refinementMethod;
+
+
 
     //Avg Light
     float leftAvgLight;

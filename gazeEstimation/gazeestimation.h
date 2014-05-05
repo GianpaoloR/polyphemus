@@ -22,9 +22,17 @@ public:
     void printCollectedData();
     int getHorizontalResponse();
     void setRealDistances(int realLeft, int realRight, Rect face);
+    void setLM(float lm[nLM*2], Mat face);
+    void computeLMDistances();
 
 
 private:
+    //Landmarks
+    float leftLM[eyeLM*2];
+    float rightLM[eyeLM*2];
+    float LMleftPupil[2];
+    float LMrightPupil[2];
+
     bool collectingData;
     double realLeftToC;
     double realRightToC;
@@ -71,6 +79,8 @@ private:
 
     void evaluateGaze(Point *leftPupil, Point *rightPupil, Rect face);
     void normalizeRatio();
+
+    void showLandmarks(Mat face, float lp[2], float lLM[eyeLM*2], float rp[2], float rLM[eyeLM*2]);
 
 };
 

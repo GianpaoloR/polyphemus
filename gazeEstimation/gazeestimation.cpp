@@ -45,6 +45,91 @@ int gazeEstimation::getHorizontalResponse()
     return this->horizontalZone;
 }
 
+void gazeEstimation::computeLMDistances()
+{
+    float lCornerDistance, rCornerDistance;
+    float lpToNoseLM;
+
+    lCornerDistance = leftLM[1] - leftLM[9];
+    lpToNoseLM = leftLM[1] - LMleftPupil[1];
+
+    cout<<"Total distance: "<<lCornerDistance<<endl;
+    cout<<"PtoN distance: "<<lpToNoseLM<<endl;
+    cout<<"Thresholds are: RIGHT (0-"<<475*lCornerDistance/1000<< ") - LEFT (" <<525*lCornerDistance/1000<<"-"<<lCornerDistance<<")"<<endl;
+
+
+    if(lpToNoseLM < 475*lCornerDistance/1000) //Looking X zone 2
+    {
+        cout<<"Looking RIGHT"<<endl;
+    }
+    else if(lpToNoseLM > 525*lCornerDistance/1000)
+    {
+        cout << "Looking LEFT"<<endl;
+    }
+    else cout << "Looking CENTER"<<endl;
+
+
+}
+
+void gazeEstimation::setLM(float lm[nLM*2], Mat face)
+{
+    int li=0, ri=0;
+
+    bool debug = true;
+
+    for(int i=0; i<nLM*2; i++)
+    {
+        if(i>=30*2 && i<38*2) //Left Eye Landmark
+        {
+            leftLM[li++] = lm[i+1];
+            leftLM[li++] = lm[i];
+            i++;
+        }
+
+        if(i>=40*2 && i<48*2) //Right Eye Landmark
+        {
+            rightLM[ri++] = lm[i+1];
+            rightLM[ri++] = lm[i];
+            i++;
+        }
+
+        if(i==38*2)
+        {
+            LMleftPupil[0] = lm[i+1];
+            LMleftPupil[1] = lm[i];
+            i++;
+        }
+
+        if(i==39*2)
+        {
+            LMrightPupil[0] = lm[i+1];
+            LMrightPupil[1] = lm[i];
+            i++;
+        }
+    }
+
+    if(debug) showLandmarks(face, LMleftPupil, leftLM, LMrightPupil, rightLM);
+
+}
+
+void gazeEstimation::showLandmarks(Mat face, float lp[2], float lLM[eyeLM*2], float rp[2], float rLM[eyeLM*2])
+{
+    namedWindow("LM", CV_WINDOW_NORMAL);
+
+    face.at<uchar>(lp[0], lp[1]) = 255;
+    face.at<uchar>(rp[0], rp[1]) = 255;
+
+    for(int i=0; i<eyeLM*2; i+=2)
+    {
+        face.at<uchar>(lLM[i], lLM[i+1]) = 255;
+        face.at<uchar>(rLM[i], rLM[i+1]) = 255;
+    }
+
+    imshow("LM", face);
+}
+
+
+
 void gazeEstimation::setRealDistances(int realLeft, int realRight, cv::Rect face)
 {
     //Using face coords!

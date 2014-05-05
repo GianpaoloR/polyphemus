@@ -69,6 +69,4 @@ enum direction
     DOWN
 };
 
-
-
 #endif

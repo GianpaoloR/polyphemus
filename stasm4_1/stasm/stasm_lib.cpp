@@ -30,6 +30,7 @@ static void ShapeToLandmarks( // convert Shape to landmarks (float *)
     int i;
     for (i = 0; i < MIN(shape.rows, stasm_NLANDMARKS); i++)
     {
+        std::cout<<"Shape("<<i<<","<<IX<<") = "<<shape(i, IX)<<"; shape("<<i<<","<<IY<<") = "<<shape(i, IY)<<std::endl;
         landmarks[i * 2]     = float(shape(i, IX));
         landmarks[i * 2 + 1] = float(shape(i, IY));
     }
@@ -192,9 +193,19 @@ int stasm_search_auto_ext( // extended version of stasm_search_auto
             if (!cv::imwrite(s, cimg))
                 Err("Cannot write %s", s);
 #endif
-            shape = RoundMat(RoiShapeToImgFrame(shape, face_roi, detpar_roi, detpar));
+
+            Shape shapeFloat = shape;
+
+            //<STASM_CHANGES>
+            //ORIG: shape = RoundMat(RoiShapeToImgFrame(shape, face_roi, detpar_roi, detpar));
+            //      now working with non flipped start shape in image frame
+            //      ShapeToLandmarks(landmarks, shape);
+            //NEW:
             // now working with non flipped start shape in image frame
-            ShapeToLandmarks(landmarks, shape);
+            ShapeToLandmarks(landmarks, RoiShapeToImgFrame(shape, face_roi, detpar_roi, detpar));
+            // </STASM_CHANGES>
+
+            // now working with non flipped start shape in image frame
             if (estyaw)
                 *estyaw = float(detpar.yaw);
         }

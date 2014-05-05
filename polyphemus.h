@@ -318,9 +318,13 @@ private:
     ///<summary> Asks guiHandler to refresh face window. Called by trackGaze(). Returns void.</summary>
     void updateFace();
     #endif
-    //KE
+
+    //---------------------------------------------------------
+    //                    STASM METHODS
+    //---------------------------------------------------------
     void stasm();
-    //KE
+    void drawSingleLandmark();
+    float landmarks[2* stasm_NLANDMARKS]; // x,y coords
 
     //---------------------------------------------------------
     //                    EYE METHODS

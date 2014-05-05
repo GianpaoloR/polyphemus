@@ -3,6 +3,9 @@
 
 //#define WEBSERVICE
 
+const int nLM = 77;
+const int eyeLM = 8;
+
 // Debugging
 const bool kPlotVectorField = false;
 

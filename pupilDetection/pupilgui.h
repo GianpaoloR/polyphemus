@@ -45,6 +45,7 @@ private:
     cv::Mat filterFrame;
     cv::Mat leftFilteredFrame;
     cv::Mat rightFilteredFrame;
+    cv::Mat LMFrame;
 
     cv::Point leftPupil;
     cv::Point leftPupilRefined;

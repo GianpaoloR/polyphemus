@@ -58,6 +58,10 @@ pupilDetection::pupilDetection(binaryAnalyzer *bin)
 }
 
 /************************
+ *  LANDMARKS
+ ***********************/
+
+/************************
  *   PUPIL FINDERS
  ***********************/
 

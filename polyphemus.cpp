@@ -1025,6 +1025,9 @@ void polyphemus::trackGaze()
             #endif
 
             stasm();
+            //drawSingleLandmark();
+            gE->setLM(landmarks, rH->getFaceROI());
+            gE->computeLMDistances();
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": STASM"<<std::endl;
             #endif
@@ -1530,19 +1533,35 @@ roiHandler* polyphemus::getRoiHandler() {
 }
 //UO
 
+void polyphemus::drawSingleLandmark()
+{
+    Mat img;
 
-//KE
+    rH->getFaceROI().copyTo(img);
+    namedWindow("SLM", CV_WINDOW_NORMAL);
+
+    char c;
+        for (int i = 0; i < stasm_NLANDMARKS; i++)
+        {
+            img.at<uchar>(cvRound(landmarks[i*2+1]), cvRound(landmarks[i*2])) = 255;
+            imshow("SLM", img);
+            cout<<"LM #"<< i<< endl;
+            c = waitKey(0);
+        }
+
+}
+
 void polyphemus::stasm()
 {
     static const char* path = "../polyphemus/stasm4_1/data/testface.jpg";
     cv::Mat_<unsigned char> img;
     img = rH->getFaceROI(); //face is already found, use it; stasm detect faces will simply return the whole img rectangle
 
-    cv::Mat img2;
+    cv::Mat_<unsigned char> img2;
     img.copyTo(img2);
 
     int foundface;
-    float landmarks[2* stasm_NLANDMARKS]; // x,y coords
+
 
     if (!stasm_search_single(&foundface, landmarks,
             (char*)img2.data, img2.cols, img2.rows, path, "../polyphemus/stasm4_1/data"))
@@ -1561,17 +1580,24 @@ void polyphemus::stasm()
     }
     else
     {
-    // draw the landmarks on the image as white dots
-        stasm_force_points_into_image(landmarks, img.cols, img.rows);
         for (int i = 0; i < stasm_NLANDMARKS; i++)
-            img(cvRound(landmarks[i*2+1]), cvRound(landmarks[i*2])) = 255;
+        {
+            cout<<"LM "<< i << ": ("<<landmarks[i*2] <<" , "<<landmarks[i*2+1]<<endl;
+        }
+        // draw the landmarks on the image as white dots
+        stasm_force_points_into_image(landmarks, img2.cols, img2.rows);
+        for (int i = 0; i < stasm_NLANDMARKS; i++)
+            img2(cvRound(landmarks[i*2+1]), cvRound(landmarks[i*2])) = 255;
+
+        for (int i = 0; i < stasm_NLANDMARKS; i++)
+        {
+            cout<<"LM "<< i << ": ("<<landmarks[i*2] <<" , "<<landmarks[i*2+1]<<")"<<endl;
+        }
     }
 #ifndef WEBSERVICE
-    cv::imshow("stasm minimal", img);
+    cv::imshow("stasm minimal", img2);
 #endif
 }
-
-//KE
 
 
 //-----------------------------------------

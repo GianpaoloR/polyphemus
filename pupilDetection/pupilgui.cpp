@@ -194,6 +194,8 @@ void pupilGui::showCorners(std::vector<cv::Point> cornerVector, bool left, bool 
     }
 }
 
+
+
 /** showPupilsLine: draw a line connecting pupils in faceFrame.
 */
 void pupilGui::showPupilsLine(cv::Point leftPupil, cv::Point rightPupil)
