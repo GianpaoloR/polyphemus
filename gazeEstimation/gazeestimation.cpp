@@ -29,6 +29,21 @@ gazeEstimation::gazeEstimation()
 
 }
 
+void gazeEstimation::setPupils(Point* left, Point* right)
+{
+    if(left!=NULL)
+    {
+        lp[0] = left->y;
+        lp[1] = left->x;
+    }
+
+    if(right!=NULL)
+    {
+        rp[0] = right->y;
+        rp[1] = right->x;
+    }
+}
+
 void gazeEstimation::setScreenResolution(int width, int height)
 {
     this->screenWidth = width;
@@ -45,29 +60,43 @@ int gazeEstimation::getHorizontalResponse()
     return this->horizontalZone;
 }
 
-void gazeEstimation::computeLMDistances()
+void gazeEstimation::computeLMDistances(pupilType pT)
 {
-    float lCornerDistance, rCornerDistance;
+    float lCornerDistance;
     float lpToNoseLM;
 
+    bool valid = true;
+
     lCornerDistance = leftLM[1] - leftLM[9];
-    lpToNoseLM = leftLM[1] - LMleftPupil[1];
+
+    if(pT == STASM) lpToNoseLM = leftLM[1] - LMleftPupil[1];
+    if(pT == G_CATCH)
+    {
+        if(lp[0] < lTop || lp[0] > lBottom || lp[1] < lLeft || lp[1] > lRight)
+        {
+            valid = false;
+        }
+        else lpToNoseLM = leftLM[1] - lp[1];
+    }
 
     cout<<"Total distance: "<<lCornerDistance<<endl;
-    cout<<"PtoN distance: "<<lpToNoseLM<<endl;
-    cout<<"Thresholds are: RIGHT (0-"<<475*lCornerDistance/1000<< ") - LEFT (" <<525*lCornerDistance/1000<<"-"<<lCornerDistance<<")"<<endl;
 
-
-    if(lpToNoseLM < 475*lCornerDistance/1000) //Looking X zone 2
+    if(valid)
     {
-        cout<<"Looking RIGHT"<<endl;
-    }
-    else if(lpToNoseLM > 525*lCornerDistance/1000)
-    {
-        cout << "Looking LEFT"<<endl;
-    }
-    else cout << "Looking CENTER"<<endl;
+        cout<<"PtoN distance: "<<lpToNoseLM<<endl;
+        cout<<"Thresholds are: RIGHT (0-"<<450*lCornerDistance/1000<< ") - LEFT (" <<550*lCornerDistance/1000<<"-"<<lCornerDistance<<")"<<endl;
 
+        if(lpToNoseLM < 450*lCornerDistance/1000) //Looking X zone 2
+        {
+            cout<<"Looking RIGHT"<<endl;
+        }
+        else if(lpToNoseLM > 525*lCornerDistance/1000)
+        {
+            cout << "Looking LEFT"<<endl;
+        }
+        else cout << "Looking CENTER"<<endl;
+    }
+    else cout << "Left pupil OUTSIDE landmarks. NO GAZE PREDICTION."<<endl;
 
 }
 
@@ -77,12 +106,31 @@ void gazeEstimation::setLM(float lm[nLM*2], Mat face)
 
     bool debug = true;
 
+    lTop = face.rows;
+    lBottom = 0;
+    lLeft = face.cols;
+    lRight = 0;
+
+    rTop = face.rows;
+    rBottom = 0;
+    rLeft = face.cols;
+    rRight = 0;
+
     for(int i=0; i<nLM*2; i++)
     {
         if(i>=30*2 && i<38*2) //Left Eye Landmark
         {
             leftLM[li++] = lm[i+1];
             leftLM[li++] = lm[i];
+
+            //y top and bottom
+            if(lm[i+1] < lTop) lTop = lm[i+1];
+            if(lm[i+1] > lBottom) lBottom = lm[i+1];
+
+            //x left and right
+            if(lm[i] < lLeft) lLeft = lm[i];
+            if(lm[i] > lRight) lRight = lm[i];
+
             i++;
         }
 
@@ -90,6 +138,15 @@ void gazeEstimation::setLM(float lm[nLM*2], Mat face)
         {
             rightLM[ri++] = lm[i+1];
             rightLM[ri++] = lm[i];
+
+            //y top and bottom
+            if(lm[i+1] < rTop) rTop = lm[i+1];
+            if(lm[i+1] > rBottom) rBottom = lm[i+1];
+
+            //x left and right
+            if(lm[i] < rLeft) rLeft = lm[i];
+            if(lm[i] > rRight) rRight = lm[i];
+
             i++;
         }
 

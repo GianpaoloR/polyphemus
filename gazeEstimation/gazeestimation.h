@@ -23,15 +23,32 @@ public:
     int getHorizontalResponse();
     void setRealDistances(int realLeft, int realRight, Rect face);
     void setLM(float lm[nLM*2], Mat face);
-    void computeLMDistances();
+    void setPupils(Point* left, Point* right);
+    void computeLMDistances(pupilType pT);
 
 
 private:
+    //For landmarks and pupils: y in 0, x in 1
+
     //Landmarks
     float leftLM[eyeLM*2];
     float rightLM[eyeLM*2];
     float LMleftPupil[2];
     float LMrightPupil[2];
+
+    //Pupil
+    float lp[2];
+    float rp[2];
+
+    //Hull
+    float lTop;
+    float lBottom;
+    float lLeft;
+    float lRight;
+    float rTop;
+    float rBottom;
+    float rLeft;
+    float rRight;
 
     bool collectingData;
     double realLeftToC;

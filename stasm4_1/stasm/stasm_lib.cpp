@@ -30,7 +30,7 @@ static void ShapeToLandmarks( // convert Shape to landmarks (float *)
     int i;
     for (i = 0; i < MIN(shape.rows, stasm_NLANDMARKS); i++)
     {
-        std::cout<<"Shape("<<i<<","<<IX<<") = "<<shape(i, IX)<<"; shape("<<i<<","<<IY<<") = "<<shape(i, IY)<<std::endl;
+        //std::cout<<"Shape("<<i<<","<<IX<<") = "<<shape(i, IX)<<"; shape("<<i<<","<<IY<<") = "<<shape(i, IY)<<std::endl;
         landmarks[i * 2]     = float(shape(i, IX));
         landmarks[i * 2 + 1] = float(shape(i, IY));
     }

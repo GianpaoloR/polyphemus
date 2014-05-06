@@ -1027,7 +1027,6 @@ void polyphemus::trackGaze()
             stasm();
             //drawSingleLandmark();
             gE->setLM(landmarks, rH->getFaceROI());
-            gE->computeLMDistances();
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": STASM"<<std::endl;
             #endif
@@ -1120,6 +1119,8 @@ void polyphemus::trackGaze()
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": PUPIL DATA SET."<<std::endl;
             #endif
+
+            gE->computeLMDistances(G_CATCH);
 
             pD->updateReduced();
             #ifdef TRACKGAZE_DEBUG
@@ -1296,6 +1297,8 @@ void polyphemus::setLeftPupilRefined(Rect eyeRect)
     leftInFaceRefined = new cv::Point();
     leftInFaceRefined->x = leftInEyeRefined->x + eyeRect.x;
     leftInFaceRefined->y = leftInEyeRefined->y + eyeRect.y;
+
+    gE->setPupils(leftInFaceRefined, NULL);
 }
 
 void polyphemus::setRightPupilRefined(Rect eyeRect)
@@ -1306,6 +1309,8 @@ void polyphemus::setRightPupilRefined(Rect eyeRect)
     rightInFaceRefined = new cv::Point();
     rightInFaceRefined->x = rightInEyeRefined->x + eyeRect.x;
     rightInFaceRefined->y = rightInEyeRefined->y + eyeRect.y;
+
+    gE->setPupils(NULL, rightInFaceRefined);
 }
 
 void polyphemus::setRightPupil(cv::Rect eyeRect)
@@ -1333,6 +1338,8 @@ void polyphemus::setRightPupil(cv::Rect eyeRect)
     rightInFace = new cv::Point();
     rightInFace->x = rightInEye->x + eyeRect.x;
     rightInFace->y = rightInEye->y + eyeRect.y;
+
+    gE->setPupils(NULL, rightInFace);
 #endif
 
     #ifdef SETRIGHTPUPIL_DEBUG
@@ -1367,6 +1374,8 @@ void polyphemus::setLeftPupil(cv::Rect eyeRect)
     leftInFace = new cv::Point();
     leftInFace->x = leftInEye->x + eyeRect.x;
     leftInFace->y = leftInEye->y + eyeRect.y;
+
+    gE->setPupils(leftInFace, NULL);
 
 #endif
 
@@ -1540,14 +1549,12 @@ void polyphemus::drawSingleLandmark()
     rH->getFaceROI().copyTo(img);
     namedWindow("SLM", CV_WINDOW_NORMAL);
 
-    char c;
-        for (int i = 0; i < stasm_NLANDMARKS; i++)
-        {
-            img.at<uchar>(cvRound(landmarks[i*2+1]), cvRound(landmarks[i*2])) = 255;
-            imshow("SLM", img);
-            cout<<"LM #"<< i<< endl;
-            c = waitKey(0);
-        }
+    for (int i = 0; i < stasm_NLANDMARKS; i++)
+    {
+        img.at<uchar>(cvRound(landmarks[i*2+1]), cvRound(landmarks[i*2])) = 255;
+        imshow("SLM", img);
+        //cout<<"LM #"<< i<< endl;
+    }
 
 }
 
@@ -1580,19 +1587,19 @@ void polyphemus::stasm()
     }
     else
     {
-        for (int i = 0; i < stasm_NLANDMARKS; i++)
-        {
-            cout<<"LM "<< i << ": ("<<landmarks[i*2] <<" , "<<landmarks[i*2+1]<<endl;
-        }
+//        for (int i = 0; i < stasm_NLANDMARKS; i++)
+//        {
+//            cout<<"LM "<< i << ": ("<<landmarks[i*2] <<" , "<<landmarks[i*2+1]<<endl;
+//        }
         // draw the landmarks on the image as white dots
         stasm_force_points_into_image(landmarks, img2.cols, img2.rows);
         for (int i = 0; i < stasm_NLANDMARKS; i++)
             img2(cvRound(landmarks[i*2+1]), cvRound(landmarks[i*2])) = 255;
 
-        for (int i = 0; i < stasm_NLANDMARKS; i++)
-        {
-            cout<<"LM "<< i << ": ("<<landmarks[i*2] <<" , "<<landmarks[i*2+1]<<")"<<endl;
-        }
+//        for (int i = 0; i < stasm_NLANDMARKS; i++)
+//        {
+//            cout<<"LM "<< i << ": ("<<landmarks[i*2] <<" , "<<landmarks[i*2+1]<<")"<<endl;
+//        }
     }
 #ifndef WEBSERVICE
     cv::imshow("stasm minimal", img2);

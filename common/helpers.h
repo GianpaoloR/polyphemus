@@ -69,4 +69,10 @@ enum direction
     DOWN
 };
 
+enum pupilType
+{
+    STASM,
+    G_CATCH
+};
+
 #endif
