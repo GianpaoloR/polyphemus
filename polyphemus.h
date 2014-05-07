@@ -303,6 +303,8 @@ private:
     //---------------------------------------------------------
     ///<summary> Boolean value. If true, Haar analysis has found at least a face in current frame.</summary>
     bool facesFound;
+    bool alreadyFace;
+    bool newFace;
 
     ///<summary>Applies further reduction on a COPY of face frame. Called by processFaceData().Returns void.</summary>
     void reduceFace();

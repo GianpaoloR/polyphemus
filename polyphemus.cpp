@@ -84,6 +84,7 @@ void polyphemus::constructor(int params) {
     rightInFaceRefined = NULL;
 
     refined = true;
+    alreadyFace = false;
 
     //HeadRotation: find the head rotations using the nose, the mouth and the ears
     headRotation = new HeadRotation();
@@ -330,10 +331,18 @@ void polyphemus::findNewFaces()
     if(faces.size()>0)
     {
         facesFound = true;
+        if(!alreadyFace)
+        {
+            alreadyFace = true;
+            newFace = true;
+            cout<<"THIS IS A NEW FACE!!"<<endl;
+        }
+        else newFace = false;
     }
     else
     {
         facesFound = false;
+        alreadyFace = false;
     }
 }
 
@@ -1026,7 +1035,7 @@ void polyphemus::trackGaze()
 
             stasm();
             //drawSingleLandmark();
-            gE->setLM(landmarks, rH->getFaceROI());
+            gE->setLM(landmarks, rH->getFaceROI(), newFace);
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": STASM"<<std::endl;
             #endif
@@ -1120,26 +1129,24 @@ void polyphemus::trackGaze()
             std::cout<<"TRACKGAZE: OK "<<h++<<": PUPIL DATA SET."<<std::endl;
             #endif
 
-            gE->computeLMDistances(G_CATCH);
+            gE->predictHorizontalZone(G_CATCH);
+            gE->predictVerticalZone(this->newFace);
 
             pD->updateReduced();
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": PUPILS SHOWED IN REDUCED WINDOWS."<<std::endl;
             #endif
 
-            /*
-            std::vector<cv::Rect> eyesReduced = rH->getReducedEmpiricEyes();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": GETREDUCEDEMPIRICEYES"<<std::endl;
-            #endif
-
-
-            if(pD->leftFound || pD->rightFound)
+            if(pD->leftFound && gui!=NULL) // || pD->rightFound)
             {
-                estimatePupilGazeDisplacement(false);
+                gui->turnOnZone(gE->getHorizontalResponse(), gE->getVerticalResponse());
+
+                //estimatePupilGazeDisplacement(false);
                 #ifdef TRACKGAZE_DEBUG
                 std::cout<<"TRACKGAZE: OK "<<h++<<": ESTIMATEPUPILGAZEDISPLACEMENT"<<std::endl;
                 #endif
+                //gui->showFinalGaze(watchingPoint);
+                updateGaze();
             }
             else
             {
@@ -1149,12 +1156,18 @@ void polyphemus::trackGaze()
                     #endif
                 #endif
             }
+            /*
+            std::vector<cv::Rect> eyesReduced = rH->getReducedEmpiricEyes();
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": GETREDUCEDEMPIRICEYES"<<std::endl;
+            #endif
+
+
 
             computeFinalGaze();
             #ifndef WEBSERVICE
             if(gui != NULL)
             {
-                gui->showFinalGaze(watchingPoint);
                 #ifdef TRACKGAZE_DEBUG
                 std::cout<<"TRACKGAZE: OK "<<h++<<": SHOWFINALGAZE"<<std::endl;
                 #endif
@@ -1163,7 +1176,6 @@ void polyphemus::trackGaze()
 
 
             #ifndef WEBSERVICE
-            updateGaze();
                 #ifdef TRACKGAZE_DEBUG
                 std::cout<<"TRACKGAZE: OK "<<h++<<": UPDATEGAZE"<<std::endl;
                 #endif

@@ -55,16 +55,22 @@ int gazeEstimation::getFinalXDisplacement()
     return this->xGazeDisplacement;
 }
 
+int gazeEstimation::getVerticalResponse()
+{
+    return this->verticalZone;
+}
+
 int gazeEstimation::getHorizontalResponse()
 {
     return this->horizontalZone;
 }
 
-void gazeEstimation::computeLMDistances(pupilType pT)
+bool gazeEstimation::predictHorizontalZone(pupilType pT)
 {
     float lCornerDistance;
     float lpToNoseLM;
 
+    //Horizontal component
     bool valid = true;
 
     lCornerDistance = leftLM[1] - leftLM[9];
@@ -86,21 +92,28 @@ void gazeEstimation::computeLMDistances(pupilType pT)
         cout<<"PtoN distance: "<<lpToNoseLM<<endl;
         cout<<"Thresholds are: RIGHT (0-"<<450*lCornerDistance/1000<< ") - LEFT (" <<550*lCornerDistance/1000<<"-"<<lCornerDistance<<")"<<endl;
 
-        if(lpToNoseLM < 450*lCornerDistance/1000) //Looking X zone 2
+        if(lpToNoseLM < 475*lCornerDistance/1000) //Looking X zone 2
         {
             cout<<"Looking RIGHT"<<endl;
+            this->horizontalZone = 2;
         }
         else if(lpToNoseLM > 525*lCornerDistance/1000)
         {
             cout << "Looking LEFT"<<endl;
+            this->horizontalZone = 0;
         }
-        else cout << "Looking CENTER"<<endl;
+        else
+        {
+            cout << "Looking CENTER"<<endl;
+            this->horizontalZone = 1;
+        }
     }
     else cout << "Left pupil OUTSIDE landmarks. NO GAZE PREDICTION."<<endl;
 
+    return valid;
 }
 
-void gazeEstimation::setLM(float lm[nLM*2], Mat face)
+void gazeEstimation::setLM(float lm[nLM*2], Mat face, bool newFace)
 {
     int li=0, ri=0;
 
@@ -165,7 +178,41 @@ void gazeEstimation::setLM(float lm[nLM*2], Mat face)
         }
     }
 
+
     if(debug) showLandmarks(face, LMleftPupil, leftLM, LMrightPupil, rightLM);
+
+}
+
+void gazeEstimation::predictVerticalZone(bool newFace)
+{
+    //Vertical aperture
+    ea = lBottom - lTop;
+    if(newFace)
+    {
+        minEa = FLT_MAX;
+        maxEa = FLT_MIN;
+    }
+    if(ea < minEa) minEa = ea;
+    if(ea > maxEa) maxEa = ea;
+
+    float vDelta = maxEa - minEa;
+    cout<< "MINEA "<<minEa<<"\tMAXEA " << maxEa << "\tEA "<<ea<<endl;
+    float vDiff = ea - minEa;
+    if(vDiff < vDelta*2/5)
+    {
+        this->verticalZone = 2;
+        cout << "Looking DOWN" <<endl;
+    }
+    else if(vDiff > vDelta*3/5)
+    {
+        this->verticalZone = 0;
+        cout << "Looking UP" << endl;
+    }
+    else
+    {
+        this->verticalZone = 1;
+        cout << "Looking CENTER" << endl;
+    }
 
 }
 

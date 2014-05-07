@@ -329,6 +329,44 @@ void guiHandler::showUpperBody(std::vector<cv::Rect> upperBodies)
     return;
 }
 
+void guiHandler::turnOnZone(int hZone, int vZone)
+{
+    Point p;
+    switch(hZone)
+    {
+    case 0:
+        p.x = hRes/4;
+        break;
+    case 1:
+        p.x = hRes/2;
+        break;
+    case 2:
+        p.x = 3*hRes/4;
+        break;
+    default:
+        p.x = hRes/2;
+        break;
+    }
+
+    switch(vZone)
+    {
+    case 0:
+        p.y = vRes/4;
+        break;
+    case 1:
+        p.y = vRes/2;
+        break;
+    case 2:
+        p.y = 3*vRes/4;
+        break;
+    default:
+        p.y = vRes/2;
+        break;
+    }
+
+    showStartingGaze(p);
+}
+
 void guiHandler::showFinalGaze(cv::Point gazePoint)
 {
     if(gazeFrame.empty()) return;
@@ -342,14 +380,14 @@ void guiHandler::showStartingGaze(cv::Point gazeStartingPoint){
     cv::Point start;
     int x = gazeStartingPoint.x;
     int y = gazeStartingPoint.y;
-    int radius = gazeFrame.cols/14;
+    //int radius = gazeFrame.cols/14;
     gazeFrame.release();
     gazeFrame = cv::Mat(vRes, hRes, CV_8UC3, cv::Scalar(255, 255, 255));
     cv::line(gazeFrame, cv::Point(0,vRes/3), cv::Point(hRes,vRes/3), cv::Scalar(0,255,255), 3, 1, 0);
     cv::line(gazeFrame, cv::Point(0,vRes*2/3), cv::Point(hRes,vRes*2/3), cv::Scalar(0,255,255), 3, 1, 0);
     cv::line(gazeFrame, cv::Point(hRes/3, 0), cv::Point(hRes/3, vRes), cv::Scalar(0,255,255), 3, 1, 0);
     cv::line(gazeFrame, cv::Point(hRes*2/3, 0), cv::Point(hRes*2/3, vRes), cv::Scalar(0,255,255), 3, 1, 0);
-    cv::circle(gazeFrame, gazeStartingPoint, radius, cv::Scalar(0,255,255), 5, 1, 0);
+    //cv::circle(gazeFrame, gazeStartingPoint, radius, cv::Scalar(0,255,255), 5, 1, 0);
     if(x <= hRes/3)
     {
         if (y <= vRes/3)

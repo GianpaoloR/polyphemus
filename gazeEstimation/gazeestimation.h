@@ -21,10 +21,12 @@ public:
     bool isCollecting();
     void printCollectedData();
     int getHorizontalResponse();
+    int getVerticalResponse();
     void setRealDistances(int realLeft, int realRight, Rect face);
-    void setLM(float lm[nLM*2], Mat face);
+    void setLM(float lm[nLM*2], Mat face, bool newFace);
     void setPupils(Point* left, Point* right);
-    void computeLMDistances(pupilType pT);
+    bool predictHorizontalZone(pupilType pT);
+    void predictVerticalZone(bool newFace);
 
 
 private:
@@ -35,6 +37,11 @@ private:
     float rightLM[eyeLM*2];
     float LMleftPupil[2];
     float LMrightPupil[2];
+
+    //eye aperture
+    float ea;
+    float minEa;
+    float maxEa;
 
     //Pupil
     float lp[2];
@@ -92,6 +99,7 @@ private:
     int nextGazeIndex;
 
     int horizontalZone;
+    int verticalZone;
 
 
     void evaluateGaze(Point *leftPupil, Point *rightPupil, Rect face);

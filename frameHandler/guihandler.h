@@ -107,6 +107,7 @@ public:
     void showStartingGaze(cv::Point gazeStartingPoint);
     void showGaze(double ratio);
     void showFinalGaze(cv::Point gazePoint);
+    void turnOnZone(int hZone, int vZone);
 
     void showRoi(const cv::Mat& roi, std::string name, bool maintain);
     void showEyesRotated(cv::Point l, cv::Point r);
