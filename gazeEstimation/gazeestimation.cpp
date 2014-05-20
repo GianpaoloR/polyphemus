@@ -12,7 +12,15 @@ gazeEstimation::gazeEstimation()
     rightMaxDisp = 0.19;//0.2028;
     rightEyeRange = 0.0366;//0.0494;
 
+#ifdef TEST_MODE
+    #ifdef PROFILING
+    collectingData = false;
+    #else
     collectingData = true;
+    #endif
+#else
+    collectingData = false;
+#endif
 
     if(collectingData)
     {
@@ -178,8 +186,9 @@ void gazeEstimation::setLM(float lm[nLM*2], Mat face, bool newFace)
         }
     }
 
-
+#ifdef WITH_GUI
     if(debug) showLandmarks(face, LMleftPupil, leftLM, LMrightPupil, rightLM);
+#endif
 
 }
 

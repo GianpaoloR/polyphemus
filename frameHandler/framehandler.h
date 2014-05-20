@@ -37,7 +37,11 @@ public:
     frameHandler();
     int getHZone();
     void prepareNextReading();
+
+#ifdef WITH_GUI
     void setDebugGui(guiHandler *gui);
+#endif
+
     bool initCapture();
     bool read();
     void mirror();
@@ -123,8 +127,10 @@ private:
     bool neverOpened;
     #endif
 
+#ifdef WITH_GUI
     //For debugging purpose
     guiHandler* gui;
+#endif
 
     //---------------------------------------------------------
 

@@ -1,4 +1,6 @@
- #include "guihandler.h"
+#ifdef WITH_GUI
+
+#include "guihandler.h"
 
 guiHandler::guiHandler(int w, int h)
 {
@@ -603,3 +605,5 @@ void guiHandler::setRightEmpiricReducedFrame(cv::Mat frame)
 {
     frame.copyTo(rightFrame);
 }
+
+#endif //WITH_GUI

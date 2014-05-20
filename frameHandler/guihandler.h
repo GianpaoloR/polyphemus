@@ -1,10 +1,6 @@
 #ifndef GUIHANDLER_H
 #define GUIHANDLER_H
 
-#include <iostream>
-#include <queue>
-#include <stdio.h>
-
 #ifdef __linux__
 #include <X11/Xlib.h>
 #else
@@ -15,6 +11,13 @@
 //#include <QtGui/QDesktopWidget>
 #include <QDesktopWidget>
 #endif
+
+#ifdef WITH_GUI
+
+#include <iostream>
+#include <queue>
+#include <stdio.h>
+
 
 #include "common/cvInclusions.h"
 #include "constants.h"
@@ -123,4 +126,7 @@ private:
     std::string mainWindowName, faceWindowName, lEyeReducedWindowName, rEyeReducedWindowName, profileWindowName, lRotatedWindowName, rRotatedWindowName, gazeWindowName;
 };
 
+#endif // WITH_GUI
+
 #endif // GUIHANDLER_H
+

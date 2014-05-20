@@ -22,8 +22,8 @@ polyphemus::polyphemus(int params, std::string testPath)
     constructor(params);
     fH->setTestPath(testPath);
 
-    hGazeRight = 0;
-    hGazeWrong = 0;
+    //hGazeRight = 0;
+    //hGazeWrong = 0;
 }
 #endif
 
@@ -31,8 +31,10 @@ polyphemus::polyphemus(int params, std::string testPath)
 void polyphemus::constructor(int params) {
 
     #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     this->gui = NULL;
-    #endif
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
 
     #ifdef TEST_MODE
     #ifdef AUTOMATIC_TEST
@@ -54,10 +56,13 @@ void polyphemus::constructor(int params) {
     #endif
     #endif
 
+    /*
     if(params & PROFILE_WANTED) profiling = true;
     else profiling = false;
+    */
 
     if(params & TWINKLE_WANTED) twinkleFlag = true;
+
     else twinkleFlag = false;
 
     //Frame handler: captures and dispatches frames. Selects rois and transforms channels.
@@ -213,6 +218,7 @@ void polyphemus::retrieveDesktop()
 //          DEBUG GUI METHODS
 //--------------------------------------
 #ifndef WEBSERVICE
+#ifdef WITH_GUI
 //EnableDebugGui: only for debugging purpose, it starts the user interface and sets gui field for every component.It is passive: it only shows possible outputs, it has debugging purposes.
 void polyphemus::enableDebugGui()
 {
@@ -223,6 +229,7 @@ void polyphemus::enableDebugGui()
     std::cout<<"Debug GUI enabled."<<std::endl;
     return;
 }
+#endif //WITH_GUI
 #endif
 
 //----------------------------
@@ -268,6 +275,7 @@ void polyphemus::init(std::string face, std::string eyePair, std::string singleE
     }
 
 #ifndef WEBSERVICE
+#ifdef WITH_GUI
     //Gui initialization
     if(gui!=NULL)
     {
@@ -275,6 +283,7 @@ void polyphemus::init(std::string face, std::string eyePair, std::string singleE
         gui->initWindow(FACE_WINDOW);
         gui->initWindow(GAZE_WINDOW);
     }
+#endif //WITH_GUI
 
     //Frame Handler Initialization
     bool goodSettings = fH->initCapture();
@@ -285,7 +294,7 @@ void polyphemus::init(std::string face, std::string eyePair, std::string singleE
         exit(1);
     }
     cv::waitKey(0);
-#endif
+#endif //WEBSERVICE
     return;
 }
 
@@ -295,9 +304,9 @@ void polyphemus::preProcessFrame()
 {
     if(preprocessDebug) std::cout<<"PREPROCESSFRAME: cols = "<<fH->getFrame().cols<<", rows = "<<fH->getFrame().rows<<std::endl;
 
-    if (!profiling) {
-        fH->mirror();
-    }
+    //if (!profiling) {
+    fH->mirror();
+    //}
 
     if(preprocessDebug) std::cout<<"PREPROCESSFRAME: cols = "<<fH->getFrame().cols<<", rows = "<<fH->getFrame().rows<<std::endl;
 
@@ -352,11 +361,13 @@ void polyphemus::reduceFace()
     rH->setReducedFaceROI(reducedRect);       //TODO: evaluate this
 
     #ifndef WEBSERVICE
+#ifdef WITH_GUI
     if (gui != NULL)
     {
         gui->setReducedFaceFrame(rH->getReducedFaceROI());
     }
-    #endif
+#endif //WITH_GUI
+    #endif //WEBSERVICE
 }
 
 void polyphemus::processFaceData()
@@ -370,12 +381,15 @@ void polyphemus::processFaceData()
 #endif
 
     #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     if(gui!=NULL)
     {
         gui->setFaceFrame(rH->getFaceROI());
         gui->faceReceived = true;
     }
-    #endif
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
+
 
     //reduceFace();       //Canny è morto?!??
 }
@@ -454,43 +468,53 @@ void polyphemus::estimateAndShowGazeStartingPoint()
 #endif
 
     #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     if(gui!=NULL && !profiling)
     {
         gui->showStartingGaze(watchingPoint);
     }
-    #endif
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
 }
 
 void polyphemus::estimateAndShowRotationsY()
 {
     double rotation = headRotation->evaluateRotationWithEyesY();
     #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     if (gui!=NULL && rH->hasLeftEye() && rH->hasRightEye() && rotation != 0) {
         gui->showEyesRotationY(rH->getFace(), rH->getLeftEye(), rH->getRightEye(), rotation);
     }
-    #endif
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
 
     rotation = headRotation->evaluateRotationWithNoseY();
     #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     if (gui!=NULL && rH->hasNose() && rotation != 0) {
         gui->showNoseRotationY(rH->getFace(), rH->getNose(), rotation);
     }
-    #endif
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
 
     rotation = headRotation->evaluateRotationWithMouthY();
     #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     if (gui!=NULL && rH->hasMouth() && rotation != 0) {
         gui->showMouthRotationY(rH->getFace(), rH->getMouth(), rotation);
     }
-    #endif
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
 
     rotation = headRotation->evaluateRotationY();
     #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     if(gui!=NULL && rotation != 0)
     {
         gui->showHeadRotationY(rH->getFace(), rotation);
     }
-    #endif
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
 
 }
 
@@ -500,13 +524,15 @@ void polyphemus::detectEyesEmpiric()
     std::vector<cv::Rect> eyes = rH->getEmpiricEyes();
 
     #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     if(gui!=NULL)
     {
         //For face frame
         gui->eyes = eyes;
         gui->showEyeZones();
     }
-    #endif
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
 }
 
 void polyphemus::reduceEmpiricEyes()
@@ -515,6 +541,7 @@ void polyphemus::reduceEmpiricEyes()
     rH->setReducedEmpiricEyes();
 
     #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     if(gui!=NULL && !profiling)
     {
         //For reduced frames
@@ -522,7 +549,8 @@ void polyphemus::reduceEmpiricEyes()
         gui->setLeftEmpiricReducedFrame(rH->getLeftEmpiricReducedROI());
         gui->setRightEmpiricReducedFrame(rH->getRightEmpiricReducedROI());
     }
-    #endif
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
 }
 
 
@@ -530,6 +558,7 @@ void polyphemus::reduceEmpiricEyes()
 
 
 #ifndef WEBSERVICE
+#ifdef WITH_GUI
 void polyphemus::updateFace()
 {
     if(gui!=NULL && !profiling)
@@ -537,24 +566,30 @@ void polyphemus::updateFace()
         gui->updateWindow(FACE_WINDOW);
     }
 }
-#endif
+#endif //WITH_GUI
+#endif //WEBSERVICE
 
 #ifndef WEBSERVICE
+#ifdef WITH_GUI
 void polyphemus::prepareProfiling()
 {
     gui->initWindow(PROFILE);
 }
-#endif
+#endif //WITH_GUI
+#endif //WEBSERVICE
 
 #ifndef WEBSERVICE
+#ifdef WITH_GUI
 void polyphemus::updateMain()
 {
     if(gui!=NULL && !profiling)
         gui->updateWindow(MAIN_WINDOW);
 }
+#endif //WITH_GUI
 #endif
 
 #ifndef WEBSERVICE
+#ifdef WITH_GUI
 void polyphemus::updateGaze()
 {
     if(gui!=NULL && !profiling)
@@ -563,6 +598,7 @@ void polyphemus::updateGaze()
     }
 
 }
+#endif //WITH_GUI
 #endif
 
 
@@ -574,9 +610,8 @@ void polyphemus::templateMatching()
     {
         rH->setOldNose();
     }
-    //UO
+
     if( !rH->hasNose() && rH->itHasDistanceNoseMouth)
-        //UO
     {
         noses.clear();
         noses[0] = MatchingMethod(rH->getFaceROI(), rH->getOldHaarNoseROI());
@@ -585,7 +620,7 @@ void polyphemus::templateMatching()
         #ifdef KETROD_DEBUG
         namedWindow("TEST$", WINDOW_AUTOSIZE);
         imshow("TEST$", rH->getFaceROI());
-        #endif
+        #endif //KETROD_DEBUG
     }
     //detectNoseWithMatchingMethod();
 
@@ -596,9 +631,7 @@ void polyphemus::templateMatching()
         rH->setOldMouth();
     }
 
-    //UO
     if (!rH->hasMouth() && rH->itHasDistanceNoseMouth)
-        //UO
     {
         mouths.clear();
         mouths[0] = MatchingMethod(rH->getFaceROI(), rH->getOldHaarMouthROI());
@@ -607,7 +640,7 @@ void polyphemus::templateMatching()
         #ifdef KETROD_DEBUG
         namedWindow("TEST$", WINDOW_AUTOSIZE);
         imshow("TEST$", rH->getFaceROI());
-        #endif
+        #endif //KETROD_DEBUG
     }
 }
 
@@ -797,8 +830,8 @@ void polyphemus::computeRealPupilDistances()
 
     gE->setRealDistances(realCoords[0],realCoords[2], faceRect);
 }
-#endif
-#endif
+#endif //AUTOMATIC_TEST
+#endif //TEST_MODE
 
 void polyphemus::setPupilData()
 {
@@ -849,8 +882,10 @@ void polyphemus::trackGaze()
     #endif
 
     #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     if(profiling) prepareProfiling();
-    #endif
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
 
     #ifdef TRACKGAZE_DEBUG
         std::cout<<"TRACKGAZE: OK"<<h++<<std::endl;
@@ -860,7 +895,7 @@ void polyphemus::trackGaze()
     while(fH->read())
     {
 #ifdef TEST_MODE
-        std::cout<<"Reading image: "<<fH->getTotalRead()<<std::endl;
+        std::cout<<"TEST MODE: Working on image: "<<fH->getTotalRead()<<std::endl;
 
 
         //------------------------------------------------
@@ -881,33 +916,87 @@ void polyphemus::trackGaze()
         {
             processFaceData();
 
+            #ifdef AUTOMATIC_TEST
             computeRealPupilDistances();
+            #endif
+
+            //STASM
+            stasm();
+            //drawSingleLandmark();
+            gE->setLM(landmarks, rH->getFaceROI(), newFace);
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": STASM"<<std::endl;
+            #endif
 
             //---------------------------------------------
             // Haar features recognition
 
             detectEyesWithHaar();
-            detectNoseWithHaar();
-            detectMouthWithHaar();
-
-            //---------------------------------------------
-            //   By Simone - Head Rotation Module
-
-            templateMatching();
-            antropometricFilter();
-            #ifdef KETROD_DEBUG
-            printFeatures();
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTEYESWITHHAAR"<<std::endl;
             #endif
 
-            headRotation->processDistances();
-            estimateAndShowRotationsY();
-            estimateAndShowGazeStartingPoint();
+            detectNoseWithHaar();
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTNOSEWITHHAAR"<<std::endl;
+            #endif
 
-            //---------------------------------------------
-            //  Empiric Eyes
+            detectMouthWithHaar();
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTMOUTHWITHHAAR"<<std::endl;
+            #endif
+
+            #ifndef WEBSERVICE
+            //da rendere usabile anche col webservice usando le funzioni di salvataggio delle immagini sul server
+            templateMatching();
+
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": TEMPLATEMATCHING"<<std::endl;
+            #endif //TRACKGAZE_DEBUG
+
+            #endif //WEBSERVICE
+
+            antropometricFilter();
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": ANTROPOMETRICFILTER"<<std::endl;
+            #endif
+
+
+            headRotation->processDistances();
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": PROCESSDISTANCES"<<std::endl;
+            #endif
+
+            estimateAndShowRotationsY();
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": ESTIMATEANDSHOWROTATIONSY"<<std::endl;
+            #endif
+
+            estimateAndShowGazeStartingPoint();
+            #ifndef WEBSERVICE
+                #ifdef TRACKGAZE_DEBUG
+                std::cout<<"TRACKGAZE: OK "<<h++<<": EVALUATEANDSHOWGAZESTARTINGPOINT"<<std::endl;
+                #endif
+            #endif
+
+            #ifndef WEBSERVICE
+            #ifdef WITH_GUI
+                updateMain();
+                #ifdef TRACKGAZE_DEBUG
+                std::cout<<"TRACKGAZE: OK "<<h++<<": UPDATEMAIN"<<std::endl;
+                #endif
+            #endif //WITH_GUI
+            #endif //WEBSERVICE
 
             detectEyesEmpiric();
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTEYESEMPIRIC"<<std::endl;
+            #endif
+
             reduceEmpiricEyes();
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": REDUCEEMPIRICEYES"<<std::endl;
+            #endif
 
             //---------------------------------------------
             //  Find and set pupil data
@@ -916,17 +1005,59 @@ void polyphemus::trackGaze()
             //Detection
             //pD->findPupils(rH->getLeftEyeROI(), rH->getRightEyeROI());
             pD->findPupils(rH->getLeftEmpiricReducedROI(), rH->getRightEmpiricReducedROI());
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": FINDPUPILS"<<std::endl;
+            #endif
+
             //Refinement
-            pD->refinePupils();
+            if(refined)
+            {
+                pD->refinePupils();
+                #ifdef TRACKGAZE_DEBUG
+                std::cout<<"TRACKGAZE: OK "<<h++<<": REFINEMENT DONE."<<std::endl;
+                #endif
+            }
+
             setPupilData();
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": PUPIL DATA SET."<<std::endl;
+            #endif
+
+            gE->predictHorizontalZone(G_CATCH);
+            gE->predictVerticalZone(this->newFace);
+
+            #ifdef AUTOMATIC_TEST
             updateErrorData();
-            //pD->findEyeCorners();
-            #else
+            #endif
+
+            #else  //ONLY_REAL_PUPILS is defined
             pD->bypassPupils(rH->getLeftEmpiricReducedROI(), rH->getRightEmpiricReducedROI());
             setPupilData();
             pD->setRealPupils(leftInEye, rightInEye);
-            #endif
+
+            #ifdef WITH_GUI
             pD->updateReduced();
+            #endif //WITH_GUI
+
+            #endif //ONLY_REAL_PUPILS
+
+            #ifdef WITH_GUI
+            updateFace();
+                #ifdef TRACKGAZE_DEBUG
+                std::cout<<"TRACKGAZE: OK "<<h++<<": UPDATEFACE"<<std::endl;
+                #endif
+            #endif //WITH_GUI
+
+            if (rH->hasLeftEye()) {
+                Mat mat = fH->getFrame();
+                mat = mat(rH->getFace());
+                eyeColourEvaluation(mat(rH->getLeftEye()));
+
+                #ifdef TRACKGAZE_DEBUG
+                std::cout<<"TRACKGAZE: OK "<<h++<<": EYECOLOUREVALUATION"<<std::endl;
+                #endif
+
+            }
 
             /*
             //---------------------------------------------
@@ -950,7 +1081,7 @@ void polyphemus::trackGaze()
             //----------------------------------------------
             //  Refresh windows images
 
-            updateGaze();*/
+            updateGaze();
             updateFace();
             updateMain();
 
@@ -982,12 +1113,17 @@ void polyphemus::trackGaze()
             #endif
 
             //waitKey(0);
+        */
         }
         else
         {
             std::cout<<"No face found!"<<std::cout;
+
+            #ifdef WITH_GUI
             updateMain();
+            #endif //WITH_GUI
         }
+
 
         interruptChar = waitKey(1000);
         if(interruptChar == 'c') break;
@@ -1055,7 +1191,6 @@ void polyphemus::trackGaze()
             std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTMOUTHWITHHAAR"<<std::endl;
             #endif
 
-            //UO
             #ifndef WEBSERVICE
             //da rendere usabile anche col webservice usando le funzioni di salvataggio delle immagini sul server
             templateMatching();
@@ -1068,7 +1203,7 @@ void polyphemus::trackGaze()
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": ANTROPOMETRICFILTER"<<std::endl;
             #endif
-            //UO
+
 
             headRotation->processDistances();
             #ifdef TRACKGAZE_DEBUG
@@ -1094,11 +1229,13 @@ void polyphemus::trackGaze()
 
 
             #ifndef WEBSERVICE
+            #ifdef WITH_GUI
                 updateMain();
                 #ifdef TRACKGAZE_DEBUG
                 std::cout<<"TRACKGAZE: OK "<<h++<<": UPDATEMAIN"<<std::endl;
                 #endif
-            #endif
+            #endif //WITH_GUI
+            #endif //WEBSERVICE
 
             detectEyesEmpiric();
             #ifdef TRACKGAZE_DEBUG
@@ -1132,30 +1269,35 @@ void polyphemus::trackGaze()
             gE->predictHorizontalZone(G_CATCH);
             gE->predictVerticalZone(this->newFace);
 
+            #ifdef WITH_GUI
             pD->updateReduced();
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": PUPILS SHOWED IN REDUCED WINDOWS."<<std::endl;
-            #endif
+            #endif //TRACKGAZE_DEBUG
 
-            if(pD->leftFound && gui!=NULL) // || pD->rightFound)
+            if(gui!=NULL) // || pD->rightFound)
             {
-                gui->turnOnZone(gE->getHorizontalResponse(), gE->getVerticalResponse());
+                if(pD->leftFound)
+                {
+                    gui->turnOnZone(gE->getHorizontalResponse(), gE->getVerticalResponse());
 
-                //estimatePupilGazeDisplacement(false);
-                #ifdef TRACKGAZE_DEBUG
-                std::cout<<"TRACKGAZE: OK "<<h++<<": ESTIMATEPUPILGAZEDISPLACEMENT"<<std::endl;
-                #endif
-                //gui->showFinalGaze(watchingPoint);
-                updateGaze();
-            }
-            else
-            {
-                #ifdef TRACKGAZE_DEBUG
-                    #ifndef WEBSERVICE
-                    std::cout<<"NO PUPIL"<<std::endl;
+                    //estimatePupilGazeDisplacement(false);
+                    #ifdef TRACKGAZE_DEBUG
+                    std::cout<<"TRACKGAZE: OK "<<h++<<": ESTIMATEPUPILGAZEDISPLACEMENT"<<std::endl;
                     #endif
-                #endif
+                    //gui->showFinalGaze(watchingPoint);
+                    updateGaze();
+                }
+                else
+                {
+                    #ifdef TRACKGAZE_DEBUG
+                        #ifndef WEBSERVICE
+                        std::cout<<"NO PUPIL"<<std::endl;
+                        #endif
+                    #endif
+                }
             }
+            #endif //WITH_GUI
             /*
             std::vector<cv::Rect> eyesReduced = rH->getReducedEmpiricEyes();
             #ifdef TRACKGAZE_DEBUG
@@ -1198,11 +1340,13 @@ void polyphemus::trackGaze()
 
 
             #ifndef WEBSERVICE
+            #ifdef WITH_GUI
             updateFace();
                 #ifdef TRACKGAZE_DEBUG
                 std::cout<<"TRACKGAZE: OK "<<h++<<": UPDATEFACE"<<std::endl;
                 #endif
-            #endif
+            #endif //WITH_GUI
+            #endif //WEBSERVICE
 
             if (rH->hasLeftEye()) {
                 Mat mat = fH->getFrame();
@@ -1218,8 +1362,10 @@ void polyphemus::trackGaze()
         else {
 #ifndef WEBSERVICE
             std::cout<<"No face found!"<<std::cout;
+#ifdef WITH_GUI
             updateMain();
-#endif
+#endif //WITH_GUI
+#endif //WEBSERVICE
         }
 #endif
 //UO
@@ -1475,17 +1621,15 @@ void polyphemus::release()
     }
 
 #ifndef WEBSERVICE
+#ifdef WITH_GUI
     if(gui!=NULL)
     {
         gui->destroy(MAIN_WINDOW);
         gui->destroy(FACE_WINDOW);
-        /*
-        gui->destroy(LEFT_ROTATED);
-        gui->destroy(RIGHT_ROTATED);
-        */
         gui->destroy(GAZE_WINDOW);
         delete gui;
     }
+#endif //WITH_GUI
 
     #ifdef FINDPUPILS_TEST
     pD->printTestResults();
@@ -1614,7 +1758,9 @@ void polyphemus::stasm()
 //        }
     }
 #ifndef WEBSERVICE
-    cv::imshow("stasm minimal", img2);
+#ifdef WITH_GUI
+    if(this->gui != NULL) cv::imshow("stasm minimal", img2);
+#endif //WITH_GUI
 #endif
 }
 

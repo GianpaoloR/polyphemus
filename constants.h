@@ -26,20 +26,6 @@ const bool eye_test=false;
 const bool face_test=false;
 #endif
 
-
-/*
-//JP constants
-const int jpEyeWidthNoseSide = 33;
-const int jpEyeWidthLeftEarSide = 33;
-const int jpEyeHeightTop = 33;
-const int jpEyeHeightBottom = 33;
-
-const int jpEarSideCropping = 25;
-const int jpNoseSideCropping = 15;
-const int jpTopSideCropping = 0;
-const int jpBottomSideCropping = 30;
-*/
-
 // Preprocessing
 const bool kSmoothFaceImage = false;
 const float kSmoothFaceFactor = 0.005;

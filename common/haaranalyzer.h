@@ -107,7 +107,11 @@ public:
     };
 
     haarAnalyzer();
+
+    #ifdef WITH_GUI
     void setDebugGui(guiHandler *gui);
+    #endif
+
     bool loadCascade(cascadeType type, std::string path);
     void detectEyePairs(cv::Mat& img, cv::Rect& face);
     void detectSingleEyes(cv::Mat& img, cv::Rect& face);
@@ -155,9 +159,10 @@ private:
     std::vector<cv::Rect> upper_bodies;
 
 
-
+#ifdef WITH_GUI
     //Debugging gui link
     guiHandler* gui;
+#endif
 
     //-----------------------------------------------
 

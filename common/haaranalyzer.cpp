@@ -15,20 +15,28 @@
 
 haarAnalyzer::haarAnalyzer()
 {
+#ifdef WITH_GUI
     gui = NULL;
+#endif //WITH_GUI
 }
 
+#ifdef WITH_GUI
 //SetDebugGui: enables gui for debugger
 void haarAnalyzer::setDebugGui(guiHandler *gui)
 {
     this->gui = gui;
     return;
 }
+#endif //WITH_GUI
 
 //LoadCascade: initializes cascade classifiers
 bool haarAnalyzer::loadCascade(cascadeType type, std::string path)
 {
     bool ok = false;
+    bool debugPrint = false;
+
+    if(debugPrint) cout<<"Trying to load cascade at " + path <<"...";
+
     // Load the cascade
     switch(type)
     {
@@ -60,12 +68,16 @@ bool haarAnalyzer::loadCascade(cascadeType type, std::string path)
         break;
     }
 
+#ifndef WEBSERVICE
     if(!ok)
     {
-#ifndef WEBSERVICE
-        std::cout<<"(!)Error loading cascade\n";
-#endif
+        if(debugPrint) std::cout<<"(!)Error loading cascade\n";
     }
+    else
+    {
+        if(debugPrint) cout<<" done."<<endl;
+    }
+#endif
 
     return ok;
 }
@@ -97,9 +109,12 @@ void haarAnalyzer::detectEyePairs(cv::Mat& img, cv::Rect& face) {
 
     eyePair_cascade.detectMultiScale(subImg, eyePairs, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, cv::Size(0.1 * face.width, 0.05 * face.height));
 
+    #ifdef WITH_GUI
     if (gui != NULL) {
         gui->showFaceElements(eyePairs, face);
     }
+    #endif //WITH_GUI
+
     return;
 }
 
@@ -137,11 +152,14 @@ void haarAnalyzer::detectSingleEyes(cv::Mat& img, cv::Rect& face) {
         singleEyes[i].x += 0;
         singleEyes[i].y += 0;
     }
+
+    #ifdef WITH_GUI
     if(gui!=NULL)
     {
         gui->showFaceElements(singleEyes, face);
     }
-    //UO
+    #endif //WITH_GUI
+
     return;
 }
 
@@ -151,14 +169,16 @@ void haarAnalyzer::detectLeftEyes(cv::Mat& img, cv::Rect& face) {
     //leftEye_cascade.detectMultiScale(subImg, leftEyes, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, cv::Size(30, 30));
     leftEye_cascade.detectMultiScale(subImg, leftEyes, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, cv::Size(0.1 * face.width, 0.05 * face.height));
 
-    //UO
     for (uint i = 0; i < leftEyes.size(); i++) {
         leftEyes[i].y += face.height*0.1;
     }
+
+    #ifdef WITH_GUI
     if (gui != NULL) {
         gui->showFaceElements(leftEyes, face);
     }
-    //UO
+    #endif //WITH_GUI
+
     return;
 }
 
@@ -169,15 +189,17 @@ void haarAnalyzer::detectRightEyes(cv::Mat& img, cv::Rect& face) {
     //rightEye_cascade.detectMultiScale(subImg, rightEyes, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, cv::Size(30, 30));
     rightEye_cascade.detectMultiScale(subImg, rightEyes, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, cv::Size(0.1 * face.width, 0.05 * face.height));
 
-    //UO
     for (uint i = 0; i < rightEyes.size(); i++) {
         rightEyes[i].y += face.height * 0.1;
         rightEyes[i].x += left;
     }
+
+    #ifdef WITH_GUI
     if (gui != NULL) {
         gui->showFaceElements(rightEyes, face);
     }
-    //UO
+    #endif //WITH_GUI
+
     return;
 }
 
@@ -196,17 +218,19 @@ void haarAnalyzer::detectNoses(cv::Mat& img, cv::Rect& face)
     //nose_cascade.detectMultiScale( subImg, noses, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, cv::Size(30, 30) );
     nose_cascade.detectMultiScale( subImg, noses, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT, cv::Size(0.1 * face.width, 0.1 * face.height) );
 
-    //UO
     for( uint i = 0; i < noses.size(); i++ )  //per ogni faccia
     {
         noses[i].y += cutImageY;
         noses[i].x += cutImageX;
     }
+
+#ifdef WITH_GUI
     if(gui!=NULL)
     {
         gui->showFaceElements(noses, face);
     }
-    //UO
+#endif //WITH_GUI
+
     return;
 }
 
@@ -230,11 +254,14 @@ void haarAnalyzer::detectMouths(cv::Mat& img, cv::Rect& face)
         mouths[i].y += cutImageY;
         mouths[i].x += cutImageX;
     }
+
+#ifdef WITH_GUI
     if(gui!=NULL)
     {
         gui->showFaceElements(mouths, face);
     }
-    //UO
+#endif //WITH_GUI
+
     return;
 }
 
@@ -320,11 +347,13 @@ void haarAnalyzer::detectFaces(cv::Mat& img)
                                    //cv::Size(150, 150));
                                    cv::Size(0.2 * img.cols, 0.2 * img.rows));
 
-
+#ifdef WITH_GUI
     if(gui!=NULL)
     {
         gui->showFaces(faces);
     }
+#endif //WITH_GUI
+
     return;
 }
 
@@ -343,11 +372,13 @@ void haarAnalyzer::detectUpperBody(cv::Mat& img)
                                    //cv::Size(150, 150));
                                    cv::Size(0.35 * img.cols, 0.35 * img.rows));
 
-
+#ifdef WITH_GUI
     if(gui!=NULL)
     {
         gui->showUpperBody(upper_bodies);
     }
+#endif //WITH_GUI
+
     return;
 }
 

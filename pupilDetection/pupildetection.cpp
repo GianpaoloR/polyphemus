@@ -27,10 +27,15 @@ pupilDetection::pupilDetection(binaryAnalyzer *bin)
 
     //UO
 #ifndef WEBSERVICE
+#ifdef WITH_GUI
     this->eyeGui = new pupilGui();
 #else
     this->eyeGui = NULL;
-#endif
+#endif //WITH_GUI
+#else
+    this->eyeGui = NULL;
+#endif //WEBSERVICE
+
     //UO
 
 #ifdef FINDPUPILS_WINDOWS

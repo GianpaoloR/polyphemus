@@ -3,18 +3,23 @@
 
 binaryAnalyzer::binaryAnalyzer()
 {
+    #ifdef WITH_GUI
     gui = NULL;
+    #endif //WITH_GUI
+
     mat_id = 0;
     setId = 0;
     oneIsLast = true;
     overallSets.clear();
 }
 
+#ifdef WITH_GUI
 //SetDebugGui: enables gui for debugger
 void binaryAnalyzer::setDebugGui(guiHandler *gui)
 {
     this->gui = gui;
 }
+#endif //WITH_GUI
 
 //NewThresholded: initializes a new zero filled cv::Mat. Returns the mat.
 cv::Mat binaryAnalyzer::newThresholded(int r, int c)

@@ -157,9 +157,11 @@ private:
     HeadRotation* headRotation;
 
     #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     ///<summary> Reference to debug gui module</summary>
     guiHandler* gui;
-    #endif
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
 
     //---------------------------------------------------------
     //                   SCREEN DATA
@@ -295,8 +297,8 @@ private:
     void computeRealPupilDistances();
     ///<summary>Compute euclidean distance from the estimated pupil to the real one (manually set), and updates test avg perfomances.</summary>
     void updateErrorData();
-    #endif
-#endif
+    #endif //AUTOMATIC_TEST
+#endif //TEST_MODE
 
     //---------------------------------------------------------
     //                    FACE DATA & METHODS

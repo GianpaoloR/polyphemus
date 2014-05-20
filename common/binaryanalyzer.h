@@ -26,7 +26,11 @@ public:
 
 
     binaryAnalyzer();
+
+#ifdef WITH_GUI
     void setDebugGui(guiHandler *gui);
+#endif
+
     cv::Mat newThresholded(int r, int c);
     cv::Mat thresholdImg(const cv::Mat &roi, int tVal);
     cv::Mat invert(const cv::Mat& roi);
@@ -60,7 +64,10 @@ private:
     void setHistoryUpdate();
     void updateSetsOverall();
     //--------------------------------------------------
+#ifdef WITH_GUI
     guiHandler* gui;
+#endif
+
     std::vector<cv::Mat> frames;
     int mat_id;
     int setId, lastFatherId;

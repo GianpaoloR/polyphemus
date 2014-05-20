@@ -4,11 +4,14 @@
 
 frameHandler::frameHandler()
 {
+    #ifdef WITH_GUI
     gui = NULL;
+    #endif //WITH_GUI
+
     capture = NULL;
 
     #ifdef TEST_MODE
-    trainingSetSize = 12;
+    trainingSetSize = 3;
     zoneCounter = 1;
     zoneNumber = 9;
     frameCounter = 0;
@@ -30,22 +33,18 @@ int frameHandler::getHZone()
 #endif
 #endif
 
+#ifdef WITH_GUI
 //SetDebugGui: enables gui for debugger
 void frameHandler::setDebugGui(guiHandler *gui)
 {
     this->gui = gui;
     return;
 }
+#endif //WITH_GUI
 
 //InitCapture: initializes the frame handler, activating the webcam
 bool frameHandler::initCapture()
 {
-#ifdef PROFILING
-    capture = cvCreateFileCapture(videoPath);
-    //capture = cvCaptureFromAVI(videoPath);
-    gui->initWindow(PROFILE);
-#endif
-
     #ifdef ACTIVE_CAM
     int i=0;
     while(capture==NULL && i<MAX_TRY)
@@ -97,11 +96,13 @@ bool frameHandler::read()
         return false;
     }
     return true;
-    #endif
+    #endif //ACTIVE_CAM
 
     #ifdef TEST_MODE
     char fileLine[50];
-    std::cout<<"**********************************************************"<<std::endl;
+    bool debugPrint = false;
+
+    if(debugPrint) std::cout<<"**********************************************************"<<std::endl;
 
     //Read frames from testPath subfolders.
     char localPath[PATH_SIZE/4] = "";
@@ -119,7 +120,7 @@ bool frameHandler::read()
     sprintf(localPath, "Zona%d/", zoneCounter);
     strcat(finalPath, localPath);
 
-
+    #ifdef AUTOMATIC_TEST
     //Handle coords file
     if(neverOpened)
     {
@@ -177,6 +178,7 @@ bool frameHandler::read()
             std::cout<<"File opened."<<std::endl;
         }
     }
+    #endif //AUTOMATIC_TEST
 
     switch(zoneCounter)
     {
@@ -211,6 +213,7 @@ bool frameHandler::read()
         std::cout<<"ERROR IN TEST PATH! NOW EXITING..."<<std::endl;
         exit(-1);
         break;
+
     }
     strcat(finalPath, localPath);
 
@@ -218,7 +221,8 @@ bool frameHandler::read()
     strcat(localPath, ".jpg");
 
     strcat(finalPath, localPath);
-    std::cout<<"Final path is: \""<< finalPath <<"\""<<std::endl;
+
+    if(debugPrint) std::cout<<"Final path is: \""<< finalPath <<"\""<<std::endl;
 
 
     //Read frame
@@ -229,6 +233,7 @@ bool frameHandler::read()
         return false;
     }
 
+    #ifdef AUTOMATIC_TEST
     //Read pupil coords
     if(fCoords!=NULL)
     {
@@ -240,8 +245,9 @@ bool frameHandler::read()
             std::cout<<"PupilCoords: L=("<<pupilCoords[0]<<","<<pupilCoords[1]<<"), R=("<<pupilCoords[2]<<","<<pupilCoords[3]<<")"<<std::endl;
         }
     }
+    #endif //AUTOMATIC_TEST
 
-    #endif
+    #endif //TEST_MODE
 
     #ifdef WEBSERVICE
     //UO
@@ -255,7 +261,6 @@ bool frameHandler::read()
 }
 
 #ifdef TEST_MODE
-#ifdef AUTOMATIC_TEST
 void frameHandler::prepareNextReading()
 {
     //Prepare for next reading
@@ -269,7 +274,6 @@ void frameHandler::prepareNextReading()
         zoneCounter++;
     }
 }
-#endif
 #endif
 
 #ifdef TEST_MODE
@@ -297,10 +301,13 @@ void frameHandler::mirror()
     //cv::addWeighted(img, 1.5, tmp, -0.5, 0, img);
     cv::addWeighted(frame, 2.5, tmp, -1.5, 0, frame);*/
 
+    #ifdef WITH_GUI
     if(gui!=NULL)
     {
         frame.copyTo(gui->mainFrame);
     }
+    #endif //WITH_GUI
+
     return;
 }
 

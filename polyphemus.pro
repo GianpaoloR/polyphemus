@@ -10,7 +10,6 @@ QT       += widgets
 TARGET = polyphemus.cgi
 TEMPLATE = app
 
-
 SOURCES += main.cpp\
     polyphemus.cpp \
     common/binaryanalyzer.cpp \
@@ -74,7 +73,6 @@ SOURCES += main.cpp\
     pupilDetection/twinkle.cpp
 
 HEADERS  += constants.h\
-    framehandler.h \
     polyphemus.h \
     common/binaryanalyzer.h \
     headRotation/headrotation.h \
@@ -151,6 +149,11 @@ HEADERS  += constants.h\
 
 #two configuration: release and debug
 CONFIG(release,debug|release){
+     #DEFINES += "ACTIVE_CAM"
+     #DEFINES += "WITH_GUI"
+     DEFINES += "TEST_MODE"
+     DEFINES += "PROFILING"
+
  INCLUDEPATH += /Installs/opencv_binaries/Release/include
     LIBS += -L/Installs/opencv_binaries/Release/lib \
     #if library name is lib[name].lib, you should write -l[name]
@@ -169,6 +172,7 @@ CONFIG(release,debug|release){
     -lopencv_video \
     -lX11
 }
+
 
 CONFIG(debug,debug|release){
      #DEFINES += "DEBUG"
@@ -208,8 +212,9 @@ CONFIG(debug,debug|release){
      #DEFINES += "TEST_MODE"
      #DEFINES += "AUTOMATIC_TEST"
      #DEFINES += "ONLY_REAL_PUPIL"
+     DEFINES += "WITH_GUI"
 
-INCLUDEPATH += /Installs/opencv_binaries/Debug/include
+ INCLUDEPATH += /Installs/opencv_binaries/Debug/include
      LIBS += -L/Installs/opencv_binaries/Debug/lib \
     #if library name is lib[name].lib, you should write -l[name]
     -lopencv_core \
@@ -226,19 +231,14 @@ INCLUDEPATH += /Installs/opencv_binaries/Debug/include
     -lopencv_ts \
     -lopencv_video \
     -lX11
+
+    # remove possible other optimization flags
+    QMAKE_CXXFLAGS += -O
+    QMAKE_CXXFLAGS -= -O1
+    QMAKE_CXXFLAGS -= -O2
+    QMAKE_CXXFLAGS -= -O3
 }
 
-# remove possible other optimization flags
-QMAKE_CXXFLAGS += -O
-QMAKE_CXXFLAGS -= -O1
-QMAKE_CXXFLAGS -= -O2
-QMAKE_CXXFLAGS -= -O3
-
-
-#CONFIG(debug, debug|release) {
-#    QMAKE_CXXFLAGS+=-pg
-#    QMAKE_LFLAGS+=-pg
-#}
 
 OTHER_FILES += \
     otherCode.txt
