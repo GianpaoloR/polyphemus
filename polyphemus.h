@@ -127,6 +127,9 @@ public:
     roiHandler* getRoiHandler();
     //UO
 
+    //KE
+    float* getStasmLandmark();
+    //EK
 
 private:
 

@@ -22,6 +22,38 @@ guiHandler::guiHandler(int w, int h)
     vRes = h;
 }
 
+cv::Point guiHandler::setGazeFromPosit(double angle_x, double angle_y, double distance, cv::Rect face)
+{
+    //cv::Point obs = evaluatePosition(yAngle, face, mainFrame);
+    double x=0,y=0; //Coordinate punto osservato
+    std::cout << "--------------------------------------------------------------" << std::endl;
+    std::cout << angle_x << ", " << angle_y << std::endl;
+    double eye_position, eye_position_y; //Proiezione occhi sullo schermo
+    //rotation:180=x:pi -> 180*x = pi*rotation ->
+    x = angle_x*M_PI/180;
+    //Calacoliamo con il teorema dei seni la coordinata x
+    double distance_x = distance * sin(x) / sin((M_PI/2) - x);
+    distance_x = distance_x * CM_TO_PIXEL*2; //1cm -> 37.795275591 pixel
+    //Calacoliamo con il teorema dei seni la coordinata y
+    y = angle_y*M_PI/180;
+    double distance_y = distance * sin(y) / sin((M_PI/2) - y);
+    distance_y = distance_y * CM_TO_PIXEL; //1cm -> 37.795275591 pixel
+    // x:hRes=position_face:frame.cols
+    eye_position = hRes*(face.x+(face.width/2))/mainFrame.cols*2;
+    eye_position_y = vRes*(face.y+(face.height/2))/mainFrame.rows*2;
+
+    std::cout << "Partenza: " << hRes/2 <<  " " << vRes/2 << std ::endl;
+    std::cout << "Scostamento " <<  distance_x <<  " " << distance_y << std ::endl;
+    //Calcolare coord x;
+    x = eye_position+ distance_y;
+    y = eye_position_y + distance_x;
+
+//    std::cout << x << "          " << y << std::endl;
+    std::cout << "--------------------------------------------------------------" << std::endl;
+    return cv::Point(x,y);
+    //cv::circle(gazeFrame, cv::Point(50, 50), 10, cv::Scalar(0, 255, 0) , 4, 8, 1);
+}
+
 void guiHandler::setGazeFromHeadData(double rotation, cv::Rect face, int difference_y)
 {
     //cv::Point obs = evaluatePosition(yAngle, face, mainFrame);
@@ -331,7 +363,7 @@ void guiHandler::showUpperBody(std::vector<cv::Rect> upperBodies)
     return;
 }
 
-void guiHandler::turnOnZone(int hZone, int vZone)
+void guiHandler::turnOnZone(int hZone, int vZone, double angleX, double angleY, double distance, cv::Rect face)
 {
     Point p;
     switch(hZone)
@@ -366,7 +398,7 @@ void guiHandler::turnOnZone(int hZone, int vZone)
         break;
     }
 
-    showStartingGaze(p);
+    showStartingGaze(p, setGazeFromPosit(angleX, angleY, distance, face));
 }
 
 void guiHandler::showFinalGaze(cv::Point gazePoint)
@@ -377,12 +409,15 @@ void guiHandler::showFinalGaze(cv::Point gazePoint)
     return;
 }
 
-void guiHandler::showStartingGaze(cv::Point gazeStartingPoint){
+
+
+void guiHandler::showStartingGaze(cv::Point gazeStartingPoint, cv::Point headOrientation){
     //int position;
     cv::Point start;
     int x = gazeStartingPoint.x;
     int y = gazeStartingPoint.y;
     //int radius = gazeFrame.cols/14;
+
     gazeFrame.release();
     gazeFrame = cv::Mat(vRes, hRes, CV_8UC3, cv::Scalar(255, 255, 255));
     cv::line(gazeFrame, cv::Point(0,vRes/3), cv::Point(hRes,vRes/3), cv::Scalar(0,255,255), 3, 1, 0);
@@ -437,6 +472,8 @@ void guiHandler::showStartingGaze(cv::Point gazeStartingPoint){
     }
 
     cv::rectangle(gazeFrame,cv::Rect(start.x, start.y, hRes/3, vRes/3),cv::Scalar(255,0,0),3,1,0);
+    cv::circle(gazeFrame, headOrientation, 20, cv::Scalar(0, 255, 0) , 4, 8, 1);
+
 
     return;
 }

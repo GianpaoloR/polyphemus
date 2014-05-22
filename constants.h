@@ -50,6 +50,7 @@ const bool kEnableEyeCorner = true;
 #define CM_TO_PIXEL 37.795275591    //1cm -> 37.795275591 pixel
 #define DIMENSIONE_SCHERMO 1600
 #define DIMENSIONE_SCHERMO_Y 900
+#define FOCAL_LENGTH 1000
 
 //extern int screenWidthPixel;
 //extern int screenHeightPixel;

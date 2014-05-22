@@ -225,6 +225,7 @@ void polyphemus::enableDebugGui()
     this->gui = new guiHandler(screenWidth, screenHeight);
     fH->setDebugGui(this->gui);
     haar->setDebugGui(this->gui);
+    headRotation->setDebugGui(this->gui);
     bin->setDebugGui(this->gui);
     std::cout<<"Debug GUI enabled."<<std::endl;
     return;
@@ -454,14 +455,14 @@ void polyphemus::detectMouthWithHaar()
         rH->setMouthROI(mouths);
     }
 }
-
+/*
 void polyphemus::estimateAndShowGazeStartingPoint()
 {
 #ifdef ESTIMATEANDSHOWGAZESTARTINGPOINT_DEBUG
     std::cout << "ESTIMATEANDSHOWGAZESTARTINGPOINT: ENTERED"<<std::endl;
 #endif
 
-    watchingPoint = headRotation->evaluatePosition(headRotation->evaluateRotationY(), rH->getFace(), fH->getFrame());
+    watchingPoint = headRotation->evaluatePosition(headRotation->evaluateRotationY(landmarks), rH->getFace(), fH->getFrame(), landmarks);
 
 #ifdef ESTIMATEANDSHOWGAZESTARTINGPOINT_DEBUG
     std::cout << "ESTIMATEANDSHOWGAZESTARTINGPOINT: initial gaze = "<< watchingPoint << std::endl;
@@ -476,9 +477,39 @@ void polyphemus::estimateAndShowGazeStartingPoint()
     #endif //WITH_GUI
     #endif //WEBSERVICE
 }
+*/
 
 #ifndef WEBSERVICE
 #ifdef WITH_GUI
+void polyphemus::estimateAndShowRotationsY()
+{
+    double rotation;;
+
+
+    rotation = headRotation->evaluateRotationWithNoseY(landmarks);
+    #ifndef WEBSERVICE
+    if (gui!=NULL && rH->hasNose() && rotation != 0) {
+        gui->showNoseRotationY(rH->getFace(), rH->getNose(), rotation);
+    }
+    #endif
+
+    rotation = headRotation->evaluateRotationWithMouthY(landmarks);
+    #ifndef WEBSERVICE
+    if (gui!=NULL && rH->hasMouth() && rotation != 0) {
+        gui->showMouthRotationY(rH->getFace(), rH->getMouth(), rotation);
+    }
+    #endif
+
+    rotation = headRotation->evaluateRotationY(landmarks);
+    #ifndef WEBSERVICE
+    if(gui!=NULL && rotation != 0)
+    {
+        gui->showHeadRotationY(rH->getFace(), rotation);
+    }
+    #endif
+
+}
+/*
 void polyphemus::estimateAndShowRotationsY()
 {
     double rotation = headRotation->evaluateRotationWithEyesY();
@@ -503,6 +534,7 @@ void polyphemus::estimateAndShowRotationsY()
     }
 
 }
+*/
 #endif //WITH_GUI
 #endif //WEBSERVICE
 
@@ -855,7 +887,6 @@ void polyphemus::setPupilData()
 }
 
 
-
 //Main function called to track gaze.
 void polyphemus::trackGaze()
 {
@@ -962,7 +993,7 @@ void polyphemus::trackGaze()
             #endif
             #endif
 
-            estimateAndShowGazeStartingPoint();
+            //estimateAndShowGazeStartingPoint();
             #ifndef WEBSERVICE
                 #ifdef TRACKGAZE_DEBUG
                 std::cout<<"TRACKGAZE: OK "<<h++<<": EVALUATEANDSHOWGAZESTARTINGPOINT"<<std::endl;
@@ -1161,7 +1192,7 @@ void polyphemus::trackGaze()
 
             stasm();
             //drawSingleLandmark();
-            gE->setLM(landmarks, rH->getFaceROI()); //, newFace);
+            gE->setLM(landmarks, rH->getFaceROI());//, newFace);
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": STASM"<<std::endl;
             #endif
@@ -1200,6 +1231,11 @@ void polyphemus::trackGaze()
             std::cout<<"TRACKGAZE: OK "<<h++<<": PROCESSDISTANCES"<<std::endl;
             #endif
 
+			headRotation->positPoint(landmarks);
+            #ifdef TRACKGAZE_DEBUG
+            std::cout<<"TRACKGAZE: OK "<<h++<<": POSITPOINT"<<std::endl;
+            #endif
+
             #ifdef WITH_GUI
             estimateAndShowRotationsY();
             #ifdef TRACKGAZE_DEBUG
@@ -1209,7 +1245,7 @@ void polyphemus::trackGaze()
 
 
             //TODO:
-            estimateAndShowGazeStartingPoint();
+            //estimateAndShowGazeStartingPoint();
             #ifndef WEBSERVICE
                 #ifdef TRACKGAZE_DEBUG
                 std::cout<<"TRACKGAZE: OK "<<h++<<": EVALUATEANDSHOWGAZESTARTINGPOINT"<<std::endl;
@@ -1271,7 +1307,7 @@ void polyphemus::trackGaze()
             {
                 if(pD->leftFound)
                 {
-                    gui->turnOnZone(gE->getHorizontalResponse(), gE->getVerticalResponse());
+                gui->turnOnZone(gE->getHorizontalResponse(), gE->getVerticalResponse(), headRotation->getAngleX(), headRotation->getAngleY(), headRotation->getDistanceHead(), rH->getFace());
 
                     //estimatePupilGazeDisplacement(false);
                     #ifdef TRACKGAZE_DEBUG
@@ -1756,6 +1792,10 @@ void polyphemus::stasm()
 #endif
 }
 
+
+float* polyphemus::getStasmLandmark(){
+    return landmarks;
+}
 
 //-----------------------------------------
 //              PRIVATE

@@ -107,10 +107,10 @@ public:
 
 
     //Gaze showers
-    void showStartingGaze(cv::Point gazeStartingPoint);
+    void showStartingGaze(cv::Point gazeStartingPoint, cv::Point headOrientation);
     void showGaze(double ratio);
     void showFinalGaze(cv::Point gazePoint);
-    void turnOnZone(int hZone, int vZone);
+    void turnOnZone(int hZone, int vZone, double angleX, double angleY, double distance, cv::Rect face);
 
     void showRoi(const cv::Mat& roi, std::string name, bool maintain);
     void showEyesRotated(cv::Point l, cv::Point r);
@@ -120,10 +120,11 @@ public:
     void setGazeFromHeadData(double rotation, cv::Rect face, int difference_y);
     void setSquareFromGazeData();
     void adjustXComponent(double ratio);
-//    void testSquare();  --> NEVER USED!!!
+    cv::Point setGazeFromPosit(double angle_x, double angle_y, double distance, cv::Rect face);
+//  void testSquare();  --> NEVER USED!!!
 
 private:
-    std::string mainWindowName, faceWindowName, lEyeReducedWindowName, rEyeReducedWindowName, profileWindowName, lRotatedWindowName, rRotatedWindowName, gazeWindowName;
+    std::string mainWindowName, faceWindowName, lEyeReducedWindowName, rEyeReducedWindowName, profileWindowName, lRotatedWindowName, rRotatedWindowName, gazeWindowName, gazeKeWindowName;
 };
 
 #endif // WITH_GUI
