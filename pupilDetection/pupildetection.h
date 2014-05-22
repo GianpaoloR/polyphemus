@@ -78,7 +78,9 @@ public:
     bool eyeLineFound;
 
     //Corners finders
+    #ifdef FINDCORNERS
     void findEyeCorners();
+    #endif
     void updateReduced();
 
 #ifdef FINDPUPILS_TEST
@@ -135,9 +137,11 @@ private:
     std::vector<Point> coverNeighborhood(cv::Mat roi, std::vector<cv::Point> v, Mat tImg, uint i, int color, int colorStep, double tValue);
 
     //Internal Corners
+#ifdef FINDCORNERS
     std::vector<cv::Point> leftCorners;
     std::vector<cv::Point> rightCorners;
     void sobelCorners(bool left);
+#endif
 
     //Eye line
     float m;

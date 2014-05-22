@@ -23,7 +23,7 @@ public:
     int getHorizontalResponse();
     int getVerticalResponse();
     void setRealDistances(int realLeft, int realRight, Rect face);
-    void setLM(float lm[nLM*2], Mat face, bool newFace);
+    void setLM(float lm[nLM*2], Mat face);//, bool newFace);
     void setPupils(Point* left, Point* right);
     bool predictHorizontalZone(pupilType pT);
     void predictVerticalZone(bool newFace);

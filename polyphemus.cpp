@@ -477,46 +477,34 @@ void polyphemus::estimateAndShowGazeStartingPoint()
     #endif //WEBSERVICE
 }
 
+#ifndef WEBSERVICE
+#ifdef WITH_GUI
 void polyphemus::estimateAndShowRotationsY()
 {
     double rotation = headRotation->evaluateRotationWithEyesY();
-    #ifndef WEBSERVICE
-    #ifdef WITH_GUI
     if (gui!=NULL && rH->hasLeftEye() && rH->hasRightEye() && rotation != 0) {
         gui->showEyesRotationY(rH->getFace(), rH->getLeftEye(), rH->getRightEye(), rotation);
     }
-    #endif //WITH_GUI
-    #endif //WEBSERVICE
 
     rotation = headRotation->evaluateRotationWithNoseY();
-    #ifndef WEBSERVICE
-    #ifdef WITH_GUI
     if (gui!=NULL && rH->hasNose() && rotation != 0) {
         gui->showNoseRotationY(rH->getFace(), rH->getNose(), rotation);
     }
-    #endif //WITH_GUI
-    #endif //WEBSERVICE
 
     rotation = headRotation->evaluateRotationWithMouthY();
-    #ifndef WEBSERVICE
-    #ifdef WITH_GUI
     if (gui!=NULL && rH->hasMouth() && rotation != 0) {
         gui->showMouthRotationY(rH->getFace(), rH->getMouth(), rotation);
     }
-    #endif //WITH_GUI
-    #endif //WEBSERVICE
 
     rotation = headRotation->evaluateRotationY();
-    #ifndef WEBSERVICE
-    #ifdef WITH_GUI
     if(gui!=NULL && rotation != 0)
     {
         gui->showHeadRotationY(rH->getFace(), rotation);
     }
-    #endif //WITH_GUI
-    #endif //WEBSERVICE
 
 }
+#endif //WITH_GUI
+#endif //WEBSERVICE
 
 void polyphemus::detectEyesEmpiric()
 {
@@ -923,7 +911,7 @@ void polyphemus::trackGaze()
             //STASM
             stasm();
             //drawSingleLandmark();
-            gE->setLM(landmarks, rH->getFaceROI(), newFace);
+            gE->setLM(landmarks, rH->getFaceROI());//, newFace);
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": STASM"<<std::endl;
             #endif
@@ -967,9 +955,11 @@ void polyphemus::trackGaze()
             std::cout<<"TRACKGAZE: OK "<<h++<<": PROCESSDISTANCES"<<std::endl;
             #endif
 
+            #ifdef WITH_GUI
             estimateAndShowRotationsY();
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": ESTIMATEANDSHOWROTATIONSY"<<std::endl;
+            #endif
             #endif
 
             estimateAndShowGazeStartingPoint();
@@ -1171,7 +1161,7 @@ void polyphemus::trackGaze()
 
             stasm();
             //drawSingleLandmark();
-            gE->setLM(landmarks, rH->getFaceROI(), newFace);
+            gE->setLM(landmarks, rH->getFaceROI()); //, newFace);
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": STASM"<<std::endl;
             #endif
@@ -1210,9 +1200,11 @@ void polyphemus::trackGaze()
             std::cout<<"TRACKGAZE: OK "<<h++<<": PROCESSDISTANCES"<<std::endl;
             #endif
 
+            #ifdef WITH_GUI
             estimateAndShowRotationsY();
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": ESTIMATEANDSHOWROTATIONSY"<<std::endl;
+            #endif
             #endif
 
 

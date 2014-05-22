@@ -99,7 +99,6 @@ bool frameHandler::read()
     #endif //ACTIVE_CAM
 
     #ifdef TEST_MODE
-    char fileLine[50];
     bool debugPrint = false;
 
     if(debugPrint) std::cout<<"**********************************************************"<<std::endl;
@@ -107,7 +106,10 @@ bool frameHandler::read()
     //Read frames from testPath subfolders.
     char localPath[PATH_SIZE/4] = "";
     char finalPath[PATH_SIZE] = "";
+    #ifdef AUTOMATIC_TEST
+    char fileLine[50];
     char filePath[PATH_SIZE] = "";
+    #endif //AUTOMATIC_TEST
 
     if(zoneCounter > zoneNumber)
     {

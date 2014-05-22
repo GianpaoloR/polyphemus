@@ -239,6 +239,10 @@ CONFIG(debug,debug|release){
     QMAKE_CXXFLAGS -= -O3
 }
 
+QMAKE_CXXFLAGS += -Wno-deprecated
+
+#QMAKE_CXXFLAGS += -fopenmp
+#LIBS += -fopenmp
 
 OTHER_FILES += \
     otherCode.txt

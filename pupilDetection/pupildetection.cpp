@@ -1241,6 +1241,13 @@ cv::Point* pupilDetection::getRightPupilRefined() {
 /*******************************
  *        CORNERS FINDERS
  ******************************/
+void thresh_callback(int, void* );
+RNG rng(12345);
+Mat src_gray;
+int thresh = 10;
+int max_thresh = 50;
+
+#ifdef FINDCORNERS
 //Use Sobel to find edges
 void pupilDetection::findEyeCorners()
 {
@@ -1248,11 +1255,6 @@ void pupilDetection::findEyeCorners()
     sobelCorners(false);
 }
 
-void thresh_callback(int, void* );
-RNG rng(12345);
-Mat src_gray;
-int thresh = 10;
-int max_thresh = 50;
 
 void pupilDetection::sobelCorners(bool left)
 {
@@ -1358,6 +1360,7 @@ void pupilDetection::sobelCorners(bool left)
 
     std::cout<<"SOBELCORNERS: EXITING"<<std::endl;
 }
+#endif
 
 
 

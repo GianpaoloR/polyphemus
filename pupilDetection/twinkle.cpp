@@ -569,7 +569,7 @@ void twinkle::findBarrier(Point p, Mat m, std::vector<Point> *l, bool debug, Mat
 
     if(toAdd)
     {
-        for(int i=0; i<l->size(); i++)
+        for(uint i=0; i<l->size(); i++)
         {
             if((*l)[i] == p2) toAdd = false;
         }
@@ -589,6 +589,8 @@ cv::Mat twinkle::twinkleDilate(const cv::Mat& roi)  //Work on neighborhood to de
 {
     #define NMASK 4
     #define SIZE 3
+
+    /*
     int maskH[SIZE][SIZE] = {{128,128,128},
                             { 255,  0,255},
                             { 128,128,128}};  //128 stands for don't care
@@ -604,6 +606,7 @@ cv::Mat twinkle::twinkleDilate(const cv::Mat& roi)  //Work on neighborhood to de
     int maskDiagUp[SIZE][SIZE] = {{128, 128, 255},
                                   {128,   0, 128},
                                   {255, 128, 128}};
+    */
 
     int mask[NMASK][SIZE][SIZE] = {{{255, 128, 128},
                                     {128,   0, 128},
@@ -620,7 +623,6 @@ cv::Mat twinkle::twinkleDilate(const cv::Mat& roi)  //Work on neighborhood to de
                                    {{128, 255, 128},
                                     {128,   0, 128},
                                     {128, 255, 128}}};
-
 
     cv::Mat diffRoi = cv::Mat::zeros(roi.rows, roi.cols, CV_8U);
     cv::Mat completeRoi = cv::Mat::zeros(roi.rows, roi.cols, CV_8U);

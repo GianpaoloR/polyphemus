@@ -76,7 +76,7 @@ int gazeEstimation::getHorizontalResponse()
 bool gazeEstimation::predictHorizontalZone(pupilType pT)
 {
     float lCornerDistance;
-    float lpToNoseLM;
+    float lpToNoseLM = 0;
 
     //Horizontal component
     bool valid = true;
@@ -84,13 +84,16 @@ bool gazeEstimation::predictHorizontalZone(pupilType pT)
     lCornerDistance = leftLM[1] - leftLM[9];
 
     if(pT == STASM) lpToNoseLM = leftLM[1] - LMleftPupil[1];
-    if(pT == G_CATCH)
+    else
     {
-        if(lp[0] < lTop || lp[0] > lBottom || lp[1] < lLeft || lp[1] > lRight)
+        if(pT == G_CATCH)
         {
-            valid = false;
+            if(lp[0] < lTop || lp[0] > lBottom || lp[1] < lLeft || lp[1] > lRight)
+            {
+                valid = false;
+            }
+            else lpToNoseLM = leftLM[1] - lp[1];
         }
-        else lpToNoseLM = leftLM[1] - lp[1];
     }
 
     cout<<"Total distance: "<<lCornerDistance<<endl;
@@ -121,11 +124,13 @@ bool gazeEstimation::predictHorizontalZone(pupilType pT)
     return valid;
 }
 
-void gazeEstimation::setLM(float lm[nLM*2], Mat face, bool newFace)
+void gazeEstimation::setLM(float lm[nLM*2], Mat face)//, bool newFace)
 {
     int li=0, ri=0;
 
+#ifdef WITH_GUI
     bool debug = true;
+#endif
 
     lTop = face.rows;
     lBottom = 0;

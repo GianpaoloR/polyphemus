@@ -833,6 +833,7 @@ void DetectEyesAndMouth(  // use OpenCV detectors to find the eyes and mouth
     int ileft_best = -1, iright_best = -1; // index into leyes and reyes vecs
     if (!leye_det_g.empty()) // need the eyes? (depends on model estart field)
     {
+        std::cout<<"EYE DETECTION NEEDED!"<<std::endl;
         DetectAllEyes(leyes, reyes,
                       img, detpar.eyaw, facerect);
 
@@ -861,6 +862,7 @@ void DetectEyesAndMouth(  // use OpenCV detectors to find the eyes and mouth
             MouthSearchRect(facerect, detpar.eyaw,
                             ileft_best, iright_best, leyes, reyes));
         vec_Rect mouths;
+        std::cout<<"MOUTH DETECTION NEEDED!"<<std::endl;
         DetectAllMouths(mouths,
                         img, facerect, mouth_searchrect);
 

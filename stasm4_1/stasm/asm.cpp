@@ -6,6 +6,7 @@
 
 namespace stasm
 {
+#if TRACE_IMAGES // will be 0 unless debugging (defined in stasm.h)
 static void TraceShape(  // write an image file showing current shape on the image
     const Shape& shape,  // in: current search shape
     const Image& pyrimg, // in: image scaled to this pyramid level
@@ -13,7 +14,6 @@ static void TraceShape(  // write an image file showing current shape on the ima
     int          iter,   // in: model iteration (-1 if start shape)
     const char*  suffix) // in
 {
-#if TRACE_IMAGES // will be 0 unless debugging (defined in stasm.h)
 
     static int index; // number images so they appear in order in the directory
     // start at index 30 because lower indices have already used for facedet etc.
@@ -82,8 +82,8 @@ static void TraceShape(  // write an image file showing current shape on the ima
         Err("Cannot write %s", path);
     index++;
 
-#endif // TRACE_IMAGES
 }
+#endif // TRACE_IMAGES
 
 #if _OPENMP
 
@@ -174,7 +174,9 @@ void Mod::LevSearch_(         // do an ASM search at one level in the image pyr
                               //     points except those equal to 0,0 are pinned
 const
 {
+#if TRACE_IMAGES
     TraceShape(shape, img, ilev, 0, "enterlevsearch");
+#endif
 
     InitHatLevData(img, ilev); // init internal HAT mats for this lev
 
@@ -187,7 +189,9 @@ const
         SuggestShape_(shape,
                       ilev, img, pinnedshape);
 
+#if TRACE_IMAGES
         TraceShape(shape, img, ilev, iter, "suggested");
+#endif
 
         // adjust suggested shape to conform to the shape model
 
@@ -197,8 +201,9 @@ const
         else
             shape = shapemod_.ConformShapeToMod_(b,
                                                  shape, ilev);
-
+#if TRACE_IMAGES
         TraceShape(shape, img, ilev, iter, "conformed");
+#endif
     }
 }
 
@@ -236,7 +241,9 @@ const
     cv::resize(img, scaledimg,
                cv::Size(), imgscale, imgscale, cv::INTER_LINEAR);
 
+#if TRACE_IMAGES
     TraceShape(startshape * imgscale, scaledimg, 0, -1, "start");
+#endif
 
     vector<Image> pyr;       // image pyramid (a vec of images, one for each pyr lev)
     CreatePyr(pyr, scaledimg, N_PYR_LEVS);
