@@ -62,7 +62,6 @@ void polyphemus::constructor(int params) {
     */
 
     if(params & TWINKLE_WANTED) twinkleFlag = true;
-
     else twinkleFlag = false;
 
     //Frame handler: captures and dispatches frames. Selects rois and transforms channels.
@@ -299,15 +298,11 @@ void polyphemus::init(std::string face, std::string eyePair, std::string singleE
     return;
 }
 
-//---------- DOC LINE (MONTOYA) ---------------
-
 void polyphemus::preProcessFrame()
 {
     if(preprocessDebug) std::cout<<"PREPROCESSFRAME: cols = "<<fH->getFrame().cols<<", rows = "<<fH->getFrame().rows<<std::endl;
 
-    //if (!profiling) {
     fH->mirror();
-    //}
 
     if(preprocessDebug) std::cout<<"PREPROCESSFRAME: cols = "<<fH->getFrame().cols<<", rows = "<<fH->getFrame().rows<<std::endl;
 
@@ -326,18 +321,14 @@ void polyphemus::clearPreviousFaces()
 
 void polyphemus::findNewFaces()
 {
-#ifdef FINDNEWFACES_DEBUG
-    int h=0;
-    std::cout<<"FIND_NEW_FACES: OK "<<h++<<std::endl;
-#endif
+    if(findNewFacesDebug) std::cout<<"FIND_NEW_FACES: ENTERED "<<std::endl;
+
     haar->detectFaces(rH->getGrayFrame());
-#ifdef FINDNEWFACES_DEBUG
-    std::cout<<"FIND_NEW_FACES: OK "<<h++<<std::endl;
-#endif
+    if(findNewFacesDebug) std::cout<<"FIND_NEW_FACES: DETECTION DONE "<<std::endl;
+
     faces = haar->getFaces();
-#ifdef FINDNEWFACES_DEBUG
-    std::cout<<"FIND_NEW_FACES: OK "<<h++<<std::endl;
-#endif
+    if(findNewFacesDebug) std::cout<<"FIND_NEW_FACES: FACE RECEIVED "<<std::endl;
+
     if(faces.size()>0)
     {
         facesFound = true;
@@ -373,13 +364,10 @@ void polyphemus::reduceFace()
 
 void polyphemus::processFaceData()
 {
-#ifdef PROCESSFACEDATA_DEBUG
-    std::cout<<"PROCESSFACEDATA: "<<faces[0]<<std::endl;
-#endif
+    if(processFaceDataDebug) std::cout<<"PROCESSFACEDATA: "<<faces[0]<<std::endl;
+
     rH->setFaceROI(faces);
-#ifdef PROCESSFACEDATA_DEBUG
-    std::cout<<"PROCESSFACEDATA: cols = "<<rH->getFaceROI().cols << ", rows = "<< rH->getFaceROI().rows<<std::endl;
-#endif
+    if(processFaceDataDebug) std::cout<<"PROCESSFACEDATA: cols = "<<rH->getFaceROI().cols << ", rows = "<< rH->getFaceROI().rows<<std::endl;
 
     #ifndef WEBSERVICE
     #ifdef WITH_GUI
@@ -391,8 +379,6 @@ void polyphemus::processFaceData()
     #endif //WITH_GUI
     #endif //WEBSERVICE
 
-
-    //reduceFace();       //Canny è morto?!??
 }
 
 void polyphemus::detectEyesWithHaar()
@@ -562,7 +548,7 @@ void polyphemus::reduceEmpiricEyes()
 
     #ifndef WEBSERVICE
     #ifdef WITH_GUI
-    if(gui!=NULL && !profiling)
+    if(gui!=NULL)
     {
         //For reduced frames
         gui->eyesReduced = rH->getReducedEmpiricEyes();
@@ -581,7 +567,7 @@ void polyphemus::reduceEmpiricEyes()
 #ifdef WITH_GUI
 void polyphemus::updateFace()
 {
-    if(gui!=NULL && !profiling)
+    if(gui!=NULL)
     {
         gui->updateWindow(FACE_WINDOW);
     }
@@ -589,20 +575,12 @@ void polyphemus::updateFace()
 #endif //WITH_GUI
 #endif //WEBSERVICE
 
-#ifndef WEBSERVICE
-#ifdef WITH_GUI
-void polyphemus::prepareProfiling()
-{
-    gui->initWindow(PROFILE);
-}
-#endif //WITH_GUI
-#endif //WEBSERVICE
 
 #ifndef WEBSERVICE
 #ifdef WITH_GUI
 void polyphemus::updateMain()
 {
-    if(gui!=NULL && !profiling)
+    if(gui!=NULL)
         gui->updateWindow(MAIN_WINDOW);
 }
 #endif //WITH_GUI
@@ -612,7 +590,7 @@ void polyphemus::updateMain()
 #ifdef WITH_GUI
 void polyphemus::updateGaze()
 {
-    if(gui!=NULL && !profiling)
+    if(gui!=NULL)
     {
         gui->updateWindow(GAZE_WINDOW);
     }
@@ -894,22 +872,13 @@ void polyphemus::trackGaze()
     char interruptChar;
     #endif
 
+    bool stasmCheckWanted = false;
+
 
     #ifdef TRACKGAZE_DEBUG
     int h=0;
     std::cout<<"TRACKGAZE: ENTERED"<<std::endl;
     #endif
-
-    #ifndef WEBSERVICE
-    #ifdef WITH_GUI
-    if(profiling) prepareProfiling();
-    #endif //WITH_GUI
-    #endif //WEBSERVICE
-
-    #ifdef TRACKGAZE_DEBUG
-        std::cout<<"TRACKGAZE: OK"<<h++<<std::endl;
-    #endif
-
 
     while(fH->read())
     {
@@ -1152,7 +1121,6 @@ void polyphemus::trackGaze()
         fH->prepareNextReading();
 #endif
 
-//UO
 #if defined ACTIVE_CAM || defined WEBSERVICE
 
         #ifdef TRACKGAZE_DEBUG
@@ -1163,40 +1131,49 @@ void polyphemus::trackGaze()
         #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": PREPROCESSFRAME"<<std::endl;
         #endif
-        //estimateZRotation();
-        clearPreviousFaces();
 
+        //estimateZRotation();  --> TODO: remove?
+
+        clearPreviousFaces();
         #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": CLEARPREVIOUSFACES"<<std::endl;
         #endif
-        findNewFaces();
 
+        findNewFaces();
         #ifdef TRACKGAZE_DEBUG
         std::cout<<"TRACKGAZE: OK "<<h++<<": FINDNEWFACES"<<std::endl;
         #endif
 
-        //detectAndSetUpperBody();
+        //detectAndSetUpperBody(); --> TODO: remove?
 
         if(facesFound)
         {
-
             #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": FACESFOUND IF PASSED"<<std::endl;
+            std::cout<<"TRACKGAZE: OK "<<h++<<": FACESFOUND IS TRUE"<<std::endl;
             #endif
-
 
             processFaceData();
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": PROCESSFACEDATA"<<std::endl;
             #endif
 
+            /****STASM PART*******/
             stasm();
-            //drawSingleLandmark();
-            gE->setLM(landmarks, rH->getFaceROI());//, newFace);
+
+            #ifndef WEBSERVICE
+            #ifdef WITH_GUI
+            if(stasmCheckWanted) drawSingleLandmark();
+            #endif //WITH_GUI
+            #endif //WEBSERVICE
+
+            gE->setLM(landmarks, rH->getFaceROI());
+
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": STASM"<<std::endl;
             #endif
+            /*****END OF STASM***/
 
+            /* JP
             detectEyesWithHaar();
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTEYESWITHHAAR"<<std::endl;
@@ -1254,7 +1231,7 @@ void polyphemus::trackGaze()
 
 
             /****************************************/
-
+/*JP
 
             #ifndef WEBSERVICE
             #ifdef WITH_GUI
@@ -1366,6 +1343,7 @@ void polyphemus::trackGaze()
             #endif        
             #endif*/
 
+/*JP
 
             #ifndef WEBSERVICE
             #ifdef WITH_GUI
@@ -1386,24 +1364,22 @@ void polyphemus::trackGaze()
                 #endif
 
             }
+JP */
         }
         else {
-#ifndef WEBSERVICE
-            std::cout<<"No face found!"<<std::cout;
-#ifdef WITH_GUI
+            #ifndef WEBSERVICE
+            std::cout<<"No face found!"<<std::endl;
+            #ifdef WITH_GUI
             updateMain();
-#endif //WITH_GUI
-#endif //WEBSERVICE
+            #endif //WITH_GUI
+            #endif //WEBSERVICE
         }
 #endif
-//UO
-
     }
 
-    //UO
-#ifndef WEBSERVICE
-    std::cout<<"END OF CAPTURE"<<std::endl;
-#endif
+    #ifndef WEBSERVICE
+    std::cout<<"********* END OF CAPTURE **********"<<std::endl;
+    #endif
 
 
 #ifndef WEBSERVICE
@@ -1411,11 +1387,6 @@ void polyphemus::trackGaze()
 //    if((char)c != 'c')
 //    {
 //        std::cout<<(" (!) No frame captured!")<< std::endl;
-//    }
-
-//    if(profiling)
-//    {
-//        gui->destroy(PROFILE);
 //    }
 #endif
 
@@ -1624,7 +1595,7 @@ void polyphemus::clearOldRightPupil()
 }
 
 
-//Release: function to call before closing program.
+//Release: call this method before closing program.
 void polyphemus::release()
 {
     delete haar;
@@ -1720,15 +1691,17 @@ void polyphemus::release()
     return;
 }
 
-//UO
 roiHandler* polyphemus::getRoiHandler() {
     return rH;
 }
-//UO
 
+
+#ifndef WEBSERVICE
+#ifdef WITH_GUI
 void polyphemus::drawSingleLandmark()
 {
     Mat img;
+    bool debugPrint = false;
 
     rH->getFaceROI().copyTo(img);
     namedWindow("SLM", CV_WINDOW_NORMAL);
@@ -1737,59 +1710,70 @@ void polyphemus::drawSingleLandmark()
     {
         img.at<uchar>(cvRound(landmarks[i*2+1]), cvRound(landmarks[i*2])) = 255;
         imshow("SLM", img);
-        //cout<<"LM #"<< i<< endl;
+        if(debugPrint) cout<<"LM #"<< i<< endl;
     }
-
 }
+#endif //WITH_GUI
+#endif //WEBSERVICE
 
 void polyphemus::stasm()
 {
+    bool printLandmarks = false;
+    int foundface;
     static const char* path = "../polyphemus/stasm4_1/data/testface.jpg";
     cv::Mat_<unsigned char> img;
-    img = rH->getFaceROI(); //face is already found, use it; stasm detect faces will simply return the whole img rectangle
 
-    cv::Mat_<unsigned char> img2;
-    img.copyTo(img2);
-
-    int foundface;
-
+    rH->getFaceROI().copyTo(img); //face is already found, use it; stasm detect faces will simply return the whole img rectangle
 
     if (!stasm_search_single(&foundface, landmarks,
-            (char*)img2.data, img2.cols, img2.rows, path, "../polyphemus/stasm4_1/data"))
+            (char*)img.data, img.cols, img.rows, path, "../polyphemus/stasm4_1/data"))
 
     {
-#ifndef WEBSERVICE
+        #ifndef WEBSERVICE
         printf("Error in stasm_search_single: %s\n", stasm_lasterr());
         exit(1);
-#endif
+        #endif
     }
 
     if (!foundface) {
-#ifndef WEBSERVICE
+        #ifndef WEBSERVICE
         printf("No face found in %s\n", path);
-#endif
+        #endif
     }
     else
     {
-//        for (int i = 0; i < stasm_NLANDMARKS; i++)
-//        {
-//            cout<<"LM "<< i << ": ("<<landmarks[i*2] <<" , "<<landmarks[i*2+1]<<endl;
-//        }
-        // draw the landmarks on the image as white dots
-        stasm_force_points_into_image(landmarks, img2.cols, img2.rows);
-        for (int i = 0; i < stasm_NLANDMARKS; i++)
-            img2(cvRound(landmarks[i*2+1]), cvRound(landmarks[i*2])) = 255;
+        if(printLandmarks)
+        {
+            for (int i = 0; i < stasm_NLANDMARKS; i++)
+            {
+                cout<<"LM "<< i << ": ("<<landmarks[i*2] <<" , "<<landmarks[i*2+1]<<endl;
+            }
+        }
 
-//        for (int i = 0; i < stasm_NLANDMARKS; i++)
-//        {
-//            cout<<"LM "<< i << ": ("<<landmarks[i*2] <<" , "<<landmarks[i*2+1]<<")"<<endl;
-//        }
+        stasm_force_points_into_image(landmarks, img.cols, img.rows);
+
+        #ifndef WEBSERVICE
+        #ifdef WITH_GUI
+        // draw the landmarks on the image as white dots
+        for (int i = 0; i < stasm_NLANDMARKS; i++)
+            img(cvRound(landmarks[i*2+1]), cvRound(landmarks[i*2])) = 255;
+        #endif //WITH_GUI
+        #endif //WEBSERVICE
+
+        if(printLandmarks)
+        {
+            for (int i = 0; i < stasm_NLANDMARKS; i++)
+            {
+                cout<<"LM "<< i << ": ("<<landmarks[i*2] <<" , "<<landmarks[i*2+1]<<")"<<endl;
+            }
+        }
     }
-#ifndef WEBSERVICE
-#ifdef WITH_GUI
-    if(this->gui != NULL) cv::imshow("stasm minimal", img2);
-#endif //WITH_GUI
-#endif
+
+    #ifndef WEBSERVICE
+    #ifdef WITH_GUI
+    if(this->gui != NULL) cv::imshow("stasm minimal", img);
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
 }
 
 

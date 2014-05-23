@@ -92,7 +92,7 @@ bool frameHandler::read()
     char c = waitKey(30);
     if(c == 'c')
     {
-        std::cout<<"Returning false"<<std::endl;
+        std::cout<<"\nNow exiting..."<<std::endl;
         return false;
     }
     return true;

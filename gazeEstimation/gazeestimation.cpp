@@ -128,9 +128,11 @@ void gazeEstimation::setLM(float lm[nLM*2], Mat face)//, bool newFace)
 {
     int li=0, ri=0;
 
+#ifndef WEBSERVICE
 #ifdef WITH_GUI
     bool debug = true;
-#endif
+#endif //WITH_GUI
+#endif //WEBSERVICE
 
     lTop = face.rows;
     lBottom = 0;
@@ -191,9 +193,11 @@ void gazeEstimation::setLM(float lm[nLM*2], Mat face)//, bool newFace)
         }
     }
 
+#ifndef WEBSERVICE
 #ifdef WITH_GUI
     if(debug) showLandmarks(face, LMleftPupil, leftLM, LMrightPupil, rightLM);
-#endif
+#endif //WITH_GUI
+#endif //WEBSERVICE
 
 }
 

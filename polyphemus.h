@@ -330,7 +330,13 @@ private:
     //                    STASM METHODS
     //---------------------------------------------------------
     void stasm();
+
+    #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     void drawSingleLandmark();
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
+
     float landmarks[2* stasm_NLANDMARKS]; // x,y coords
 
     //---------------------------------------------------------

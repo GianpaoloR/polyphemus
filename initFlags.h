@@ -4,10 +4,14 @@
 const bool retrieveDesktopDebug = false;
 const bool preprocessDebug = false;
 const bool flatfieldDebug = false;
+const bool findNewFacesDebug = false;
+const bool processFaceDataDebug = false;
 /* DONE
 #DEFINES += "RETRIEVEDESKTOP_DEBUG"
 #DEFINES += "PREPROCESS_DEBUG"
 #DEFINES += "FLATFIELD_DEBUG"
+#DEFINES += "FINDNEWFACES_DEBUG"
+#DEFINES += "PROCESSFACEDATA_DEBUG"
 */
 /* NOT YET DONE
 #DEFINES += "DEBUG"
@@ -15,9 +19,7 @@ const bool flatfieldDebug = false;
 #DEFINES += "SETGRAYFRAME_DEBUG"
 #DEFINES += "GETGRAYFRAME_DEBUG"
 #DEFINES += "DETECTFACES_DEBUG"
-#DEFINES += "FINDNEWFACES_DEBUG"
 #DEFINES += "DETECTUPPERBODY_DEBUG"
-#DEFINES += "PROCESSFACEDATA_DEBUG"
 #DEFINES += "SETFACEROI_DEBUG"
 #DEFINES += "MAKEEMPIRICEYES_DEBUG"
 #DEFINES += "SETEMPIRICEYES_DEBUG"
