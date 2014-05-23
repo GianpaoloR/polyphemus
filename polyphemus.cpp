@@ -381,66 +381,10 @@ void polyphemus::processFaceData()
 
 }
 
-void polyphemus::detectEyesWithHaar()
-{
-    cv::Mat m;
-    rH->clearHaarEyes();
 
-    eyePairs.clear();
-    haar->detectEyePairs(rH->getFaceROI(), rH->getFace());
-    eyePairs = haar->getEyePairs();
-    if (eyePairs.size()) {
-        m = rH->getGrayFrame();
-        //fH->setEyePairROI(eyePairs);
-        rH->setEyePairROI(eyePairs);
-    }
 
-    //Detect single eyes
-    /*singleEyes.clear();
-    haar->detectSingleEyes(fH->getFaceROI(), fH->getFace());
-    singleEyes = haar->getSingleEyes();
-    if (singleEyes.size()) {
-        fH->setEyesHaarROI(singleEyes);
-    }*/
 
-    //Detect left eyes
-    leftEyes.clear();
-    haar->detectLeftEyes(rH->getFaceROI(), rH->getFace());
-    leftEyes = haar->getLeftEyes();
-    if (leftEyes.size()) {
-        rH->setLeftEyeROI(leftEyes);
-    }
 
-    //Detect right eyes
-    rightEyes.clear();
-    haar->detectRightEyes(rH->getFaceROI(), rH->getFace());
-    rightEyes = haar->getRightEyes();
-    if (rightEyes.size()) {
-        rH->setRightEyeROI(rightEyes);
-    }
-}
-
-void polyphemus::detectNoseWithHaar()
-{
-    noses.clear();
-    rH->clearNose();
-    haar->detectNoses(rH->getFaceROI(), rH->getFace());
-    noses = haar->getNoses();
-    if (noses.size()) {
-        rH->setNoseROI(noses);
-    }
-}
-
-void polyphemus::detectMouthWithHaar()
-{
-    mouths.clear();
-    rH->clearMouth();
-    haar->detectMouths(rH->getFaceROI(), rH->getFace());
-    mouths = haar->getMouths();
-    if (mouths.size()) {
-        rH->setMouthROI(mouths);
-    }
-}
 /*
 void polyphemus::estimateAndShowGazeStartingPoint()
 {
@@ -601,61 +545,6 @@ void polyphemus::updateGaze()
 
 
 
-//TEMPORARY SIMONE'S METHOD
-void polyphemus::templateMatching()
-{
-    if ( rH->hasNose())
-    {
-        rH->setOldNose();
-    }
-
-    if( !rH->hasNose() && rH->itHasDistanceNoseMouth)
-    {
-        noses.clear();
-        noses[0] = MatchingMethod(rH->getFaceROI(), rH->getOldHaarNoseROI());
-        rH->setNoseROI(noses);
-
-        #ifdef KETROD_DEBUG
-        namedWindow("TEST$", WINDOW_AUTOSIZE);
-        imshow("TEST$", rH->getFaceROI());
-        #endif //KETROD_DEBUG
-    }
-    //detectNoseWithMatchingMethod();
-
-
-    //-------------
-    if ( rH->hasMouth())
-    {
-        rH->setOldMouth();
-    }
-
-    if (!rH->hasMouth() && rH->itHasDistanceNoseMouth)
-    {
-        mouths.clear();
-        mouths[0] = MatchingMethod(rH->getFaceROI(), rH->getOldHaarMouthROI());
-        rH->setMouthROI(mouths);
-
-        #ifdef KETROD_DEBUG
-        namedWindow("TEST$", WINDOW_AUTOSIZE);
-        imshow("TEST$", rH->getFaceROI());
-        #endif //KETROD_DEBUG
-    }
-}
-
-void polyphemus::antropometricFilter()
-{
-    if (rH->hasMouth() && rH->hasNose())
-    {
-        cv::Rect n = rH->getNose();
-        cv::Rect m = rH->getMouth();
-
-        if ((n.y + n.height/2) > (m.y + m.height/2))
-        {
-            rH->clearMouth();
-            rH->clearNose();
-        }
-    }
-}
 
 #ifdef KETROD_DEBUG
 void polyphemus::printFeatures()
@@ -916,39 +805,6 @@ void polyphemus::trackGaze()
             std::cout<<"TRACKGAZE: OK "<<h++<<": STASM"<<std::endl;
             #endif
 
-            //---------------------------------------------
-            // Haar features recognition
-
-            detectEyesWithHaar();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTEYESWITHHAAR"<<std::endl;
-            #endif
-
-            detectNoseWithHaar();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTNOSEWITHHAAR"<<std::endl;
-            #endif
-
-            detectMouthWithHaar();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTMOUTHWITHHAAR"<<std::endl;
-            #endif
-
-            #ifndef WEBSERVICE
-            //da rendere usabile anche col webservice usando le funzioni di salvataggio delle immagini sul server
-            templateMatching();
-
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": TEMPLATEMATCHING"<<std::endl;
-            #endif //TRACKGAZE_DEBUG
-
-            #endif //WEBSERVICE
-
-            antropometricFilter();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": ANTROPOMETRICFILTER"<<std::endl;
-            #endif
-
 
             headRotation->processDistances();
             #ifdef TRACKGAZE_DEBUG
@@ -1132,8 +988,6 @@ void polyphemus::trackGaze()
             std::cout<<"TRACKGAZE: OK "<<h++<<": PREPROCESSFRAME"<<std::endl;
         #endif
 
-        //estimateZRotation();  --> TODO: remove?
-
         clearPreviousFaces();
         #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": CLEARPREVIOUSFACES"<<std::endl;
@@ -1143,8 +997,6 @@ void polyphemus::trackGaze()
         #ifdef TRACKGAZE_DEBUG
         std::cout<<"TRACKGAZE: OK "<<h++<<": FINDNEWFACES"<<std::endl;
         #endif
-
-        //detectAndSetUpperBody(); --> TODO: remove?
 
         if(facesFound)
         {
@@ -1174,33 +1026,6 @@ void polyphemus::trackGaze()
             /*****END OF STASM***/
 
             /* JP
-            detectEyesWithHaar();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTEYESWITHHAAR"<<std::endl;
-            #endif
-
-            detectNoseWithHaar();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTNOSEWITHHAAR"<<std::endl;
-            #endif
-
-            detectMouthWithHaar();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTMOUTHWITHHAAR"<<std::endl;
-            #endif
-
-            #ifndef WEBSERVICE
-            //da rendere usabile anche col webservice usando le funzioni di salvataggio delle immagini sul server
-            templateMatching();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": TEMPLATEMATCHING"<<std::endl;
-            #endif
-            #endif
-
-            antropometricFilter();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": ANTROPOMETRICFILTER"<<std::endl;
-            #endif
 
 
             headRotation->processDistances();
@@ -1381,14 +1206,6 @@ JP */
     std::cout<<"********* END OF CAPTURE **********"<<std::endl;
     #endif
 
-
-#ifndef WEBSERVICE
-    //See why program exited from while
-//    if((char)c != 'c')
-//    {
-//        std::cout<<(" (!) No frame captured!")<< std::endl;
-//    }
-#endif
 
     return;
 }

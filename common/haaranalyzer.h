@@ -113,23 +113,11 @@ public:
     #endif
 
     bool loadCascade(cascadeType type, std::string path);
-    void detectEyePairs(cv::Mat& img, cv::Rect& face);
-    void detectSingleEyes(cv::Mat& img, cv::Rect& face);
-    void detectLeftEyes(cv::Mat& img, cv::Rect& face);
-    void detectRightEyes(cv::Mat& img, cv::Rect& face);
-    void detectNoses(cv::Mat& img, cv::Rect& face);
-    void detectMouths(cv::Mat& img, cv::Rect& face);
     bool hasDetectFace(cv::Mat& img);
     void detectUpperBody(cv::Mat& img);
     bool hasDetectFaceWithSize(cv::Mat& img, cv::Size &roundSize);
     void detectFaces(cv::Mat& img);
     bool redetectFace(cv::Mat& img);
-    std::vector<cv::Rect> getEyePairs();
-    std::vector<cv::Rect> getSingleEyes();
-    std::vector<cv::Rect> getLeftEyes();
-    std::vector<cv::Rect> getRightEyes();
-    std::vector<cv::Rect> getNoses();
-    std::vector<cv::Rect> getMouths();
     std::vector<cv::Rect> getFaces();
     std::vector<cv::Rect> getEyeZones();
     std::vector<cv::Rect> getUpperBodies();
@@ -149,12 +137,6 @@ private:
     cv::CascadeClassifier upper_body_cascade;
 
     //Face rectangle vector
-    std::vector<cv::Rect> eyePairs;
-    std::vector<cv::Rect> singleEyes;
-    std::vector<cv::Rect> leftEyes;
-    std::vector<cv::Rect> rightEyes;
-    std::vector<cv::Rect> noses;
-    std::vector<cv::Rect> mouths;
     std::vector<cv::Rect> faces;
     std::vector<cv::Rect> upper_bodies;
 

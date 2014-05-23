@@ -245,4 +245,5 @@ QMAKE_CXXFLAGS += -Wno-deprecated
 #LIBS += -fopenmp
 
 OTHER_FILES += \
-    otherCode.txt
+    otherCode.txt \
+    otherCode.jp

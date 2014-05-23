@@ -199,27 +199,9 @@ private:
     //---------------------------------------------------------
     //                   HAAR DATA & METHODS
     //---------------------------------------------------------
-    ///<summary> Vector to be filled by Haar analysis (eye couple).</summary>
-    std::vector<cv::Rect> eyePairs;
-    ///<summary> Vector to be filled by Haar analysis (single eye).</summary>
-    std::vector<cv::Rect> singleEyes;
-    ///<summary> Vector to be filled by Haar analysis (left eye).</summary>
-    std::vector<cv::Rect> leftEyes;
-    ///<summary> Vector to be filled by Haar analysis (right eye).</summary>
-    std::vector<cv::Rect> rightEyes;
-    ///<summary> Vector to be filled by Haar analysis (nose).</summary>
-    std::vector<cv::Rect> noses;
     ///<summary> Vector to be filled by Haar analysis (face).</summary>
     std::vector<cv::Rect> faces;
-    ///<summary> Vector to be filled by Haar analysis (mouth).</summary>
-    std::vector<cv::Rect> mouths;
 
-    ///<summary> Find nose through Haar classifier. Called by trackGaze(). Returns void.</summary>
-    void detectNoseWithHaar();
-    ///<summary> Find mouth through Haar classifier. Called by trackGaze(). Returns void.</summary>
-    void detectMouthWithHaar();
-    ///<summary>Applies Haar analysis (eye pairs, left eye, right eye detection) and sets rois accordingly. Called by trackGaze(). Returns void.</summary>
-    void detectEyesWithHaar();
 
     //---------------------------------------------------------
     //                   PUPIL DATA & METHODS
@@ -375,9 +357,6 @@ private:
 
     void prepareProfiling();
 
-
-    void templateMatching(); //TEMPORARY SIMONE'S METHOD
-    void antropometricFilter(); //TEMPORARY SIMONE'S METHOD
     #ifdef KETROD_DEBUG
     void printFeatures(); //TEMPORARY SIMONE'S METHOD
     #endif
