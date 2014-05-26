@@ -31,7 +31,6 @@ public:
     cv::Rect thresholdImage(cv::Mat& img);
     int searchWhiteAtL(int k, cv::Mat drawing);
     int searchWhiteAtR(int k, cv::Mat drawing);
-    void processDistances();
     double evaluateRotationZ(haarAnalyzer *haar);
     void positPoint(float * landmarks);
     void posit(std::vector<CvPoint3D32f> modelPoints, std::vector<CvPoint2D32f> srcImagePoints);

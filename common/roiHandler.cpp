@@ -423,21 +423,7 @@ void roiHandler::setOldMouth()
 /*******************************************************************************/
 /*                                   NOSE                                      */
 /*******************************************************************************/
-//SetNoseROI: makes the frameHandler set his nose frame
-void roiHandler::setNoseROI(std::vector<cv::Rect> fVett)
-{
-    if(fVett.size() == 0) return;
 
-    itHasNose = true;
-    noseHaarRect = fVett[0];
-    noseHaarFrame = grayFrame(fVett[0]);
-
-    return;
-}
-
-bool roiHandler::hasNose() {
-    return itHasNose;
-}
 
 cv::Rect& roiHandler::getNose() {
     return noseHaarRect;
@@ -447,15 +433,7 @@ cv::Mat& roiHandler::getNoseROI() {
     return noseHaarFrame;
 }
 
-//clearNose: flush the noseFrame
-void roiHandler::clearNose()
-{
-    if (itHasNose) {
-        itHasNose = false;
-        noseHaarRect = cv::Rect(0, 0, 0, 0);
-        noseHaarFrame.release();
-    }
-}
+
 
 
 /*******************************************************************************/
@@ -497,7 +475,7 @@ void roiHandler::clearMouth()
 
 void roiHandler::release()
 {
-    clearNose();
+    //clearNose();
     clearMouth();
     clearFace();
 

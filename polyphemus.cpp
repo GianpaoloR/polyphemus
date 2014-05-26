@@ -385,88 +385,8 @@ void polyphemus::processFaceData()
 
 
 
-/*
-void polyphemus::estimateAndShowGazeStartingPoint()
-{
-#ifdef ESTIMATEANDSHOWGAZESTARTINGPOINT_DEBUG
-    std::cout << "ESTIMATEANDSHOWGAZESTARTINGPOINT: ENTERED"<<std::endl;
-#endif
-
-    watchingPoint = headRotation->evaluatePosition(headRotation->evaluateRotationY(landmarks), rH->getFace(), fH->getFrame(), landmarks);
-
-#ifdef ESTIMATEANDSHOWGAZESTARTINGPOINT_DEBUG
-    std::cout << "ESTIMATEANDSHOWGAZESTARTINGPOINT: initial gaze = "<< watchingPoint << std::endl;
-#endif
-
-    #ifndef WEBSERVICE
-    #ifdef WITH_GUI
-    if(gui!=NULL && !profiling)
-    {
-        gui->showStartingGaze(watchingPoint);
-    }
-    #endif //WITH_GUI
-    #endif //WEBSERVICE
-}
-*/
-
-#ifndef WEBSERVICE
-#ifdef WITH_GUI
-void polyphemus::estimateAndShowRotationsY()
-{
-    double rotation;;
 
 
-    rotation = headRotation->evaluateRotationWithNoseY(landmarks);
-    #ifndef WEBSERVICE
-    if (gui!=NULL && rH->hasNose() && rotation != 0) {
-        gui->showNoseRotationY(rH->getFace(), rH->getNose(), rotation);
-    }
-    #endif
-
-    rotation = headRotation->evaluateRotationWithMouthY(landmarks);
-    #ifndef WEBSERVICE
-    if (gui!=NULL && rH->hasMouth() && rotation != 0) {
-        gui->showMouthRotationY(rH->getFace(), rH->getMouth(), rotation);
-    }
-    #endif
-
-    rotation = headRotation->evaluateRotationY(landmarks);
-    #ifndef WEBSERVICE
-    if(gui!=NULL && rotation != 0)
-    {
-        gui->showHeadRotationY(rH->getFace(), rotation);
-    }
-    #endif
-
-}
-/*
-void polyphemus::estimateAndShowRotationsY()
-{
-    double rotation = headRotation->evaluateRotationWithEyesY();
-    if (gui!=NULL && rH->hasLeftEye() && rH->hasRightEye() && rotation != 0) {
-        gui->showEyesRotationY(rH->getFace(), rH->getLeftEye(), rH->getRightEye(), rotation);
-    }
-
-    rotation = headRotation->evaluateRotationWithNoseY();
-    if (gui!=NULL && rH->hasNose() && rotation != 0) {
-        gui->showNoseRotationY(rH->getFace(), rH->getNose(), rotation);
-    }
-
-    rotation = headRotation->evaluateRotationWithMouthY();
-    if (gui!=NULL && rH->hasMouth() && rotation != 0) {
-        gui->showMouthRotationY(rH->getFace(), rH->getMouth(), rotation);
-    }
-
-    rotation = headRotation->evaluateRotationY();
-    if(gui!=NULL && rotation != 0)
-    {
-        gui->showHeadRotationY(rH->getFace(), rotation);
-    }
-
-}
-*/
-#endif //WITH_GUI
-#endif //WEBSERVICE
 
 void polyphemus::detectEyesEmpiric()
 {
@@ -777,12 +697,10 @@ void polyphemus::trackGaze()
 
         //------------------------------------------------
         //  Initial frame elaboration
-
         preProcessFrame();
 
         //------------------------------------------------
         //  face recognition
-
         clearPreviousFaces();
         findNewFaces();
 
@@ -790,59 +708,28 @@ void polyphemus::trackGaze()
         //  face processing
 
         if(facesFound)
-        {
+        {            
             processFaceData();
 
             #ifdef AUTOMATIC_TEST
             computeRealPupilDistances();
             #endif
 
-            //STASM
+            /****STASM PART*******/
             stasm();
-            //drawSingleLandmark();
             gE->setLM(landmarks, rH->getFaceROI());//, newFace);
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": STASM"<<std::endl;
             #endif
 
 
-            headRotation->processDistances();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": PROCESSDISTANCES"<<std::endl;
-            #endif
+            /****KETROD PART******/
+            headRotation->positPoint(landmarks);
 
-            #ifdef WITH_GUI
-            estimateAndShowRotationsY();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": ESTIMATEANDSHOWROTATIONSY"<<std::endl;
-            #endif
-            #endif
 
-            //estimateAndShowGazeStartingPoint();
-            #ifndef WEBSERVICE
-                #ifdef TRACKGAZE_DEBUG
-                std::cout<<"TRACKGAZE: OK "<<h++<<": EVALUATEANDSHOWGAZESTARTINGPOINT"<<std::endl;
-                #endif
-            #endif
-
-            #ifndef WEBSERVICE
-            #ifdef WITH_GUI
-                updateMain();
-                #ifdef TRACKGAZE_DEBUG
-                std::cout<<"TRACKGAZE: OK "<<h++<<": UPDATEMAIN"<<std::endl;
-                #endif
-            #endif //WITH_GUI
-            #endif //WEBSERVICE
-
+            /****JP PART**********/
             detectEyesEmpiric();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTEYESEMPIRIC"<<std::endl;
-            #endif
-
             reduceEmpiricEyes();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": REDUCEEMPIRICEYES"<<std::endl;
-            #endif
 
             //---------------------------------------------
             //  Find and set pupil data
@@ -851,23 +738,11 @@ void polyphemus::trackGaze()
             //Detection
             //pD->findPupils(rH->getLeftEyeROI(), rH->getRightEyeROI());
             pD->findPupils(rH->getLeftEmpiricReducedROI(), rH->getRightEmpiricReducedROI());
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": FINDPUPILS"<<std::endl;
-            #endif
 
             //Refinement
-            if(refined)
-            {
-                pD->refinePupils();
-                #ifdef TRACKGAZE_DEBUG
-                std::cout<<"TRACKGAZE: OK "<<h++<<": REFINEMENT DONE."<<std::endl;
-                #endif
-            }
+            if(refined)     pD->refinePupils();
 
             setPupilData();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": PUPIL DATA SET."<<std::endl;
-            #endif
 
             gE->predictHorizontalZone(G_CATCH);
             gE->predictVerticalZone(this->newFace);
@@ -887,49 +762,6 @@ void polyphemus::trackGaze()
 
             #endif //ONLY_REAL_PUPILS
 
-            #ifdef WITH_GUI
-            updateFace();
-                #ifdef TRACKGAZE_DEBUG
-                std::cout<<"TRACKGAZE: OK "<<h++<<": UPDATEFACE"<<std::endl;
-                #endif
-            #endif //WITH_GUI
-
-            if (rH->hasLeftEye()) {
-                Mat mat = fH->getFrame();
-                mat = mat(rH->getFace());
-                eyeColourEvaluation(mat(rH->getLeftEye()));
-
-                #ifdef TRACKGAZE_DEBUG
-                std::cout<<"TRACKGAZE: OK "<<h++<<": EYECOLOUREVALUATION"<<std::endl;
-                #endif
-
-            }
-
-            /*
-            //---------------------------------------------
-            //  Evaluate pupil gaze x displacement
-
-            if(pD->leftFound || pD->rightFound)
-            {
-                estimatePupilGazeDisplacement(true);
-            }
-            else
-            {
-                std::cout<<"NO PUPIL"<<std::endl;
-            }
-
-            //----------------------------------------------
-            //  Unify head and pupil gaze data
-            computeFinalGaze();
-            if(gui!=NULL) gui->showFinalGaze(watchingPoint);
-
-
-            //----------------------------------------------
-            //  Refresh windows images
-
-            updateGaze();
-            updateFace();
-            updateMain();
 
             //----------------------------------------------
             //  Collect user opinion
@@ -959,7 +791,6 @@ void polyphemus::trackGaze()
             #endif
 
             //waitKey(0);
-        */
         }
         else
         {
@@ -1025,38 +856,44 @@ void polyphemus::trackGaze()
             #endif
             /*****END OF STASM***/
 
-            /* JP
+            #ifndef WEBSERVICE
+            #ifdef WITH_GUI
+            //Prepare gaze window
+            if(gui!=NULL) gui->redrawGazeFrame();
+            #endif //WITH_GUI
+            #endif //WEBSERVICE
 
-
-            headRotation->processDistances();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": PROCESSDISTANCES"<<std::endl;
-            #endif
+            /***** KETROD PART *****/
+            //headRotation->processDistances(); --> TODO: remove?
+            //#ifdef TRACKGAZE_DEBUG
+            //std::cout<<"TRACKGAZE: OK "<<h++<<": PROCESSDISTANCES"<<std::endl;
+            //#endif
 
 			headRotation->positPoint(landmarks);
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": POSITPOINT"<<std::endl;
             #endif
 
-            #ifdef WITH_GUI
-            estimateAndShowRotationsY();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": ESTIMATEANDSHOWROTATIONSY"<<std::endl;
-            #endif
-            #endif
-
-
-            //TODO:
-            //estimateAndShowGazeStartingPoint();
+            //TODO --> remove?
+            /*
+            estimateAndShowGazeStartingPoint();
             #ifndef WEBSERVICE
                 #ifdef TRACKGAZE_DEBUG
                 std::cout<<"TRACKGAZE: OK "<<h++<<": EVALUATEANDSHOWGAZESTARTINGPOINT"<<std::endl;
                 #endif
             #endif
+            */
 
+            #ifndef WEBSERVICE
+            #ifdef WITH_GUI
+            if(gui!=NULL)
+            {
+                gui->turnOnHeadZone(headRotation->getAngleX(), headRotation->getAngleY(), headRotation->getDistanceHead(), rH->getFace());
+            }
+            #endif //WITH_GUI
+            #endif //WEBSERVICE
 
-            /****************************************/
-/*JP
+            /***** END OF KETROD PART *****/
 
             #ifndef WEBSERVICE
             #ifdef WITH_GUI
@@ -1066,6 +903,9 @@ void polyphemus::trackGaze()
                 #endif
             #endif //WITH_GUI
             #endif //WEBSERVICE
+
+
+            /***** JP PART *****/
 
             detectEyesEmpiric();
             #ifdef TRACKGAZE_DEBUG
@@ -1099,24 +939,34 @@ void polyphemus::trackGaze()
             gE->predictHorizontalZone(G_CATCH);
             gE->predictVerticalZone(this->newFace);
 
+            #ifndef WEBSERVICE
             #ifdef WITH_GUI
             pD->updateReduced();
             #ifdef TRACKGAZE_DEBUG
             std::cout<<"TRACKGAZE: OK "<<h++<<": PUPILS SHOWED IN REDUCED WINDOWS."<<std::endl;
             #endif //TRACKGAZE_DEBUG
 
-            if(gui!=NULL) // || pD->rightFound)
+            if(gui!=NULL)
             {
                 if(pD->leftFound)
                 {
-                gui->turnOnZone(gE->getHorizontalResponse(), gE->getVerticalResponse(), headRotation->getAngleX(), headRotation->getAngleY(), headRotation->getDistanceHead(), rH->getFace());
-
-                    //estimatePupilGazeDisplacement(false);
-                    #ifdef TRACKGAZE_DEBUG
-                    std::cout<<"TRACKGAZE: OK "<<h++<<": ESTIMATEPUPILGAZEDISPLACEMENT"<<std::endl;
-                    #endif
-                    //gui->showFinalGaze(watchingPoint);
+                    gui->turnOnEyeZone(gE->getHorizontalResponse(), gE->getVerticalResponse());
+                    #ifdef GREATCATCH_TEST
                     updateGaze();
+                    std::cout<<"Is this the correct place? [y,n,t]"<<std::endl;
+                    char userResponse = cv::waitKey(0);
+                    switch(userResponse)
+                    {
+                    case 'y':
+                        correctPlace++;
+                        break;
+                    case 'n':
+                        wrongPlace++;
+                        break;
+                    default:
+                        break;
+                    }
+                    #endif //GREATCATCH_TEST
                 }
                 else
                 {
@@ -1128,68 +978,29 @@ void polyphemus::trackGaze()
                 }
             }
             #endif //WITH_GUI
-            /*
-            std::vector<cv::Rect> eyesReduced = rH->getReducedEmpiricEyes();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": GETREDUCEDEMPIRICEYES"<<std::endl;
-            #endif
+            #endif //WEBSERVICE
 
+            /***** END OF JP PART *****/
 
-
-            computeFinalGaze();
-            #ifndef WEBSERVICE
-            if(gui != NULL)
-            {
-                #ifdef TRACKGAZE_DEBUG
-                std::cout<<"TRACKGAZE: OK "<<h++<<": SHOWFINALGAZE"<<std::endl;
-                #endif
-            }
-            #endif
-
-
-            #ifndef WEBSERVICE
-                #ifdef TRACKGAZE_DEBUG
-                std::cout<<"TRACKGAZE: OK "<<h++<<": UPDATEGAZE"<<std::endl;
-                #endif
-            #ifdef GREATCATCH_TEST
-            std::cout<<"Is this the correct place? [y,n,t]"<<std::endl;
-            char userResponse = cv::waitKey(0);
-            switch(userResponse)
-            {
-            case 'y':
-                correctPlace++;
-                break;
-            case 'n':
-                wrongPlace++;
-                break;
-            default:
-                break;
-            }
-            #endif        
-            #endif*/
-
-/*JP
+            /***** FINAL PREDICTION ******/
 
             #ifndef WEBSERVICE
             #ifdef WITH_GUI
-            updateFace();
-                #ifdef TRACKGAZE_DEBUG
-                std::cout<<"TRACKGAZE: OK "<<h++<<": UPDATEFACE"<<std::endl;
-                #endif
+
+            if(gui!=NULL)
+            {
+                updateGaze();
+                    #ifdef TRACKGAZE_DEBUG
+                    std::cout<<"TRACKGAZE: OK "<<h++<<": UPDATEGAZE"<<std::endl;
+                    #endif
+                updateFace();
+                    #ifdef TRACKGAZE_DEBUG
+                    std::cout<<"TRACKGAZE: OK "<<h++<<": UPDATEFACE"<<std::endl;
+                    #endif
+            }
+
             #endif //WITH_GUI
             #endif //WEBSERVICE
-
-            if (rH->hasLeftEye()) {
-                Mat mat = fH->getFrame();
-                mat = mat(rH->getFace());
-                eyeColourEvaluation(mat(rH->getLeftEye()));
-
-                #ifdef TRACKGAZE_DEBUG
-                std::cout<<"TRACKGAZE: OK "<<h++<<": EYECOLOUREVALUATION"<<std::endl;
-                #endif
-
-            }
-JP */
         }
         else {
             #ifndef WEBSERVICE
@@ -1218,50 +1029,6 @@ void polyphemus::estimatePupilGazeDisplacement(bool refined)
     return;
 }
 
-void polyphemus::computeFinalGaze()
-{
-    //Horizontal component
-    computeFinalGazeX();
-
-    //Vertical component
-    computeFinalGazeY(); //TODO!!!
-
-}
-
-void polyphemus::computeFinalGazeY()
-{
-    return;
-}
-
-void polyphemus::computeFinalGazeX()
-{
-    int displ = gE->getFinalXDisplacement();
-#ifdef COMPUTEFINALGAZEX_DEBUG
-    std::cout <<"COMPUTEFINALGAZEX: ENTERED. WatchingPoint = " << watchingPoint <<", displacement = " << displ << std::endl;
-#endif
-    //WITH HEAD
-    //watchingPoint.x += displ;
-    //WITHOUT HEAD
-    watchingPoint.x = screenWidth/2 + displ;
-#ifdef COMPUTEFINALGAZEX_DEBUG
-    std::cout <<"COMPUTEFINALGAZEX: Final watchingPoint = " << watchingPoint <<", displacement = " << displ << std::endl;
-#endif
-#ifdef MONTOYA
-
-    double xDebug = (ratio*gazeFrame.cols);
-    double xGlobal = (ratio-0.5)*hRes;
-    std::cout<<"\tGAZE ONLY: X = "<< xDebug <<" [DIMENSIONE FINESTRA DI DEBUG = "<<gazeFrame.cols<<"]"<< std::endl;
-    std::cout<<"\tGAZE GLOBAL DISPLACEMENT: X = "<< xGlobal <<" [DIMENSIONE SCHERMO = "<<hRes<<"]"<< std::endl;
-    gaze.x = (int)xDebug;
-    gaze.y = gazeFrame.rows/5;
-    if(gaze.x >= gazeFrame.cols) gaze.x = gazeFrame.cols-1;
-    if(gaze.x < 0) gaze.x = 0;
-    globalGaze.x += (int)xGlobal;
-    if(globalGaze.x >= hRes) globalGaze.x = hRes-1;
-    if(globalGaze.x < 0) globalGaze.x = 0;
-    std::cout<<"\tGAZE GLOBAL FINAL: X = "<< globalGaze.x <<" [DIMENSIONE SCHERMO = "<<hRes<<"]"<< std::endl;
-#endif
-}
 
 void polyphemus::setLeftPupilRefined(Rect eyeRect)
 {

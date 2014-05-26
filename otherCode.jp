@@ -22,8 +22,181 @@ std::vector<cv::Rect> mouths;
     void templateMatching(); //TEMPORARY SIMONE'S METHOD
     void antropometricFilter(); //TEMPORARY SIMONE'S METHOD
 
+    ///<summary> Estimate head rotation along y axis (pan movement) and sets headRotation's structures accordingly. Called by trackGaze(). Returns void.</summary>
+    void estimateAndShowRotationsY();
+
+    ///<summary> Sets the initial position for the gaze point on screen. Needs previous work done by headRotation for y axes. Called by trackGaze(). Returns void.</summary>
+    void estimateAndShowGazeStartingPoint();
+
+    ///<summary> Main function to merge together all gaze data computed before (head, eyes, x and y). Called by trackGaze(). Returns void.</summary>
+    void computeFinalGaze();
+    ///<summary> Internal function to merge together gaze data computed before (head + eyes). ONLY for X axis. Called by computeFinalGaze(). Returns void.</summary>
+    void computeFinalGazeX();
+    ///<summary> Internal function to merge together gaze data computed before (head + eyes). ONLY for Y axis. Called by computeFinalGaze(). Returns void.</summary>
+    void computeFinalGazeY();    //TODO!!!
 
 ---------_POLYPHEMUS_----------------
+
+
+//IN trackgaze(), al fondo
+
+    if (rH->hasLeftEye()) {
+        Mat mat = fH->getFrame();
+        mat = mat(rH->getFace());
+        eyeColourEvaluation(mat(rH->getLeftEye()));
+
+        /*JP
+        #ifdef TRACKGAZE_DEBUG
+        std::cout<<"TRACKGAZE: OK "<<h++<<": EYECOLOUREVALUATION"<<std::endl;
+        #endif
+
+    }
+
+// ^^^ in trackgaze(), al fondo ^^^
+
+
+void polyphemus::computeFinalGaze()
+{
+    //Horizontal component
+    computeFinalGazeX();
+
+    //Vertical component
+    computeFinalGazeY(); //TODO!!!
+
+}
+
+void polyphemus::computeFinalGazeY()
+{
+    return;
+}
+
+void polyphemus::computeFinalGazeX()
+{
+    int displ = gE->getFinalXDisplacement();
+#ifdef COMPUTEFINALGAZEX_DEBUG
+    std::cout <<"COMPUTEFINALGAZEX: ENTERED. WatchingPoint = " << watchingPoint <<", displacement = " << displ << std::endl;
+#endif
+    //WITH HEAD
+    //watchingPoint.x += displ;
+    //WITHOUT HEAD
+    watchingPoint.x = screenWidth/2 + displ;
+#ifdef COMPUTEFINALGAZEX_DEBUG
+    std::cout <<"COMPUTEFINALGAZEX: Final watchingPoint = " << watchingPoint <<", displacement = " << displ << std::endl;
+#endif
+#ifdef MONTOYA
+
+    double xDebug = (ratio*gazeFrame.cols);
+    double xGlobal = (ratio-0.5)*hRes;
+    std::cout<<"\tGAZE ONLY: X = "<< xDebug <<" [DIMENSIONE FINESTRA DI DEBUG = "<<gazeFrame.cols<<"]"<< std::endl;
+    std::cout<<"\tGAZE GLOBAL DISPLACEMENT: X = "<< xGlobal <<" [DIMENSIONE SCHERMO = "<<hRes<<"]"<< std::endl;
+    gaze.x = (int)xDebug;
+    gaze.y = gazeFrame.rows/5;
+    if(gaze.x >= gazeFrame.cols) gaze.x = gazeFrame.cols-1;
+    if(gaze.x < 0) gaze.x = 0;
+    globalGaze.x += (int)xGlobal;
+    if(globalGaze.x >= hRes) globalGaze.x = hRes-1;
+    if(globalGaze.x < 0) globalGaze.x = 0;
+    std::cout<<"\tGAZE GLOBAL FINAL: X = "<< globalGaze.x <<" [DIMENSIONE SCHERMO = "<<hRes<<"]"<< std::endl;
+#endif
+}
+
+
+
+/*
+void polyphemus::estimateAndShowGazeStartingPoint()
+{
+#ifdef ESTIMATEANDSHOWGAZESTARTINGPOINT_DEBUG
+    std::cout << "ESTIMATEANDSHOWGAZESTARTINGPOINT: ENTERED"<<std::endl;
+#endif
+
+    watchingPoint = headRotation->evaluatePosition(headRotation->evaluateRotationY(landmarks), rH->getFace(), fH->getFrame(), landmarks);
+
+#ifdef ESTIMATEANDSHOWGAZESTARTINGPOINT_DEBUG
+    std::cout << "ESTIMATEANDSHOWGAZESTARTINGPOINT: initial gaze = "<< watchingPoint << std::endl;
+#endif
+
+    #ifndef WEBSERVICE
+    #ifdef WITH_GUI
+    if(gui!=NULL && !profiling)
+    {
+        gui->showStartingGaze(watchingPoint);
+    }
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
+}
+*/
+
+
+#ifndef WEBSERVICE
+#ifdef WITH_GUI
+void polyphemus::estimateAndShowRotationsY()
+{
+    double rotation;;
+
+
+    rotation = headRotation->evaluateRotationWithNoseY(landmarks);
+    /*
+    #ifndef WEBSERVICE
+    if (gui!=NULL && rH->hasNose() && rotation != 0) {
+        gui->showNoseRotationY(rH->getFace(), rH->getNose(), rotation);
+    }
+    #endif
+    */
+
+    rotation = headRotation->evaluateRotationWithMouthY(landmarks);
+    #ifndef WEBSERVICE
+    if (gui!=NULL && rH->hasMouth() && rotation != 0) {
+        gui->showMouthRotationY(rH->getFace(), rH->getMouth(), rotation);
+    }
+    #endif
+
+    rotation = headRotation->evaluateRotationY(landmarks);
+    #ifndef WEBSERVICE
+    if(gui!=NULL && rotation != 0)
+    {
+        gui->showHeadRotationY(rH->getFace(), rotation);
+    }
+    #endif
+
+}
+/*
+void polyphemus::estimateAndShowRotationsY()
+{
+    double rotation = headRotation->evaluateRotationWithEyesY();
+    if (gui!=NULL && rH->hasLeftEye() && rH->hasRightEye() && rotation != 0) {
+        gui->showEyesRotationY(rH->getFace(), rH->getLeftEye(), rH->getRightEye(), rotation);
+    }
+
+    rotation = headRotation->evaluateRotationWithNoseY();
+    if (gui!=NULL && rH->hasNose() && rotation != 0) {
+        gui->showNoseRotationY(rH->getFace(), rH->getNose(), rotation);
+    }
+
+    rotation = headRotation->evaluateRotationWithMouthY();
+    if (gui!=NULL && rH->hasMouth() && rotation != 0) {
+        gui->showMouthRotationY(rH->getFace(), rH->getMouth(), rotation);
+    }
+
+    rotation = headRotation->evaluateRotationY();
+    if(gui!=NULL && rotation != 0)
+    {
+        gui->showHeadRotationY(rH->getFace(), rotation);
+    }
+
+}
+*/
+#endif //WITH_GUI
+#endif //WEBSERVICE
+
+
+// ^^^ in trackgaze() ^^^
+#ifdef WITH_GUI
+estimateAndShowRotationsY();
+#ifdef TRACKGAZE_DEBUG
+std::cout<<"TRACKGAZE: OK "<<h++<<": ESTIMATEANDSHOWROTATIONSY"<<std::endl;
+#endif //TRACKGAZE_DEBUG
+#endif //WITH_GUI
+//
 
 
 void polyphemus::antropometricFilter()
@@ -350,3 +523,533 @@ void detectSingleEyes(cv::Mat& img, cv::Rect& face);
 void detectMouths(cv::Mat& img, cv::Rect& face);
 std::vector<cv::Rect> getMouths();
 std::vector<cv::Rect> mouths;
+
+
+---------- HEADROTATION.H -------------
+
+void processDistances();
+
+
+
+---------- HEADROTATION.CPP -------------
+
+void HeadRotation::processDistances()
+{
+    //-----------------------
+    //  Eye to Eye distance
+
+#ifdef WEBSERVICE
+    //std::string distanceEyes = Server::getServer()->getCookie("distanceEyes");
+    rH->distance_eyes = Server::getServer()->getInfoDouble("distanceEyes");
+    if (rH->distance_eyes != NULL) {
+        //rH->distance_eyes = atof(distanceEyes.c_str());
+        rH->itHasDistanceEyes = true;
+    }
+#endif
+
+    if ((!rH->itHasDistanceEyes) && (rH->hasLeftEye()) && (rH->hasRightEye())) {
+        cv::Point eL (rH->getLeftEye().x+(rH->getLeftEye().width/2), rH->getLeftEye().y+(rH->getLeftEye().height/2));
+        cv::Point eR (rH->getRightEye().x+(rH->getRightEye().width/2), rH->getRightEye().y+(rH->getRightEye().height/2));
+        rH->distance_eyes=evaluateDistance(eL, eR)*100/rH->getFace().width;
+        rH->itHasDistanceEyes = true;
+
+#ifdef WEBSERVICE
+        Server::getServer()->setInfo("distanceEyes", rH->distance_eyes);
+        //Server::getServer()->setCookie("distanceEyes", rH->distance_eyes);
+#endif
+    }
+
+    //-------------	CvPOSITObject* positObject;-----------------
+    //    Mouth to Center distance
+
+    #ifdef WEBSERVICE
+    //std::string distanceMouthCenter = Server::getServer()->getCookie("distanceMouthCenter");
+    rH->distance_mouth_center = Server::getServer()->getInfoDouble("distanceMouthCenter");
+    if (rH->distance_mouth_center != NULL) {
+        //rH->distance_mouth_center = atof(distanceMouthCenter.c_str());
+        rH->itHasDistanceMouthCenter = true;
+    }
+    #endif
+
+    if ((!rH->itHasDistanceMouthCenter) && (rH->hasMouth())) {
+        cv::Point f ((rH->getFace().width/2), (rH->getFace().height/2));
+        cv::Point m (rH->getMouth().x+(rH->getMouth().width/2), rH->getMouth().y+(rH->getMouth().height/2));
+        rH->distance_mouth_center=evaluateDistance(m, f) * 100/rH->getFace().height;
+        rH->itHasDistanceMouthCenter = true;
+
+        #ifdef WEBSERVICE
+        Server::getServer()->setInfo("distanceMouthCenter", rH->distance_mouth_center);
+        //Server::getServer()->setCookie("distanceMouthCenter", rH->distance_mouth_center);
+        #endif
+    }
+
+    //------------------------------
+    //    Nose to Center distance
+
+    #ifdef WEBSERVICE
+    //std::string distanceNoseCenter = Server::getServer()->getCookie("distanceNoseCenter");
+    rH->distance_nose_center = Server::getServer()->getInfoDouble("distanceNoseCenter");
+    if (rH->distance_nose_center != NULL) {
+        //rH->distance_nose_center = atof(distanceNoseCenter.c_str());
+        rH->itHasDistanceNoseCenter = true;
+    }
+    #endif
+
+    if ((!rH->itHasDistanceNoseCenter) && (rH->hasNose())) {
+        cv::Point f ((rH->getFace().width/2), (rH->getFace().height/2));
+        cv::Point n (rH->getNose().x+(rH->getNose().width/2), rH->getNose().y+(rH->getNose().height/2));
+        rH->distance_nose_center=evaluateDistance(f, n)*100/rH->getFace().height;
+        rH->itHasDistanceNoseCenter = true;
+
+        #ifdef WEBSERVICE
+        Server::getServer()->setInfo("distanceNoseCenter", rH->distance_nose_center);
+        //Server::getServer()->setCookie("distanceNoseCenter", rH->distance_nose_center);
+        #endif
+    }
+
+    //------------------------------
+    //    Nose to Mouth distance
+
+    #ifdef WEBSERVICE
+    //std::string distanceNoseMouth = Server::getServer()->getCookie("distanceNoseMouth");
+    rH->distance_nose_mouth = Server::getServer()->getInfoDouble("distanceNoseMouth");
+    if (rH->distance_nose_mouth != NULL) {
+        //rH->distance_nose_mouth = atof(distanceNoseMouth.c_str());
+        rH->itHasDistanceNoseMouth = true;
+    }
+    #endif
+
+    if ((!rH->itHasDistanceNoseMouth) && (rH->hasMouth()) && (rH->hasNose())) {
+        cv::Point m (rH->getMouth().x+(rH->getMouth().width/2), rH->getMouth().y+(rH->getMouth().height/2));
+        cv::Point n (rH->getNose().x+(rH->getNose().width/2), rH->getNose().y+(rH->getNose().height/2));
+        rH->distance_nose_mouth=evaluateDistance(n, m)* 100/rH->getFace().height;
+        rH->itHasDistanceNoseMouth = true;
+
+        #ifdef WEBSERVICE
+        Server::getServer()->setInfo("distanceNoseMouth", rH->distance_nose_mouth);
+        //Server::getServer()->setCookie("distanceNoseMouth", rH->distance_nose_mouth);
+        #endif
+    }
+}
+
+
+
+
+--------- ROIHANDLER.H ------------
+
+//Nose setter
+void setNoseROI(std::vector<cv::Rect> fVett);
+//Nose existance
+bool hasNose();
+//Nose cleaner
+void clearNose();
+
+--------- ROIHANDLER.CPP ----------
+
+//SetNoseROI: makes the frameHandler set his nose frame
+void roiHandler::setNoseROI(std::vector<cv::Rect> fVett)
+{
+    if(fVett.size() == 0) return;
+
+    itHasNose = true;
+    noseHaarRect = fVett[0];
+    noseHaarFrame = grayFrame(fVett[0]);
+
+    return;
+}
+
+bool roiHandler::hasNose() {
+    return itHasNose;
+}
+
+//clearNose: flush the noseFrame
+void roiHandler::clearNose()
+{
+    if (itHasNose) {
+        itHasNose = false;
+        noseHaarRect = cv::Rect(0, 0, 0, 0);
+        noseHaarFrame.release();
+    }
+}
+
+
+
+--------- SERVER.CPP -------------
+
+    if (roiHandler->hasNose()) {
+        std::cout << ", \"nose\": {\"x\": " << roiHandler->getFace().x + roiHandler->getNose().x << ", \"y\": " << roiHandler->getFace().y + roiHandler->getNose().y << ", \"width\": " << roiHandler->getNose().width << ", \"height\": " << roiHandler->getNose().height << "}";
+    }
+    else {
+        std::cout << ", \"nose\": null";
+    }
+
+
+
+-------- HELPERS.H   ------------
+
+void eyeColourEvaluation(Mat src);
+
+
+-------- HELPERS.CPP ------------
+
+void eyeColourEvaluation(Mat image) {
+    bool showWindow = false;
+    GaussianBlur(image, image, Size(3,3), 3);
+
+    //cv::addWeighted(img, 1.5, tmp, -0.5, 0, img);
+    addWeighted(image, 2.5, image, -1.5, 0, image);     //using the blur, applies an unsharp mask
+
+    vector<Mat> image_channels(3);
+    Mat imageHSV, originalImageHSV, imageHSV2BGR;
+    //int histSizeV[1]={256};
+
+    if (showWindow) {
+        namedWindow("image", CV_WINDOW_NORMAL);
+        imshow("image", image);
+    }
+
+    //    // HSV values range
+    //    float hrangesHS[2]={0.0, 255.0};
+    //    float hrangesV[2]={0.0, 179.0};
+    //    const float* rangesHS[1]={hrangesHS};
+    //    const float* rangesV[1]={hrangesV};
+    //    int channel[1]={0};
+
+    //    // number of histogram lines
+    //    int histSizeHS[1]={256};
+    //    int histSizeV[1]={180};
+
+    //    int i, img_h, img_wHS, img_wV, intensity_hue, intensity_sat, intensity_val;
+    //    double maxH, maxS, maxV;
+    //    double minH, minS, minV;
+    //    Point pointMaxH, pointMaxS, pointMaxV;
+    //    Point pointMinH, pointMinS, pointMinV;
+    //    MatND hist_hue, hist_sat, hist_val;
+
+    //    Mat imgH;
+    //    image.convertTo(image, -1, 2, 0);
+
+    //    if (showWindow) {
+    //    namedWindow("contrastH", CV_WINDOW_NORMAL);
+    //    imshow("contrastH", image);
+    //    }
+
+    //    split(image, image_channels);
+    //    minMaxLoc(image_channels[0], &minH, &maxH, &pointMinH, &pointMaxH);
+    //    minMaxLoc(image_channels[1], &minS, &maxS, &pointMinS, &pointMaxS);
+    //    minMaxLoc(image_channels[2], &minV, &maxV, &pointMinV, &pointMaxV);
+    //    image_channels[0].convertTo(image_channels[0], CV_8U, 255.0/(maxH - minH), -minH * 255.0/(maxH - minH));
+    //    image_channels[1].convertTo(image_channels[1], CV_8U, 255.0/(maxS - minS), -minS * 255.0/(maxS - minS));
+    //    image_channels[2].convertTo(image_channels[2], CV_8U, 255.0/(maxV - minV), -minV * 255.0/(maxV - minV));
+    //    merge(image_channels, image);
+    //    if (showWindow) {
+    //    namedWindow("eq", CV_WINDOW_NORMAL);
+    //    imshow("eq", image);
+    //    }
+
+
+    //    Mat grey;
+    //    cvtColor(image, grey, CV_BGR2GRAY);
+
+    //    Mat sobelx;
+    //    Sobel(grey, sobelx, CV_32F, 1, 0);
+
+    //    double minVal, maxVal;
+    //    minMaxLoc(sobelx, &minVal, &maxVal); //find minimum and maximum intensities
+    //    Mat draw;
+    //    sobelx.convertTo(draw, CV_8U, 255.0/(maxVal - minVal), -minVal * 255.0/(maxVal - minVal));
+
+    //    if (showWindow) {
+    //    namedWindow("sobelx", CV_WINDOW_NORMAL);
+    //    imshow("sobelx", draw);
+    //    }
+
+
+
+    cvtColor(image, originalImageHSV, CV_BGR2HSV);
+    originalImageHSV.copyTo(imageHSV);
+
+    if (showWindow) {
+        cvtColor(originalImageHSV, imageHSV2BGR, CV_HSV2BGR);
+        namedWindow("imageHSV", CV_WINDOW_NORMAL);
+        imshow("imageHSV", imageHSV2BGR);
+    }
+
+
+    for (int i = 0; i < imageHSV.rows; i++) {
+        for (int j = 0; j < imageHSV.cols; j++) {
+            for (int z = 1; z < 3; z++) {
+                int temp=imageHSV.at<cv::Vec3b>(i, j)[z]+255;
+
+                if(temp>255) {
+                    imageHSV.at<cv::Vec3b>(i, j)[z]=255;
+                }
+                else {
+                    if(temp<0) {
+                        imageHSV.at<cv::Vec3b>(i, j)[z]=0;
+                    }
+                    else {
+                        imageHSV.at<cv::Vec3b>(i, j)[z]=temp;
+                    }
+                }
+            }
+        }
+    }
+    if (showWindow) {
+        cvtColor(imageHSV, imageHSV2BGR, CV_HSV2BGR);
+        namedWindow("imageHSV Smax and Vmax", CV_WINDOW_NORMAL);
+        imshow("imageHSV Smax and Vmax", imageHSV2BGR);
+    }
+
+
+    Mat imgHLS;
+    cvtColor(image, imgHLS, CV_BGR2HLS);
+    Mat rngMask;
+    inRange(imgHLS, Scalar(0, 200, 0), Scalar(255, 255, 255), rngMask);
+    split(imgHLS, image_channels);
+    for (int i = 0; i < imgHLS.rows; i++) {
+        for (int j = 0; j < imgHLS.cols; j++) {
+            for (int z = 1; z < 2; z++) {
+                imgHLS.at<cv::Vec3b>(i, j)[z]=127;
+            }
+        }
+    }
+    if (showWindow) {
+        cvtColor(imgHLS, imageHSV2BGR, CV_HLS2BGR);
+        namedWindow("imageHLS L1/2", CV_WINDOW_NORMAL);
+        imshow("imageHLS L1/2", image_channels[1]);
+    }
+
+
+
+
+    originalImageHSV.copyTo(imageHSV);
+    for (int i = 0; i < imageHSV.rows; i++) {
+        for (int j = 0; j < imageHSV.cols; j++) {
+            for (int z = 1; z < 3; z++) {
+                int temp=imageHSV.at<cv::Vec3b>(i, j)[z]+25;
+
+                if(temp>255) {
+                    imageHSV.at<cv::Vec3b>(i, j)[z]=255;
+                }
+                else {
+                    if(temp<0) {
+                        imageHSV.at<cv::Vec3b>(i, j)[z]=0;
+                    }
+                    else {
+                        imageHSV.at<cv::Vec3b>(i, j)[z]=temp;
+                    }
+                }
+            }
+        }
+    }
+    if (showWindow) {
+        cvtColor(imageHSV, imageHSV2BGR, CV_HSV2BGR);
+        namedWindow("imageHSV S++ and V++", CV_WINDOW_NORMAL);
+        imshow("imageHSV S++ and V++", imageHSV2BGR);
+    }
+
+
+    //    split(imageHSV, image_channels);
+    //    //split(image, image_channels);
+
+    //    //equalizeHist(image_channels[0], image_channels[0]);
+    //    equalizeHist(image_channels[1], image_channels[1]);
+    //    equalizeHist(image_channels[2], image_channels[2]);
+    //    //merge(image_channels, imageHSV);
+
+    //    calcHist(&image_channels[0], 1, channel, Mat(), hist_hue, 1, histSizeHS, rangesHS);
+    //    calcHist(&image_channels[1], 1, channel, Mat(), hist_sat, 1, histSizeHS, rangesHS);
+    //    calcHist(&image_channels[2], 1, channel, Mat(), hist_val, 1, histSizeV, rangesV);
+
+    //    // max and min value of bins
+    //    maxH=maxS=maxV=0.0;
+    //    minH=minS=minV=0.0;
+    //    minMaxLoc(hist_hue, &minH, &maxH, &pointMinH, &pointMaxH);
+    //    minMaxLoc(hist_sat, &minS, &maxS, &pointMinS, &pointMaxS);
+    //    minMaxLoc(hist_val, &minV, &maxV, &pointMinV, &pointMaxV);
+
+    //    // image for drawing the histogram
+    //    img_h=400;
+    //    img_wHS=histSizeHS[0];
+    //    img_wV=histSizeV[0];
+
+    //    Mat histImg_hue(img_h, img_wHS, CV_8UC3, Scalar(0, 0, 0));
+    //    Mat histImg_sat(img_h, img_wHS, CV_8UC3, Scalar(0, 0, 0));
+    //    Mat histImg_val(img_h, img_wV, CV_8UC3, Scalar(0, 0, 0));
+
+    //    // max height (90% of image height)
+    //    int hpt=static_cast<int>(0.9*img_h);
+
+    //    // draw a single line for each bin
+    //    for (i=0; i<img_wHS; i++){
+    //        // normalized height (with respect to the histogram image)
+    //        intensity_hue=static_cast<int>(hist_hue.at<float>(i)*hpt/maxH);
+    //        intensity_sat=static_cast<int>(hist_sat.at<float>(i)*hpt/maxS);
+    //        if (i<img_wV){
+    //            intensity_val=static_cast<int>(hist_val.at<float>(i)*hpt/maxV);
+    //        }
+
+    //        // effectively draw the line
+    //        line(histImg_hue, Point(i,img_h), Point(i,img_h-intensity_hue), Scalar(255,0,0));
+    //        line(histImg_sat, Point(i,img_h), Point(i,img_h-intensity_sat), Scalar(0,255,0));
+    //        if (i<img_wV){
+    //            line(histImg_val, Point(i,img_h), Point(i,img_h-intensity_val), Scalar(0,0,255));
+    //        }
+    //    }
+
+    //    line(histImg_hue, Point(pointMaxH.y,img_h), Point(pointMaxH.y,img_h/2), Scalar(0,255,255));
+    //    line(histImg_sat, Point(pointMaxS.y,img_h), Point(pointMaxS.y,img_h/2), Scalar(255,0,255));
+    //    line(histImg_val, Point(pointMaxV.y,img_h), Point(pointMaxV.y,img_h/2), Scalar(255,255,0));
+
+    //    if (showWindow) {
+    //    cvtColor(histImg_hue, histImg_hue, CV_RGB2BGR);
+    //    cvtColor(histImg_sat, histImg_sat, CV_RGB2BGR);
+    //    cvtColor(histImg_val, histImg_val, CV_RGB2BGR);
+    //    namedWindow("H hist", CV_WINDOW_NORMAL);
+    //    namedWindow("S hist", CV_WINDOW_NORMAL);
+    //    namedWindow("V hist", CV_WINDOW_NORMAL);
+    //    imshow("H hist", histImg_hue);
+    //    imshow("S hist", histImg_sat);
+    //    imshow("V hist", histImg_val);
+    //    }
+
+    Mat rangeMask, rangeImage;
+    for (int i = 0; i < 360; i+=30) {
+        int iIn255 = (int)(i*255/360);
+        int epsilon = (int)(15*255/360);
+
+        inRange(imageHSV, Scalar(iIn255 - epsilon, 0, 0), Scalar(iIn255 + epsilon, 255, 255), rangeMask);
+
+        bitwise_and(image, image, rangeImage, rangeMask);
+
+        Mat r;
+        cvtColor(rangeImage, r, CV_RGB2GRAY);
+        std::string name = "rangeImage ";
+        std::stringstream sstm;
+        sstm << name << (i);
+        name = sstm.str();
+        if (showWindow) {
+            namedWindow(name, CV_WINDOW_NORMAL);
+            imshow(name, rangeImage);
+        }
+        rangeMask.release();
+        rangeImage.release();
+    }
+
+    int erosionSize = 2;
+    Mat erodeSettings = getStructuringElement(MORPH_ELLIPSE, Size(2*erosionSize + 1, 2*erosionSize+1), Point(erosionSize, erosionSize));
+    Mat erodedImage;
+    int dilateSize = 2;
+    Mat dilateSettings = getStructuringElement(MORPH_ELLIPSE, Size(2*dilateSize + 1, 2*dilateSize+1), Point(dilateSize, dilateSize));
+    Mat dilatedImage;
+    /// Apply the erosion operation
+    erode(image, erodedImage, erodeSettings);
+    if (showWindow) {
+        namedWindow("erodedImage", CV_WINDOW_NORMAL);
+        imshow("erodedImage", erodedImage);
+    }
+    /// Apply the dilation operation
+    dilate(image, dilatedImage, dilateSettings);
+    if (showWindow) {
+        namedWindow("dilatedImage", CV_WINDOW_NORMAL);
+        imshow("dilatedImage", dilatedImage);
+    }
+
+    //    erodedImage.convertTo(erodedImage, -1, 2, 0);
+    //    namedWindow("erodedImageH", CV_WINDOW_NORMAL);
+    //    imshow("erodedImageH", erodedImage);
+
+    Mat whiteImageHSV, blackImageHLS;
+    cvtColor(image, whiteImageHSV, CV_RGB2HSV);
+    cvtColor(erodedImage, blackImageHLS, CV_RGB2HLS);
+    //    for (int i = 0; i < whiteImageHSV.rows; i++) {
+    //        for (int j = 0; j < whiteImageHSV.cols; j++) {
+    //            for (int z = 1; z < 3; z++) {
+    //                int temp;
+    //                if (z == 1)
+    //                    temp=whiteImageHSV.at<cv::Vec3b>(i, j)[z]-25;
+    //                else
+    //                    temp=whiteImageHSV.at<cv::Vec3b>(i, j)[z]+25;
+
+    //                if(temp>255) {
+    //                    whiteImageHSV.at<cv::Vec3b>(i, j)[z]=255;
+    //                }
+    //                else {
+    //                    if(temp<0) {
+    //                        whiteImageHSV.at<cv::Vec3b>(i, j)[z]=0;
+    //                    }
+    //                    else {
+    //                        whiteImageHSV.at<cv::Vec3b>(i, j)[z]=temp;
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
+    //    cvtColor(whiteImageHSV, imageHSV2BGR, CV_HSV2BGR);
+    //    namedWindow("imageHSV S-- and V++", CV_WINDOW_NORMAL);
+    //    imshow("imageHSV S-- and V++", imageHSV2BGR);
+
+    inRange(whiteImageHSV, Scalar(0, 0, 42), Scalar(255, 42, 255), rangeMask);
+    bitwise_and(image, image, rangeImage, rangeMask);
+
+    if (showWindow) {
+        namedWindow("rangeImage white HSV", CV_WINDOW_NORMAL);
+        imshow("rangeImage white HSV", rangeImage);
+    }
+
+    rangeMask.release();
+    rangeImage.release();
+
+    split(blackImageHLS, image_channels);
+    equalizeHist(image_channels[1], image_channels[1]);
+    merge(image_channels, blackImageHLS);
+
+    inRange(blackImageHLS, Scalar(0, 0, 0), Scalar(255, 32, 255), rangeMask);
+    bitwise_and(image, image, rangeImage, rangeMask);
+
+    if (showWindow) {
+        namedWindow("rangeImage black HLS", CV_WINDOW_NORMAL);
+        imshow("rangeImage black HLS", rangeMask);
+    }
+
+    rangeMask.release();
+    rangeImage.release();
+
+
+    //    cv::Mat imgGray;
+    //    int threshold = 50;
+    //    int maxContoursSize = 5;
+    //    cv::Mat cannyOutput;
+    //    std::vector<std::vector<cv::Point> > contours;
+    //    std::vector<cv::Vec4i> hierarchy;
+
+    //    /// Convert image to gray and blur it
+    //    if (image.channels() != 1)
+    //        cv::cvtColor(image, imgGray, CV_BGR2GRAY);
+    //    else
+    //        image.copyTo(imgGray);
+    //    cv::blur(imgGray, imgGray, cv::Size(3,3));
+
+    //    do {
+    //        threshold--;
+    //        /// Detect edges using canny
+    //        cv::Canny(imgGray, cannyOutput, threshold, threshold*2, 3);
+    //        /// Find contours
+    //        cv::findContours(cannyOutput, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0));
+    //    } while ((contours.size() < maxContoursSize) && (threshold > 0));
+    //    cout << "contours.size() " << contours.size() << endl;
+
+    //    cv::Mat drawing = cv::Mat::zeros(cannyOutput.size(), CV_8UC1);
+    //    for (int i = 0; i< contours.size(); i++) {
+    //        cv::Scalar color = cv::Scalar(255);
+    //        cv::drawContours(drawing, contours, i, color, 1, 8, hierarchy, 0, cv::Point());
+    //    }
+
+    //    if (showWindow) {
+    //    cv::namedWindow("Contours", CV_WINDOW_NORMAL);
+    //    imshow("Contours", drawing);
+    //    }
+
+    //    waitKey(0);
+}

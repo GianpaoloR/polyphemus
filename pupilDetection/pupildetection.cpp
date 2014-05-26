@@ -73,33 +73,28 @@ pupilDetection::pupilDetection(binaryAnalyzer *bin)
 //DetectEyes: finds pupil inside reduced eye regions
 void pupilDetection::findPupils(cv::Mat leftROI, cv::Mat rightROI)//std::vector<cv::Rect> eyesReduced)
 {
-#ifdef FINDPUPILS_DEBUG
     int h = 0;
-    std::cout<<"FINDPUPILS: OK " << h++ <<": left: "<<leftROI.cols<<"x"<<leftROI.rows<<", right: "<<rightROI.cols<<"x"<<rightROI.rows<<std::endl;
-#endif
-
     bool equalizing = true;
+
+    if(findPupilsDebug)
+        std::cout<<"FINDPUPILS: OK " << h++ <<": left: "<<leftROI.cols<<"x"<<leftROI.rows<<", right: "<<rightROI.cols<<"x"<<rightROI.rows<<std::endl;
 
     pupilrH->setLeftROI(leftROI);
     pupilrH->setRightROI(rightROI);
     if(equalizing)
     {
         pupilrH->equalizeROIs();
-        //UO
         if (eyeGui != NULL) {
             eyeGui->setLeftFrame(pupilrH->getLeftROIEq());
             eyeGui->setRightFrame(pupilrH->getRightROIEq());
         }
-        //UO
     }
     else
     {
-        //UO
         if (eyeGui != NULL) {
             eyeGui->setLeftFrame(pupilrH->getLeftROI());
             eyeGui->setRightFrame(pupilrH->getRightROI());
         }
-        //UO
     }
 
     //updateReduced();
@@ -116,12 +111,13 @@ void pupilDetection::findPupils(cv::Mat leftROI, cv::Mat rightROI)//std::vector<
 #endif
 
 
-#ifdef FINDPUPILS_DEBUG
-//cv::Mat left = pupilrH->getLeftROI();
-//cv::Mat right = pupilrH->getRightROI();
-    std::cout<<"FINDPUPILS: OK " << h++ <<": left: "<<leftROI.cols<<"x"<<leftROI.rows<<", right: "<<rightROI.cols<<"x"<<rightROI.rows<<std::endl;
-    std::cout<<"FINDPUPILS: OK " << h++ << ": avgLightLeft = "<<leftAvgLight<<"; avgLightRight = "<<rightAvgLight<<std::endl;
-#endif
+    if(findPupilsDebug)
+    {
+        //cv::Mat left = pupilrH->getLeftROI();
+        //cv::Mat right = pupilrH->getRightROI();
+        std::cout<<"FINDPUPILS: OK " << h++ <<": left: "<<leftROI.cols<<"x"<<leftROI.rows<<", right: "<<rightROI.cols<<"x"<<rightROI.rows<<std::endl;
+        std::cout<<"FINDPUPILS: OK " << h++ << ": avgLightLeft = "<<leftAvgLight<<"; avgLightRight = "<<rightAvgLight<<std::endl;
+    }
 
     //DETECT PUPIL
     switch(detectionMethod)
@@ -162,28 +158,27 @@ void pupilDetection::findPupils(cv::Mat leftROI, cv::Mat rightROI)//std::vector<
     }
 
 
-#ifdef FINDPUPILS_DEBUG
-{
-    if(leftPupil != NULL)
+    if(findPupilsDebug)
     {
-        std::cout<<"FINDPUPILS: OK " << h++ << ": leftPupil = {"<<leftPupil->x <<"," << leftPupil->y << "}" << std::endl;
-    }
-    else
-    {
-        std::cout<<"FINDPUPILS: OK " << h++ << ": leftPupil NOT FOUND." << std::endl;
-    }
+        if(leftPupil != NULL)
+        {
+            std::cout<<"FINDPUPILS: OK " << h++ << ": leftPupil = {"<<leftPupil->x <<"," << leftPupil->y << "}" << std::endl;
+        }
+        else
+        {
+            std::cout<<"FINDPUPILS: OK " << h++ << ": leftPupil NOT FOUND." << std::endl;
+        }
 
 
-    if(rightPupil != NULL)
-    {
-        std::cout<<"FINDPUPILS: OK " << h++ << ": rightPupil = {"<<rightPupil->x <<"," << rightPupil->y << "}" << std::endl;
+        if(rightPupil != NULL)
+        {
+            std::cout<<"FINDPUPILS: OK " << h++ << ": rightPupil = {"<<rightPupil->x <<"," << rightPupil->y << "}" << std::endl;
+        }
+        else
+        {
+            std::cout<<"FINDPUPILS: OK " << h++ << ": rightPupil NOT FOUND." << std::endl;
+        }
     }
-    else
-    {
-        std::cout<<"FINDPUPILS: OK " << h++ << ": rightPupil NOT FOUND." << std::endl;
-    }
-}
-#endif
 
 #ifdef FINDPUPILS_WINDOWS
     if(eyeGui!=NULL)
@@ -206,11 +201,7 @@ void pupilDetection::findPupils(cv::Mat leftROI, cv::Mat rightROI)//std::vector<
 
 void pupilDetection::refinePupils()
 {
-    //UO
-    #ifdef REFINEPUPILS_DEBUG
-    std::cout<<"REFINEPUPILS: ENTERED"<<std::endl;
-    #endif
-    //UO
+    if(refinePupilsDebug)    std::cout<<"REFINEPUPILS: ENTERED"<<std::endl;
 
     leftPupilRefined = new cv::Point();
     rightPupilRefined = new cv::Point();
@@ -225,11 +216,7 @@ void pupilDetection::refinePupils()
         *rightPupilRefined = *rightPupil;
     }
 
-    //UO
-    #ifdef REFINEPUPILS_DEBUG
-    std::cout<<"REFINEPUPILS: ASSIGNMENT DONE"<<std::endl;
-    #endif
-    //UO
+    if(refinePupilsDebug)   std::cout<<"REFINEPUPILS: ASSIGNMENT DONE"<<std::endl;
 
     switch(refinementMethod)
     {
@@ -254,11 +241,11 @@ void pupilDetection::refinePupils()
       //rightRefined = refinePupil(false);
 
 
-
-#ifdef REFINEPUPILS_DEBUG
-    std::cout<<"REFINEPUPILS: leftPupilRefined = {"<<leftPupilRefined->x <<"," << leftPupilRefined->y << "}" << std::endl;
-    std::cout<<"REFINEPUPILS: rightPupilRefined = {"<<rightPupilRefined->x <<"," << rightPupilRefined->y << "}" << std::endl;
-#endif
+    if(refinePupilsDebug)
+    {
+        std::cout<<"REFINEPUPILS: leftPupilRefined = {"<<leftPupilRefined->x <<"," << leftPupilRefined->y << "}" << std::endl;
+        std::cout<<"REFINEPUPILS: rightPupilRefined = {"<<rightPupilRefined->x <<"," << rightPupilRefined->y << "}" << std::endl;
+    }
 
     if(eyeGui != NULL)
     {

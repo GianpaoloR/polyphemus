@@ -363,7 +363,7 @@ void guiHandler::showUpperBody(std::vector<cv::Rect> upperBodies)
     return;
 }
 
-void guiHandler::turnOnZone(int hZone, int vZone, double angleX, double angleY, double distance, cv::Rect face)
+void guiHandler::turnOnEyeZone(int hZone, int vZone)
 {
     Point p;
     switch(hZone)
@@ -398,8 +398,15 @@ void guiHandler::turnOnZone(int hZone, int vZone, double angleX, double angleY, 
         break;
     }
 
-    showStartingGaze(p, setGazeFromPosit(angleX, angleY, distance, face));
+    showStartingEyeGaze(p);
 }
+
+void guiHandler::turnOnHeadZone(double angleX, double angleY, double distance, cv::Rect face)
+{
+    cv::Point p = setGazeFromPosit(angleX, angleY, distance, face);
+    showStartingHeadGaze(p);
+}
+
 
 void guiHandler::showFinalGaze(cv::Point gazePoint)
 {
@@ -409,22 +416,23 @@ void guiHandler::showFinalGaze(cv::Point gazePoint)
     return;
 }
 
-
-
-void guiHandler::showStartingGaze(cv::Point gazeStartingPoint, cv::Point headOrientation){
-    //int position;
-    cv::Point start;
-    int x = gazeStartingPoint.x;
-    int y = gazeStartingPoint.y;
-    //int radius = gazeFrame.cols/14;
-
+void guiHandler::redrawGazeFrame()
+{
     gazeFrame.release();
     gazeFrame = cv::Mat(vRes, hRes, CV_8UC3, cv::Scalar(255, 255, 255));
     cv::line(gazeFrame, cv::Point(0,vRes/3), cv::Point(hRes,vRes/3), cv::Scalar(0,255,255), 3, 1, 0);
     cv::line(gazeFrame, cv::Point(0,vRes*2/3), cv::Point(hRes,vRes*2/3), cv::Scalar(0,255,255), 3, 1, 0);
     cv::line(gazeFrame, cv::Point(hRes/3, 0), cv::Point(hRes/3, vRes), cv::Scalar(0,255,255), 3, 1, 0);
     cv::line(gazeFrame, cv::Point(hRes*2/3, 0), cv::Point(hRes*2/3, vRes), cv::Scalar(0,255,255), 3, 1, 0);
-    //cv::circle(gazeFrame, gazeStartingPoint, radius, cv::Scalar(0,255,255), 5, 1, 0);
+
+}
+
+void guiHandler::showStartingEyeGaze(cv::Point gazeStartingPoint)
+{
+    cv::Point start;
+    int x = gazeStartingPoint.x;
+    int y = gazeStartingPoint.y;
+
     if(x <= hRes/3)
     {
         if (y <= vRes/3)
@@ -472,8 +480,15 @@ void guiHandler::showStartingGaze(cv::Point gazeStartingPoint, cv::Point headOri
     }
 
     cv::rectangle(gazeFrame,cv::Rect(start.x, start.y, hRes/3, vRes/3),cv::Scalar(255,0,0),3,1,0);
-    cv::circle(gazeFrame, headOrientation, 20, cv::Scalar(0, 255, 0) , 4, 8, 1);
+}
 
+void guiHandler::showStartingHeadGaze(cv::Point headOrientation){
+    //int position;
+    //int radius = gazeFrame.cols/14;
+
+    //cv::circle(gazeFrame, gazeStartingPoint, radius, cv::Scalar(0,255,255), 5, 1, 0);
+
+    cv::circle(gazeFrame, headOrientation, 20, cv::Scalar(0, 255, 0) , 4, 8, 1);
 
     return;
 }

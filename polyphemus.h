@@ -181,16 +181,10 @@ private:
     ///<summary> WatchingPoint is a Point structure which contains gaze coordinates.</summary>
     cv::Point watchingPoint;
 
-    ///<summary> Sets the initial position for the gaze point on screen. Needs previous work done by headRotation for y axes. Called by trackGaze(). Returns void.</summary>
-    void estimateAndShowGazeStartingPoint();
+
     ///<summary> Encapsulates call to gE member methods to estimate local pupil displacement. Called by trackGaze(). Returns void.</summary>
     void estimatePupilGazeDisplacement(bool refined);
-    ///<summary> Main function to merge together all gaze data computed before (head, eyes, x and y). Called by trackGaze(). Returns void.</summary>
-    void computeFinalGaze();
-    ///<summary> Internal function to merge together gaze data computed before (head + eyes). ONLY for X axis. Called by computeFinalGaze(). Returns void.</summary>
-    void computeFinalGazeX();
-    ///<summary> Internal function to merge together gaze data computed before (head + eyes). ONLY for Y axis. Called by computeFinalGaze(). Returns void.</summary>
-    void computeFinalGazeY();    //TODO!!!
+
     #ifndef WEBSERVICE
     ///<summary> Asks guiHandler to refresh gaze window. Called by trackGaze(). Returns void.</summary>
     void updateGaze();
@@ -339,8 +333,7 @@ private:
     //---------------------------------------------------------
     //                    ROTATIONS DATA & METHODS
     //---------------------------------------------------------
-    ///<summary> Estimate head rotation along y axis (pan movement) and sets headRotation's structures accordingly. Called by trackGaze(). Returns void.</summary>
-    void estimateAndShowRotationsY();
+
 
     //---------------------------------------------------------
     //                    OTHER DATA & METHODS

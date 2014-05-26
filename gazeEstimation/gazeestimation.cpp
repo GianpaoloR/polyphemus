@@ -96,30 +96,33 @@ bool gazeEstimation::predictHorizontalZone(pupilType pT)
         }
     }
 
-    cout<<"Total distance: "<<lCornerDistance<<endl;
+    if(predictHorizDebug) cout<<"Total distance: "<<lCornerDistance<<endl;
 
     if(valid)
     {
-        cout<<"PtoN distance: "<<lpToNoseLM<<endl;
-        cout<<"Thresholds are: RIGHT (0-"<<450*lCornerDistance/1000<< ") - LEFT (" <<550*lCornerDistance/1000<<"-"<<lCornerDistance<<")"<<endl;
+        if(predictHorizDebug)
+        {
+            cout<<"PtoN distance: "<<lpToNoseLM<<endl;
+            cout<<"Thresholds are: RIGHT (0-"<<450*lCornerDistance/1000<< ") - LEFT (" <<550*lCornerDistance/1000<<"-"<<lCornerDistance<<")"<<endl;
+        }
 
         if(lpToNoseLM < 475*lCornerDistance/1000) //Looking X zone 2
         {
-            cout<<"Looking RIGHT"<<endl;
+            cout<<"PREDICTHORIZONTALZONE: Looking RIGHT"<<endl;
             this->horizontalZone = 2;
         }
         else if(lpToNoseLM > 525*lCornerDistance/1000)
         {
-            cout << "Looking LEFT"<<endl;
+            cout << "PREDICTHORIZONTALZONE: Looking LEFT"<<endl;
             this->horizontalZone = 0;
         }
         else
         {
-            cout << "Looking CENTER"<<endl;
+            cout << "PREDICTHORIZONTALZONE: Looking CENTER"<<endl;
             this->horizontalZone = 1;
         }
     }
-    else cout << "Left pupil OUTSIDE landmarks. NO GAZE PREDICTION."<<endl;
+    else cout << "PREDICTHORIZONTALZONE: (great catch) Left pupil OUTSIDE landmarks. NO GAZE PREDICTION."<<endl;
 
     return valid;
 }
@@ -214,22 +217,22 @@ void gazeEstimation::predictVerticalZone(bool newFace)
     if(ea > maxEa) maxEa = ea;
 
     float vDelta = maxEa - minEa;
-    cout<< "MINEA "<<minEa<<"\tMAXEA " << maxEa << "\tEA "<<ea<<endl;
+    if(predictVertDebug) cout<< "MINEA "<<minEa<<"\tMAXEA " << maxEa << "\tEA "<<ea<<endl;
     float vDiff = ea - minEa;
     if(vDiff < vDelta*2/5)
     {
         this->verticalZone = 2;
-        cout << "Looking DOWN" <<endl;
+        cout << "PREDICTVERTICALZONE: Looking DOWN" <<endl;
     }
     else if(vDiff > vDelta*3/5)
     {
         this->verticalZone = 0;
-        cout << "Looking UP" << endl;
+        cout << "PREDICTVERTICALZONE: Looking UP" << endl;
     }
     else
     {
         this->verticalZone = 1;
-        cout << "Looking CENTER" << endl;
+        cout << "PREDICTVERTICALZONE: Looking CENTER" << endl;
     }
 
 }
