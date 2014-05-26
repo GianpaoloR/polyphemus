@@ -36,7 +36,6 @@ int copyDirectory(const char *src, const char *dest, mode_t mode);
 int copyFile(const char *src, const char *dest, mode_t mode);
 long long timestamp_usec();
 //UO
-void eyeColourEvaluation(Mat src);
 void circles(Mat src);
 void flat(cv::Mat& image);
 void flatField(cv::Mat& image);

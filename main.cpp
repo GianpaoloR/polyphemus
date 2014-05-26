@@ -115,9 +115,9 @@ int main() {
     paul.enableDebugGui();
 #endif
 
+    std::cout <<"Initialization...";
     paul.init(faceCascadeName, eyePairCascadeName, eyeCascadeName, leftEyeCascadeName, rightEyeCascadeName, noseCascadeName, mouthCascadeName, upperBodyCascadeName);
-
-    std::cout <<"Paul initialized."<<std::endl;
+    std::cout <<" done."<<endl;
 
     paul.trackGaze();
 

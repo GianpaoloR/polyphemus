@@ -181,16 +181,10 @@ private:
     ///<summary> WatchingPoint is a Point structure which contains gaze coordinates.</summary>
     cv::Point watchingPoint;
 
-    ///<summary> Sets the initial position for the gaze point on screen. Needs previous work done by headRotation for y axes. Called by trackGaze(). Returns void.</summary>
-    void estimateAndShowGazeStartingPoint();
+
     ///<summary> Encapsulates call to gE member methods to estimate local pupil displacement. Called by trackGaze(). Returns void.</summary>
     void estimatePupilGazeDisplacement(bool refined);
-    ///<summary> Main function to merge together all gaze data computed before (head, eyes, x and y). Called by trackGaze(). Returns void.</summary>
-    void computeFinalGaze();
-    ///<summary> Internal function to merge together gaze data computed before (head + eyes). ONLY for X axis. Called by computeFinalGaze(). Returns void.</summary>
-    void computeFinalGazeX();
-    ///<summary> Internal function to merge together gaze data computed before (head + eyes). ONLY for Y axis. Called by computeFinalGaze(). Returns void.</summary>
-    void computeFinalGazeY();    //TODO!!!
+
     #ifndef WEBSERVICE
     ///<summary> Asks guiHandler to refresh gaze window. Called by trackGaze(). Returns void.</summary>
     void updateGaze();
@@ -199,27 +193,9 @@ private:
     //---------------------------------------------------------
     //                   HAAR DATA & METHODS
     //---------------------------------------------------------
-    ///<summary> Vector to be filled by Haar analysis (eye couple).</summary>
-    std::vector<cv::Rect> eyePairs;
-    ///<summary> Vector to be filled by Haar analysis (single eye).</summary>
-    std::vector<cv::Rect> singleEyes;
-    ///<summary> Vector to be filled by Haar analysis (left eye).</summary>
-    std::vector<cv::Rect> leftEyes;
-    ///<summary> Vector to be filled by Haar analysis (right eye).</summary>
-    std::vector<cv::Rect> rightEyes;
-    ///<summary> Vector to be filled by Haar analysis (nose).</summary>
-    std::vector<cv::Rect> noses;
     ///<summary> Vector to be filled by Haar analysis (face).</summary>
     std::vector<cv::Rect> faces;
-    ///<summary> Vector to be filled by Haar analysis (mouth).</summary>
-    std::vector<cv::Rect> mouths;
 
-    ///<summary> Find nose through Haar classifier. Called by trackGaze(). Returns void.</summary>
-    void detectNoseWithHaar();
-    ///<summary> Find mouth through Haar classifier. Called by trackGaze(). Returns void.</summary>
-    void detectMouthWithHaar();
-    ///<summary>Applies Haar analysis (eye pairs, left eye, right eye detection) and sets rois accordingly. Called by trackGaze(). Returns void.</summary>
-    void detectEyesWithHaar();
 
     //---------------------------------------------------------
     //                   PUPIL DATA & METHODS
@@ -330,7 +306,13 @@ private:
     //                    STASM METHODS
     //---------------------------------------------------------
     void stasm();
+
+    #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     void drawSingleLandmark();
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
+
     float landmarks[2* stasm_NLANDMARKS]; // x,y coords
 
     //---------------------------------------------------------
@@ -351,8 +333,7 @@ private:
     //---------------------------------------------------------
     //                    ROTATIONS DATA & METHODS
     //---------------------------------------------------------
-    ///<summary> Estimate head rotation along y axis (pan movement) and sets headRotation's structures accordingly. Called by trackGaze(). Returns void.</summary>
-    void estimateAndShowRotationsY();
+
 
     //---------------------------------------------------------
     //                    OTHER DATA & METHODS
@@ -369,9 +350,6 @@ private:
 
     void prepareProfiling();
 
-
-    void templateMatching(); //TEMPORARY SIMONE'S METHOD
-    void antropometricFilter(); //TEMPORARY SIMONE'S METHOD
     #ifdef KETROD_DEBUG
     void printFeatures(); //TEMPORARY SIMONE'S METHOD
     #endif

@@ -199,7 +199,6 @@ CONFIG(debug,debug|release){
      #DEFINES += "FOLLOWGAZE_DEBUG"
      #DEFINES += "EVALUATEGAZE_DEBUG"
      #DEFINES += "ESTIMATEANDSHOWGAZESTARTINGPOINT_DEBUG"
-     #DEFINES += "COMPUTEFINALGAZEX_DEBUG"
      #DEFINES += "TRACKGAZE_DEBUG"
      #DEFINES += "EXPONENTIALAPPROX_DEBUG"
      #DEFINES += "LINEARAPPROX_DEBUG"
@@ -243,4 +242,5 @@ CONFIG(debug,debug|release){
 #LIBS += -fopenmp
 
 OTHER_FILES += \
-    otherCode.txt
+    otherCode.txt \
+    otherCode.jp

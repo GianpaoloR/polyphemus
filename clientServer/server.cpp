@@ -615,12 +615,6 @@ void Server::printResponse(roiHandler* roiHandler) {
         std::cout << ", \"rightEye\": null";
     }
 
-    if (roiHandler->hasNose()) {
-        std::cout << ", \"nose\": {\"x\": " << roiHandler->getFace().x + roiHandler->getNose().x << ", \"y\": " << roiHandler->getFace().y + roiHandler->getNose().y << ", \"width\": " << roiHandler->getNose().width << ", \"height\": " << roiHandler->getNose().height << "}";
-    }
-    else {
-        std::cout << ", \"nose\": null";
-    }
 
     if (roiHandler->hasMouth()) {
         std::cout << ", \"mouth\": {\"x\": " << roiHandler->getFace().x + roiHandler->getMouth().x << ", \"y\": " << roiHandler->getFace().y + roiHandler->getMouth().y << ", \"width\": " << roiHandler->getMouth().width << ", \"height\": " << roiHandler->getMouth().height << "}";
@@ -631,7 +625,7 @@ void Server::printResponse(roiHandler* roiHandler) {
 
     std::cout << ", \"snapshotType\": \"" << snapshotType << "\"" << std::endl;
     if (snapshotType.compare("training") == 0) {
-        if ((roiHandler->hasFace()) && (roiHandler->hasLeftEye()) && (roiHandler->hasRightEye()) && (roiHandler->hasNose()) && (roiHandler->hasMouth())) {
+        if ((roiHandler->hasFace()) && (roiHandler->hasLeftEye()) && (roiHandler->hasRightEye()) && (roiHandler->hasMouth())) {
             std::cout << ", \"train\": { \"isDone\": true }" << std::endl;
         }
     }

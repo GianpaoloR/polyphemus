@@ -107,10 +107,15 @@ public:
 
 
     //Gaze showers
-    void showStartingGaze(cv::Point gazeStartingPoint, double obsX, double obsY);
+
+    void showStartingGaze(cv::Point gazeStartingPoint);
     void showGaze(double ratio);
     void showFinalGaze(cv::Point gazePoint);
-    void turnOnZone(int hZone, int vZone, double x, double y);
+    void redrawGazeFrame();
+    void turnOnEyeZone(int hZone, int vZone);
+    void showStartingEyeGaze(cv::Point gazeStartingPoint);
+    void turnOnHeadZone(double angleX, double angleY, double distance, cv::Rect face);
+    void showStartingHeadGaze(cv::Point headOrientation);
 
     void showRoi(const cv::Mat& roi, std::string name, bool maintain);
     void showEyesRotated(cv::Point l, cv::Point r);

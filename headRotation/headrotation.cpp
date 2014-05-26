@@ -241,23 +241,27 @@ double HeadRotation::evaluateRotationZ(haarAnalyzer* haar) {
 
 double HeadRotation::evaluateRotationWithNoseY(float* landmarks) {
     double left = landmarks[52*2];
+    /*
     if (rH->hasNose()) {
         left += (rH->getNose().x + rH->getNose().width*0.5);
         left = left / 2;
         //double right = rH->getFace().width - (rH->getNose().x + rH->getNose().width*0.5);
         //return ((right / fH->getFace().width) * 180) - 90;
     }
+    */
     return 90 - ((left / rH->getFace().width) * 180);
 }
 
 double HeadRotation::evaluateRotationWithMouthY(float* landmarks) {
     double left = landmarks[67*2];
+    /*
     if (rH->hasMouth()) {
         left += rH->getMouth().x + rH->getMouth().width*0.5;
         left = left / 2;
         //double right = rH->getFace().width - (rH->getMouth().x + rH->getMouth().width*0.5);
         //return ((right / rH->getFace().width) * 180) - 90;
     }
+    */
     return 90 - ((left / rH->getFace().width) * 180);
 }
 
@@ -455,106 +459,7 @@ int HeadRotation::searchWhiteAtR(int k, cv::Mat drawing)
     return saveJR;
 }
 
-void HeadRotation::processDistances()
-{
-    //-----------------------
-    //  Eye to Eye distance
 
-#ifdef WEBSERVICE
-    //std::string distanceEyes = Server::getServer()->getCookie("distanceEyes");
-    rH->distance_eyes = Server::getServer()->getInfoDouble("distanceEyes");
-    if (rH->distance_eyes != NULL) {
-        //rH->distance_eyes = atof(distanceEyes.c_str());
-        rH->itHasDistanceEyes = true;
-    }
-#endif
-
-    if ((!rH->itHasDistanceEyes) && (rH->hasLeftEye()) && (rH->hasRightEye())) {
-        cv::Point eL (rH->getLeftEye().x+(rH->getLeftEye().width/2), rH->getLeftEye().y+(rH->getLeftEye().height/2));
-        cv::Point eR (rH->getRightEye().x+(rH->getRightEye().width/2), rH->getRightEye().y+(rH->getRightEye().height/2));
-        rH->distance_eyes=evaluateDistance(eL, eR)*100/rH->getFace().width;
-        rH->itHasDistanceEyes = true;
-
-#ifdef WEBSERVICE
-        //UO
-        Server::getServer()->setInfo("distanceEyes", rH->distance_eyes);
-        //Server::getServer()->setCookie("distanceEyes", rH->distance_eyes);
-        //UO
-#endif
-    }
-
-    //-------------	CvPOSITObject* positObject;-----------------
-    //    Mouth to Center distance
-
-    #ifdef WEBSERVICE
-    //std::string distanceMouthCenter = Server::getServer()->getCookie("distanceMouthCenter");
-    rH->distance_mouth_center = Server::getServer()->getInfoDouble("distanceMouthCenter");
-    if (rH->distance_mouth_center != NULL) {
-        //rH->distance_mouth_center = atof(distanceMouthCenter.c_str());
-        rH->itHasDistanceMouthCenter = true;
-    }
-    #endif
-
-    if ((!rH->itHasDistanceMouthCenter) && (rH->hasMouth())) {
-        cv::Point f ((rH->getFace().width/2), (rH->getFace().height/2));
-        cv::Point m (rH->getMouth().x+(rH->getMouth().width/2), rH->getMouth().y+(rH->getMouth().height/2));
-        rH->distance_mouth_center=evaluateDistance(m, f) * 100/rH->getFace().height;
-        rH->itHasDistanceMouthCenter = true;
-
-        #ifdef WEBSERVICE
-        Server::getServer()->setInfo("distanceMouthCenter", rH->distance_mouth_center);
-        //Server::getServer()->setCookie("distanceMouthCenter", rH->distance_mouth_center);
-        #endif
-    }
-
-    //------------------------------
-    //    Nose to Center distance
-
-    #ifdef WEBSERVICE
-    //std::string distanceNoseCenter = Server::getServer()->getCookie("distanceNoseCenter");
-    rH->distance_nose_center = Server::getServer()->getInfoDouble("distanceNoseCenter");
-    if (rH->distance_nose_center != NULL) {
-        //rH->distance_nose_center = atof(distanceNoseCenter.c_str());
-        rH->itHasDistanceNoseCenter = true;
-    }
-    #endif
-
-    if ((!rH->itHasDistanceNoseCenter) && (rH->hasNose())) {
-        cv::Point f ((rH->getFace().width/2), (rH->getFace().height/2));
-        cv::Point n (rH->getNose().x+(rH->getNose().width/2), rH->getNose().y+(rH->getNose().height/2));
-        rH->distance_nose_center=evaluateDistance(f, n)*100/rH->getFace().height;
-        rH->itHasDistanceNoseCenter = true;
-
-        #ifdef WEBSERVICE
-        Server::getServer()->setInfo("distanceNoseCenter", rH->distance_nose_center);
-        //Server::getServer()->setCookie("distanceNoseCenter", rH->distance_nose_center);
-        #endif
-    }
-
-    //------------------------------
-    //    Nose to Mouth distance
-
-    #ifdef WEBSERVICE
-    //std::string distanceNoseMouth = Server::getServer()->getCookie("distanceNoseMouth");
-    rH->distance_nose_mouth = Server::getServer()->getInfoDouble("distanceNoseMouth");
-    if (rH->distance_nose_mouth != NULL) {
-        //rH->distance_nose_mouth = atof(distanceNoseMouth.c_str());
-        rH->itHasDistanceNoseMouth = true;
-    }
-    #endif
-
-    if ((!rH->itHasDistanceNoseMouth) && (rH->hasMouth()) && (rH->hasNose())) {
-        cv::Point m (rH->getMouth().x+(rH->getMouth().width/2), rH->getMouth().y+(rH->getMouth().height/2));
-        cv::Point n (rH->getNose().x+(rH->getNose().width/2), rH->getNose().y+(rH->getNose().height/2));
-        rH->distance_nose_mouth=evaluateDistance(n, m)* 100/rH->getFace().height;
-        rH->itHasDistanceNoseMouth = true;
-
-        #ifdef WEBSERVICE
-        Server::getServer()->setInfo("distanceNoseMouth", rH->distance_nose_mouth);
-        //Server::getServer()->setCookie("distanceNoseMouth", rH->distance_nose_mouth);
-        #endif
-    }
-}
 
 void HeadRotation::positPoint(float* landmarks)
 {
@@ -601,13 +506,6 @@ void HeadRotation::positPoint(float* landmarks)
     cv::Point n;
 
 
-    if (rH->hasNose())
-    {
-        n = cv::Point (rH->getNose().x+(rH->getNose().width/2), rH->getNose().y+(rH->getNose().height/2));
-        nose.x=(nose.x+n.x)/2;
-        nose.y=(nose.y+n.y)/2;
-    }
-
    /* earR.y+=10;
     earR.x+=40+(evaluateRotationY(landmarks)*2.5);
 
@@ -653,7 +551,9 @@ void HeadRotation::positPoint(float* landmarks)
     srcImagePoints.push_back( cvPoint2D32f( earR.x-xOff, -earL.y+yOff ) );
 
     posit(modelPoints, srcImagePoints);
-    std::cout << "1" << std::endl;
+
+    #ifndef WEBSERVICE
+    #ifdef WITH_GUI
     cv::circle(img, nose, 3, cv::Scalar(0,255,255), 1, 8, 0);
     cv::circle(img, eyeL, 3, cv::Scalar(0,255,255), 1, 8, 0);
     cv::circle(img, eyeR, 3, cv::Scalar(0,255,255), 1, 8, 0);
@@ -667,6 +567,8 @@ void HeadRotation::positPoint(float* landmarks)
 
     cv::namedWindow("Posit",CV_WINDOW_NORMAL);
     imshow("Posit", img);
+    #endif //WITH_GUI
+    #endif //WEBSERVICE
 
     /*
     if (rH->hasMouth())

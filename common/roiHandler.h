@@ -120,16 +120,12 @@ public:
     //Mouth existance
     bool hasMouth();
 
-    //Nose setter
-    void setNoseROI(std::vector<cv::Rect> fVett);
+
     //Nose getter
     cv::Rect& getNose();
     cv::Mat& getNoseROI();
     cv::Mat& getOldHaarNoseROI();
-    //Nose cleaner
-    void clearNose();
-    //Nose existance
-    bool hasNose();
+
 
     //Face setter
     void setFaceROI(std::vector<cv::Rect> fVett);
