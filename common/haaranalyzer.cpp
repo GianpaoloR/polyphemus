@@ -97,7 +97,7 @@ std::vector<cv::Rect> haarAnalyzer::getFaces()
     return faces;
 }
 
-//hasDetectFace: looks for faces and returns true if it find one face.
+//has: looks for faces and returns true if it find one face.
 bool haarAnalyzer::hasDetectFace(cv::Mat& img) {
     std::vector<cv::Rect> faces;
     face_cascade.detectMultiScale(img, faces,
