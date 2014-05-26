@@ -33,7 +33,7 @@ void polyphemus::constructor(int params) {
     #ifndef WEBSERVICE
     #ifdef WITH_GUI
     this->gui = NULL;
-    #endif //WITH_GUI
+    #endif //WITH_GUI2.00
     #endif //WEBSERVICE
 
     #ifdef TEST_MODE
@@ -223,6 +223,7 @@ void polyphemus::retrieveDesktop()
 void polyphemus::enableDebugGui()
 {
     this->gui = new guiHandler(screenWidth, screenHeight);
+    //gui->setHeadRotation(headRotation);
     fH->setDebugGui(this->gui);
     haar->setDebugGui(this->gui);
     headRotation->setDebugGui(this->gui);
@@ -361,14 +362,14 @@ void polyphemus::reduceFace()
     cv::Rect reducedRect = headRotation->thresholdImage(rH->getFaceROI());
     rH->setReducedFaceROI(reducedRect);       //TODO: evaluate this
 
-    #ifndef WEBSERVICE
+#ifndef WEBSERVICE
 #ifdef WITH_GUI
     if (gui != NULL)
     {
         gui->setReducedFaceFrame(rH->getReducedFaceROI());
     }
 #endif //WITH_GUI
-    #endif //WEBSERVICE
+#endif //WEBSERVICE
 }
 
 void polyphemus::processFaceData()
@@ -581,7 +582,7 @@ void polyphemus::reduceEmpiricEyes()
 #ifdef WITH_GUI
 void polyphemus::updateFace()
 {
-    if(gui!=NULL && !profiling)
+    if(gui!=NULL /*&& !profiling*/)
     {
         gui->updateWindow(FACE_WINDOW);
     }
@@ -602,8 +603,10 @@ void polyphemus::prepareProfiling()
 #ifdef WITH_GUI
 void polyphemus::updateMain()
 {
-    if(gui!=NULL && !profiling)
+    if(gui!=NULL  /*&& !profiling*/)
+    {
         gui->updateWindow(MAIN_WINDOW);
+    }
 }
 #endif //WITH_GUI
 #endif
@@ -612,7 +615,7 @@ void polyphemus::updateMain()
 #ifdef WITH_GUI
 void polyphemus::updateGaze()
 {
-    if(gui!=NULL && !profiling)
+    if(gui!=NULL /*&& !profiling*/)
     {
         gui->updateWindow(GAZE_WINDOW);
     }
@@ -1307,7 +1310,8 @@ void polyphemus::trackGaze()
             {
                 if(pD->leftFound)
                 {
-                gui->turnOnZone(gE->getHorizontalResponse(), gE->getVerticalResponse(), headRotation->getAngleX(), headRotation->getAngleY(), headRotation->getDistanceHead(), rH->getFace());
+                    gui->turnOnZone(gE->getHorizontalResponse(), gE->getVerticalResponse(), headRotation->getObsPointX(), headRotation->getObsPointY());
+
 
                     //estimatePupilGazeDisplacement(false);
                     #ifdef TRACKGAZE_DEBUG

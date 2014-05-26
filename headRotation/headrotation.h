@@ -35,7 +35,14 @@ public:
     double evaluateRotationZ(haarAnalyzer *haar);
     void positPoint(float * landmarks);
     void posit(std::vector<CvPoint3D32f> modelPoints, std::vector<CvPoint2D32f> srcImagePoints);
+    void setGazeFromPosit();
+    double getObsPointX();
+    double getObsPointY();
+    double getObsPointXKalmanCorrection();
+    double getObsPointYKalmanCorrection();
+    void kalmanFilter();
     double radianti_gradi(double radiante);
+    void setDistanceHead();
     double getDistanceHead();
     double getAngleZ();
     double getAngleX();
@@ -55,8 +62,18 @@ private:
     double angle_x;
     double angle_y;
     double angle_z;
+    double distance;
     double eyeDim;
-
+    double obsPointX;
+    double obsPointY;
+    double obsPointXKalmanCorrection;
+    double obsPointYKalmanCorrection;
+    Mat_<float> measurement;
+    bool initKalman;
+    cv::Mat prediction;
+    cv::Mat estimated;
+    KalmanFilter KF;
+    vector<Point> obsv,kalmanv;
 };
 
 #endif // HEADROTATION_H
