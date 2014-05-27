@@ -893,7 +893,7 @@ void polyphemus::trackGaze()
             #ifdef WITH_GUI
             if(gui!=NULL)
             {
-                gui->turnOnHeadZone(headRotation->getAngleX(), headRotation->getAngleY(), headRotation->getDistanceHead(), rH->getFace());
+                gui->turnOnHeadZone(headRotation->getObsPointX(), headRotation->getObsPointY(), headRotation->getObsPointXKalmanCorrection(), headRotation->getObsPointYKalmanCorrection());
             }
             #endif //WITH_GUI
             #endif //WEBSERVICE

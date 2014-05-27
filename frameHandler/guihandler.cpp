@@ -372,10 +372,10 @@ void guiHandler::turnOnEyeZone(int hZone, int vZone)
     showStartingEyeGaze(p);
 }
 
-void guiHandler::turnOnHeadZone(double angleX, double angleY, double distance, cv::Rect face)
+void guiHandler::turnOnHeadZone(double X, double Y, double KX, double KY)
 {
-    //cv::Point p = setGazeFromPosit(angleX, angleY, distance, face);
-    //showStartingHeadGaze(p);
+    showStartingHeadGaze(cv::Point(X, Y), cv::Scalar(0, 255, 0));
+    showStartingHeadGaze(cv::Point(KX, KY), cv::Scalar(255, 255, 0));
 }
 
 
@@ -463,14 +463,31 @@ void guiHandler::showStartingEyeGaze(cv::Point gazeStartingPoint)
     cv::rectangle(gazeFrame,cv::Rect(start.x, start.y, hRes/3, vRes/3),cv::Scalar(255,0,0),3,1,0);
 }
 
-void guiHandler::showStartingHeadGaze(cv::Point headOrientation){
-    //int position;
-    //int radius = gazeFrame.cols/14;
+void guiHandler::showStartingHeadGaze(cv::Point headOrientation, cv::Scalar color){
+    int radius = 50;
 
-    //cv::circle(gazeFrame, gazeStartingPoint, radius, cv::Scalar(0,255,255), 5, 1, 0);
+    if (headOrientation.x<0)
+    {
+        radius=radius-headOrientation.x;
+        headOrientation.x=0;
+    }
+    if (headOrientation.x > (hRes*2))
+    {
+        radius=radius+(headOrientation.x-(hRes*2));
+        headOrientation.x=(hRes*2);
+    }
+    if (headOrientation.y<0)
+    {
+        radius=radius-headOrientation.y;
+        headOrientation.y=0;
+    }
+    if (headOrientation.y>(vRes*2))
+    {
+        radius=radius+(headOrientation.y-(vRes*2));
+        headOrientation.y=(vRes*2);
+    }
 
-    cv::circle(gazeFrame, headOrientation, 20, cv::Scalar(0, 255, 0) , 4, 8, 1);
-
+    cv::circle(gazeFrame, headOrientation, radius, color , 10, 8, 1);
 
     return;
 }

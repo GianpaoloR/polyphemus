@@ -41,7 +41,6 @@ public:
     double getObsPointYKalmanCorrection();
     void kalmanFilter();
     double radianti_gradi(double radiante);
-    void setDistanceHead();
     double getDistanceHead();
     double getAngleZ();
     double getAngleX();
@@ -69,8 +68,6 @@ private:
     double obsPointYKalmanCorrection;
     Mat_<float> measurement;
     bool initKalman;
-    cv::Mat prediction;
-    cv::Mat estimated;
     KalmanFilter KF;
     vector<Point> obsv,kalmanv;
 };

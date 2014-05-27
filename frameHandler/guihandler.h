@@ -114,8 +114,8 @@ public:
     void redrawGazeFrame();
     void turnOnEyeZone(int hZone, int vZone);
     void showStartingEyeGaze(cv::Point gazeStartingPoint);
-    void turnOnHeadZone(double angleX, double angleY, double distance, cv::Rect face);
-    void showStartingHeadGaze(cv::Point headOrientation);
+    void turnOnHeadZone(double X, double Y, double KX, double KY);
+    void showStartingHeadGaze(cv::Point headOrientation, cv::Scalar color);
 
     void showRoi(const cv::Mat& roi, std::string name, bool maintain);
     void showEyesRotated(cv::Point l, cv::Point r);

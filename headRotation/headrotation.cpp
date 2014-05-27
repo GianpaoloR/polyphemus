@@ -522,7 +522,9 @@ void HeadRotation::positPoint(float* landmarks)
     //Distanza fronte.naso lungo asse y attenuata dalla grandezza degli occhi in modo che se mi allontano
     //Viene compreso che mi sono allontanato e che la grandezza e' diminuita a causa di un mio allontanamento.
     double dim=eyeDim*4.5-(landmarks[52*2+1]-landmarks[14*2+1]);
-    std::cout << "Distance: "  << eyeDim <<  std::endl;
+    #ifdef POSIT_DEBUG
+    std::cout << "Distance Eyes: "  << eyeDim <<  std::endl;
+    #endif
 
     //double distance_monitor =
 
@@ -569,13 +571,6 @@ void HeadRotation::positPoint(float* landmarks)
     imshow("Posit", img);
     #endif //WITH_GUI
     #endif //WEBSERVICE
-
-    /*
-    if (rH->hasMouth())
-    {
-       cv::Point m (rH->getMouth().x+(rH->getMouth().width/2), rH->getMouth().y+(rH->getMouth().height/2));
-    }
-    */
 }
 
 
@@ -637,14 +632,20 @@ void HeadRotation::posit(std::vector<CvPoint3D32f> modelPoints, std::vector<CvPo
     angle_y = radianti_gradi(atan2(-rotation_matrix[2*3], sqrt(rotation_matrix[2*3+1]*rotation_matrix[2*3+1] +  rotation_matrix[2*3+2]*rotation_matrix[2*3+2])));
     angle_z = radianti_gradi(atan2(rotation_matrix[1*3], rotation_matrix[0]));
 
-    setDistanceHead();
+    distance = getDistanceHead();
+
+    #ifdef POSIT_DEBUG
+    cout << "Distance head: " << distance << endl;
+    #endif
 
     setGazeFromPosit();
-    //kalmanFilter();
+    kalmanFilter();
 
+    #ifdef POSIT_DEBUG
     cout << "Angle x: " <<radianti_gradi(atan2(rotation_matrix[2*3+1], rotation_matrix[2*3+2])) << endl;
     cout << "Angle y: " <<radianti_gradi(atan2(-rotation_matrix[2*3], sqrt(rotation_matrix[2*3+1]*rotation_matrix[2*3+1] +  rotation_matrix[2*3+2]*rotation_matrix[2*3+2]))) << endl;
     cout << "Angle z: " <<radianti_gradi(atan2(rotation_matrix[1*3], rotation_matrix[0])) << endl;
+    #endif
 
 
     //guiHandler->setGazeFromPosit(x, y, 70);
@@ -690,21 +691,16 @@ double HeadRotation::getAngleZ()
     return angle_z;
 }
 
-void HeadRotation::setDistanceHead()
-{
-    distance = 70;
-}
-
 double HeadRotation::getDistanceHead()
 {
-    //TODO: DA FARE CON eyeDim
-    return (double) 70;
+    double delta=(eyeDim-20)*2;
+    return 100-(eyeDim+delta);
 }
 
 
 void HeadRotation::kalmanFilter()
 {
-    if (initKalman=false)
+    if (initKalman==false)
     {
         KF.init(4,2,0);
         measurement.create(2,1);
@@ -712,7 +708,7 @@ void HeadRotation::kalmanFilter()
 
         // intialization of KF...
         KF.transitionMatrix = *(Mat_<float>(4, 4) << 1,0,1,0,   0,1,0,1,  0,0,1,0,  0,0,0,1);
-        Mat_<float> measurement(2,1);
+
         measurement.setTo(Scalar(0));
 
         KF.statePre.at<float>(0) = obsPointX;
@@ -732,7 +728,7 @@ void HeadRotation::kalmanFilter()
     else
     {
         // First predict, to update the internal statePre variable
-        prediction = KF.predict();
+        Mat prediction = KF.predict();
         Point predictPt(prediction.at<float>(0),prediction.at<float>(1));
 
         // Get mouse point
@@ -741,15 +737,16 @@ void HeadRotation::kalmanFilter()
         measurement(1) = obsPointY;
 
         // The update phase
-        estimated = KF.correct(measurement);
+        Mat estimated = KF.correct(measurement);
 
         Point statePt(estimated.at<float>(0),estimated.at<float>(1));
         Point measPt(measurement(0),measurement(1));
 
+        obsPointXKalmanCorrection=statePt.x;
+        obsPointYKalmanCorrection=statePt.y;
 
         obsv.push_back(measPt);
         kalmanv.push_back(statePt);
-
 
         //for (int i = 0; i < obsv.size()-1; i++)
         //    line(img, mousev[i], mousev[i+1], Scalar(255,255,0), 1);

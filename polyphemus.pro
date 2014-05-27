@@ -212,6 +212,8 @@ CONFIG(debug,debug|release){
      #DEFINES += "AUTOMATIC_TEST"
      #DEFINES += "ONLY_REAL_PUPIL"
      DEFINES += "WITH_GUI"
+     #DEFINES += "POSIT_DEBUG"
+     #DEFINES += "STASM"
 
     INCLUDEPATH += /home/ketrod/Applicazioni/build_with_Qt/release/include
     LIBS += -L/home/ketrod/Applicazioni/build_with_Qt/release/lib \

@@ -833,7 +833,9 @@ void DetectEyesAndMouth(  // use OpenCV detectors to find the eyes and mouth
     int ileft_best = -1, iright_best = -1; // index into leyes and reyes vecs
     if (!leye_det_g.empty()) // need the eyes? (depends on model estart field)
     {
+        #ifdef STASM
         std::cout<<"EYE DETECTION NEEDED!"<<std::endl;
+        #endif
         DetectAllEyes(leyes, reyes,
                       img, detpar.eyaw, facerect);
 
