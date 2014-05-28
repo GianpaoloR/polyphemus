@@ -33,7 +33,7 @@ void polyphemus::constructor(int params) {
     #ifndef WEBSERVICE
     #ifdef WITH_GUI
     this->gui = NULL;
-    #endif //WITH_GUI2.00
+    #endif //WITH_GUI
     #endif //WEBSERVICE
 
     #ifdef TEST_MODE
@@ -432,7 +432,6 @@ void polyphemus::reduceEmpiricEyes()
 #ifdef WITH_GUI
 void polyphemus::updateFace()
 {
-
     if(gui!=NULL)
     {
         gui->updateWindow(FACE_WINDOW);
@@ -459,7 +458,6 @@ void polyphemus::updateMain()
 void polyphemus::updateGaze()
 {
     if(gui!=NULL)
-
     {
         gui->updateWindow(GAZE_WINDOW);
     }
@@ -955,13 +953,6 @@ void polyphemus::trackGaze()
             {
                 if(pD->leftFound)
                 {
-                    //gui->turnOnZone(gE->getHorizontalResponse(), gE->getVerticalResponse(), headRotation->getObsPointX(), headRotation->getObsPointY());
-                    //estimatePupilGazeDisplacement(false);
-                    #ifdef TRACKGAZE_DEBUG
-                    std::cout<<"TRACKGAZE: OK "<<h++<<": ESTIMATEPUPILGAZEDISPLACEMENT"<<std::endl;
-                    #endif
-                    //gui->showFinalGaze(watchingPoint);
-
                     gui->turnOnEyeZone(gE->getHorizontalResponse(), gE->getVerticalResponse());
                     #ifdef GREATCATCH_TEST
                     updateGaze();

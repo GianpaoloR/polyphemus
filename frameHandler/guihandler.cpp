@@ -172,7 +172,6 @@ void guiHandler::initWindow(WINDOW_TYPE wt)
 //UpdateWindow: refresh windows content
 void guiHandler::updateWindow(WINDOW_TYPE wt)
 {
-
     switch (wt)
     {
     case MAIN_WINDOW:
@@ -387,17 +386,6 @@ void guiHandler::showFinalGaze(cv::Point gazePoint)
     return;
 }
 
-
-
-
-void guiHandler::showStartingGaze(cv::Point gazeStartingPoint){
-    //int position;
-    cv::Point start;
-    int x = gazeStartingPoint.x;
-    int y = gazeStartingPoint.y;
-    //int radius = gazeFrame.cols/14;
-
-}
 void guiHandler::redrawGazeFrame()
 {
     gazeFrame.release();
@@ -406,6 +394,7 @@ void guiHandler::redrawGazeFrame()
     cv::line(gazeFrame, cv::Point(0,vRes*2/3), cv::Point(hRes,vRes*2/3), cv::Scalar(0,255,255), 3, 1, 0);
     cv::line(gazeFrame, cv::Point(hRes/3, 0), cv::Point(hRes/3, vRes), cv::Scalar(0,255,255), 3, 1, 0);
     cv::line(gazeFrame, cv::Point(hRes*2/3, 0), cv::Point(hRes*2/3, vRes), cv::Scalar(0,255,255), 3, 1, 0);
+
 }
 
 void guiHandler::showStartingEyeGaze(cv::Point gazeStartingPoint)
