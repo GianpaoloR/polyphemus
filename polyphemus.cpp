@@ -33,7 +33,7 @@ void polyphemus::constructor(int params) {
     #ifndef WEBSERVICE
     #ifdef WITH_GUI
     this->gui = NULL;
-    #endif //WITH_GUI2.00
+    #endif //WITH_GUI
     #endif //WEBSERVICE
 
     #ifdef TEST_MODE
@@ -87,6 +87,7 @@ void polyphemus::constructor(int params) {
     leftInFaceRefined = NULL;
     rightInFaceRefined = NULL;
 
+    facesFound = false;
     refined = true;
     alreadyFace = false;
 
@@ -324,7 +325,7 @@ void polyphemus::findNewFaces()
 {
     if(findNewFacesDebug) std::cout<<"FIND_NEW_FACES: ENTERED "<<std::endl;
 
-    haar->detectFaces(rH->getGrayFrame());
+    haar->detectFaces(rH->getGrayFrame(), facesFound);
     if(findNewFacesDebug) std::cout<<"FIND_NEW_FACES: DETECTION DONE "<<std::endl;
 
     faces = haar->getFaces();
@@ -339,7 +340,10 @@ void polyphemus::findNewFaces()
             newFace = true;
             //cout<<"THIS IS A NEW FACE!!"<<endl;
         }
-        else newFace = false;
+        else
+        {
+            newFace = false;
+        }
     }
     else
     {
@@ -432,7 +436,6 @@ void polyphemus::reduceEmpiricEyes()
 #ifdef WITH_GUI
 void polyphemus::updateFace()
 {
-
     if(gui!=NULL)
     {
         gui->updateWindow(FACE_WINDOW);
@@ -459,7 +462,6 @@ void polyphemus::updateMain()
 void polyphemus::updateGaze()
 {
     if(gui!=NULL)
-
     {
         gui->updateWindow(GAZE_WINDOW);
     }
@@ -807,8 +809,8 @@ void polyphemus::trackGaze()
         }
 
 
-        interruptChar = waitKey(1000);
-        if(interruptChar == 'c') break;
+//        interruptChar = waitKey(1000); //TODO: remove?
+//        if(interruptChar == 'c') break;
 
         fH->prepareNextReading();
 #endif
@@ -955,13 +957,6 @@ void polyphemus::trackGaze()
             {
                 if(pD->leftFound)
                 {
-                    //gui->turnOnZone(gE->getHorizontalResponse(), gE->getVerticalResponse(), headRotation->getObsPointX(), headRotation->getObsPointY());
-                    //estimatePupilGazeDisplacement(false);
-                    #ifdef TRACKGAZE_DEBUG
-                    std::cout<<"TRACKGAZE: OK "<<h++<<": ESTIMATEPUPILGAZEDISPLACEMENT"<<std::endl;
-                    #endif
-                    //gui->showFinalGaze(watchingPoint);
-
                     gui->turnOnEyeZone(gE->getHorizontalResponse(), gE->getVerticalResponse());
                     #ifdef GREATCATCH_TEST
                     updateGaze();

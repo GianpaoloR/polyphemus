@@ -10,6 +10,7 @@ const bool findPupilsDebug = false;
 const bool refinePupilsDebug = false;
 const bool predictHorizDebug = false;
 const bool predictVertDebug = false;
+const bool detectFacesDebug = false;
 /* DONE
 #DEFINES += "RETRIEVEDESKTOP_DEBUG"
 #DEFINES += "PREPROCESS_DEBUG"
@@ -18,13 +19,13 @@ const bool predictVertDebug = false;
 #DEFINES += "PROCESSFACEDATA_DEBUG"
 #DEFINES += "FINDPUPILS_DEBUG"
 #DEFINES += "REFINEPUPILS_DEBUG"
+#DEFINES += "DETECTFACES_DEBUG"
 */
 /* NOT YET DONE
 #DEFINES += "DEBUG"
 #DEFINES += "TOGRAYSCALE_DEBUG"
 #DEFINES += "SETGRAYFRAME_DEBUG"
 #DEFINES += "GETGRAYFRAME_DEBUG"
-#DEFINES += "DETECTFACES_DEBUG"
 #DEFINES += "DETECTUPPERBODY_DEBUG"
 #DEFINES += "SETFACEROI_DEBUG"
 #DEFINES += "MAKEEMPIRICEYES_DEBUG"

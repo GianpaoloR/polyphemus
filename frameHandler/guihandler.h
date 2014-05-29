@@ -107,10 +107,6 @@ public:
 
 
     //Gaze showers
-
-    void showStartingGaze(cv::Point gazeStartingPoint);
-    void showGaze(double ratio);
-    void showFinalGaze(cv::Point gazePoint);
     void redrawGazeFrame();
     void turnOnEyeZone(int hZone, int vZone);
     void showStartingEyeGaze(cv::Point gazeStartingPoint);
