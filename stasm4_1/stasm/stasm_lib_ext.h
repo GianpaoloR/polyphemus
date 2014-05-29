@@ -5,20 +5,24 @@
 #define STASM_LIB_EXT_H
 
 extern "C"                   // extended version of stasm_init
+//UO
 int stasm_init_ext(          // call once, at bootup
-    const char*  datadir,    // in: directory of face detector files
+    //const char*  datadir,    // in: directory of face detector files
     int          trace,      // in: 0 normal use, 1 trace to stdout and stasm.log
     void*        detparams); // in: NULL or face detector parameters
+//OU
 
 extern "C"                   // extended version of stasm_open_image
+//UO
 int stasm_open_image_ext(    // call once per image, detect faces
     const char*  img,        // in: gray image data, top left corner at 0,0
     int          width,      // in: image width
     int          height,     // in: image height
-    const char*  imgpath,    // in: image path, used only for err msgs and debug
+    //const char*  imgpath,    // in: image path, used only for err msgs and debug
     int          multiface,  // in: 0=return only one face, 1=allow multiple faces
     int          minwidth,   // in: min face width as percentage of img width
     void*        user);      // in: NULL or pointer to user abort func
+//OU
 
 extern "C"
 int stasm_search_auto_ext(   // extended version of stasm_search_auto

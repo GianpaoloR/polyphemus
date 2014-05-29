@@ -26,7 +26,7 @@ public:
 
     void DetectFaces_(            // call once per image to find all the faces
         const Image& img,         // in: the image (grayscale)
-        const char*  imgpath,     // in: used only for debugging
+        //const char*  imgpath,     // in: used only for debugging
         bool         multiface,   // in: if false, want only the best face
         int          minwidth,    // in: min face width as percent of img width
         void*        user);       // in: unused (match virt func signature)

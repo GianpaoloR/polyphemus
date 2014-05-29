@@ -152,7 +152,7 @@ cv::Rect& polyphemus::getRightEye()
 
 bool polyphemus::hasNose()
 {
-    return rH->hasNose();
+    return false;
 }
 
 cv::Rect& polyphemus::getNose()
@@ -337,7 +337,7 @@ void polyphemus::findNewFaces()
         {
             alreadyFace = true;
             newFace = true;
-            cout<<"THIS IS A NEW FACE!!"<<endl;
+            //cout<<"THIS IS A NEW FACE!!"<<endl;
         }
         else newFace = false;
     }
@@ -1321,9 +1321,10 @@ void polyphemus::stasm()
 
     rH->getFaceROI().copyTo(img); //face is already found, use it; stasm detect faces will simply return the whole img rectangle
 
+    //UO
     if (!stasm_search_single(&foundface, landmarks,
-            (char*)img.data, img.cols, img.rows, path, "../polyphemus/stasm4_1/data"))
-
+            (char*)img.data, img.cols, img.rows/*, path, "../polyphemus/stasm4_1/data"*/))
+    //OU
     {
         #ifndef WEBSERVICE
         printf("Error in stasm_search_single: %s\n", stasm_lasterr());
@@ -1332,9 +1333,7 @@ void polyphemus::stasm()
     }
 
     if (!foundface) {
-        #ifndef WEBSERVICE
         printf("No face found in %s\n", path);
-        #endif
     }
     else
     {

@@ -67,18 +67,22 @@ static const int stasm_NLANDMARKS = 77; // number of landmarks
 extern const char* const stasm_VERSION;
 
 extern "C"
+//UO
 int stasm_init(              // call once, at bootup
-    const char*  datadir,    // in: directory of face detector files
+    //const char*  datadir,    // in: directory of face detector files
     int          trace);     // in: 0 normal use, 1 trace to stdout and stasm.log
+//OU
 
 extern "C"
+//UO
 int stasm_open_image(        // call once per image, detect faces
     const char*  img,        // in: gray image data, top left corner at 0,0
     int          width,      // in: image width
     int          height,     // in: image height
-    const char*  imgpath,    // in: image path, used only for err msgs and debug
+    //const char*  imgpath,    // in: image path, used only for err msgs and debug
     int          multiface,  // in: 0=return only one face, 1=allow multiple faces
     int          minwidth);  // in: min face width as percentage of img width
+//OU
 
 extern "C"
 int stasm_search_auto(       // call repeatedly to find all faces
@@ -86,14 +90,16 @@ int stasm_search_auto(       // call repeatedly to find all faces
     float*       landmarks); // out: x0, y0, x1, y1, ..., caller must allocate
 
 extern "C"
+//UO
 int stasm_search_single(     // wrapper for stasm_search_auto and friends
     int*         foundface,  // out: 0=no face, 1=found face
     float*       landmarks,  // out: x0, y0, x1, y1, ..., caller must allocate
     const char*  img,        // in: gray image data, top left corner at 0,0
     int          width,      // in: image width
-    int          height,     // in: image height
+    int          height/*,     // in: image height
     const char*  imgpath,    // in: image path, used only for err msgs and debug
-    const char*  datadir);   // in: directory of face detector files
+    const char*  datadir*/);   // in: directory of face detector files
+//OU
 
 extern "C"                   // find landmarks, no OpenCV face detect
 int stasm_search_pinned(     // call after the user has pinned some points

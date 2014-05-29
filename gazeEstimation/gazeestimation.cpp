@@ -108,21 +108,21 @@ bool gazeEstimation::predictHorizontalZone(pupilType pT)
 
         if(lpToNoseLM < 475*lCornerDistance/1000) //Looking X zone 2
         {
-            cout<<"PREDICTHORIZONTALZONE: Looking RIGHT"<<endl;
+            //cout<<"PREDICTHORIZONTALZONE: Looking RIGHT"<<endl;
             this->horizontalZone = 2;
         }
         else if(lpToNoseLM > 525*lCornerDistance/1000)
         {
-            cout << "PREDICTHORIZONTALZONE: Looking LEFT"<<endl;
+            //cout << "PREDICTHORIZONTALZONE: Looking LEFT"<<endl;
             this->horizontalZone = 0;
         }
         else
         {
-            cout << "PREDICTHORIZONTALZONE: Looking CENTER"<<endl;
+            //cout << "PREDICTHORIZONTALZONE: Looking CENTER"<<endl;
             this->horizontalZone = 1;
         }
     }
-    else cout << "PREDICTHORIZONTALZONE: (great catch) Left pupil OUTSIDE landmarks. NO GAZE PREDICTION."<<endl;
+   // else cout << "PREDICTHORIZONTALZONE: (great catch) Left pupil OUTSIDE landmarks. NO GAZE PREDICTION."<<endl;
 
     return valid;
 }
@@ -222,17 +222,17 @@ void gazeEstimation::predictVerticalZone(bool newFace)
     if(vDiff < vDelta*2/5)
     {
         this->verticalZone = 2;
-        cout << "PREDICTVERTICALZONE: Looking DOWN" <<endl;
+        //cout << "PREDICTVERTICALZONE: Looking DOWN" <<endl;
     }
     else if(vDiff > vDelta*3/5)
     {
         this->verticalZone = 0;
-        cout << "PREDICTVERTICALZONE: Looking UP" << endl;
+        //cout << "PREDICTVERTICALZONE: Looking UP" << endl;
     }
     else
     {
         this->verticalZone = 1;
-        cout << "PREDICTVERTICALZONE: Looking CENTER" << endl;
+        //cout << "PREDICTVERTICALZONE: Looking CENTER" << endl;
     }
 
 }

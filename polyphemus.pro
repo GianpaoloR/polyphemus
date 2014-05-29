@@ -154,8 +154,8 @@ CONFIG(release,debug|release){
      DEFINES += "TEST_MODE"
      DEFINES += "PROFILING"
 
-    INCLUDEPATH += /home/ketrod/Applicazioni/build_with_Qt/release/include
-    LIBS += -L/home/ketrod/Applicazioni/build_with_Qt/release/lib \    #if library name is lib[name].lib, you should write -l[name]
+    INCLUDEPATH += /home/abuntu/build_with_Qt/release/include
+    LIBS += -L/home/abuntu/build_with_Qt/release/lib \
     #if library name is lib[name].lib, you should write -l[name]
     -lopencv_core \
     -lopencv_highgui \
@@ -215,8 +215,8 @@ CONFIG(debug,debug|release){
      #DEFINES += "POSIT_DEBUG"
      #DEFINES += "STASM"
 
-    INCLUDEPATH += /home/ketrod/Applicazioni/build_with_Qt/release/include
-    LIBS += -L/home/ketrod/Applicazioni/build_with_Qt/release/lib \
+     INCLUDEPATH += /home/abuntu/build_with_Qt/debug/include
+     LIBS += -L/home/abuntu/build_with_Qt/debug/lib \
     #if library name is lib[name].lib, you should write -l[name]
     -lopencv_core \
     -lopencv_highgui \

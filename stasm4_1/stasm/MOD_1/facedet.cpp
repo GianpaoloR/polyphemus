@@ -49,7 +49,9 @@ void DetectFaces(          // all face rects into detpars
     //Polyphemus version: we already have the face, returns the whole image rectangle
     bool changedForPolyphemus = true;
 
-    CV_Assert(!facedet_g.empty()); // check that OpenFaceDetector_ was called
+    //UO
+    //CV_Assert(!facedet_g.empty()); // check that OpenFaceDetector_ was called
+    //OU
 
     if(changedForPolyphemus)
     {
@@ -200,31 +202,45 @@ static void TraceFaces(        // write image showing detected face rects
 #endif
 }
 
+//UO
 void FaceDet::DetectFaces_( // call once per image to find all the faces
     const Image& img,       // in: the image (grayscale)
-    const char*  imgpath,   // in: used only for debugging
+    //const char*  imgpath,   // in: used only for debugging
     bool         multiface, // in: if false, want only the best face
     int          minwidth,  // in: min face width as percentage of img width
     void*        user)      // in: unused (match virt func signature)
+//OU
 {
     CV_Assert(user == NULL);
 
     DetectFaces(detpars_, img, minwidth);
     char tracepath[SLEN];
-    sprintf(tracepath, "%s_00_unsortedfacedet.bmp", Base(imgpath));
+
+    //UO
+    //sprintf(tracepath, "%s_00_unsortedfacedet.bmp", Base(imgpath));
+    //OU
+
     TraceFaces(detpars_, img, tracepath);
     DiscardMissizedFaces(detpars_);
     if (multiface) // order faces on increasing distance from left margin
     {
         sort(detpars_.begin(), detpars_.end(), IncreasingLeftMargin);
-        sprintf(tracepath, "%s_05_facedet.bmp", Base(imgpath));
+
+        //UO
+        //sprintf(tracepath, "%s_05_facedet.bmp", Base(imgpath));
+        //OU
+
         TraceFaces(detpars_, img, tracepath);
     }
     else
     {
         // order faces on decreasing width, keep only the first (the largest face)
         sort(detpars_.begin(), detpars_.end(), DecreasingWidth);
-        sprintf(tracepath, "%s_05_sortedfaces.bmp", Base(imgpath));
+
+        //UO
+        //sprintf(tracepath, "%s_05_sortedfaces.bmp", Base(imgpath));
+        //OU
+
         TraceFaces(detpars_, img, tracepath);
         if (NSIZE(detpars_))
             detpars_.resize(1);

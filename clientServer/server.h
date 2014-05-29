@@ -66,6 +66,7 @@ public:
     std::string getSnapshotType();
     int getScreenWidthPixel();
     int getScreenHeightPixel();
+    bool getIsBoundingBox();
 
     void setWatchingPoint(cv::Point watchingPoint);
 
@@ -100,6 +101,8 @@ private:
     std::string snapshotType;
     int screenWidthPixel;
     int screenHeightPixel;
+
+    bool isBoundingBox;
 
     cv::Mat frame;
     cv::Mat previousFrame;

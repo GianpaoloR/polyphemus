@@ -67,7 +67,11 @@ int main() {
         paul.init(faceCascadeName, eyePairCascadeName, eyeCascadeName, leftEyeCascadeName, rightEyeCascadeName, noseCascadeName, mouthCascadeName, upperBodyCascadeName);
         paul.trackGaze();
 
-        Server::getServer()->setWatchingPoint(paul.getWatchingPoint());
+        //UO
+        //Server::getServer()->setWatchingPoint(paul.getWatchingPoint());
+        Server::getServer()->setWatchingPoint(Point(paul.headRotation->getObsPointY(), paul.headRotation->getObsPointX()));
+        //OU
+
         Server::getServer()->printResponse(paul.getRoiHandler());
 
         paul.release();

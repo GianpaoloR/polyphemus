@@ -156,8 +156,12 @@ private:
     ///<summary> Reference to morphology module</summary>
     binaryAnalyzer* bin;
 
+//UO
+public:
     ///<summary> Reference to head position and rotation module</summary>
     HeadRotation* headRotation;
+private:
+//OU
 
     #ifndef WEBSERVICE
     #ifdef WITH_GUI

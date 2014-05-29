@@ -58,10 +58,12 @@ static const Shape LandmarksAsShape( // return a Shape
 
 //-----------------------------------------------------------------------------
 
+//UO
 int stasm_init_ext(        // extended version of stasm_init
-    const char* datadir,   // in: directory of face detector files
+    //const char* datadir,   // in: directory of face detector files
     int         trace,     // in: 0 normal use, 1 trace to stdout and stasm.log
     void*       detparams) // in: NULL or face detector parameters
+//OU
 {
     int returnval = 1;     // assume success
     CatchOpenCvErrs();
@@ -80,10 +82,12 @@ int stasm_init_ext(        // extended version of stasm_init
             }
             lprintf("Stasm version %s%s\n",
                     stasm_VERSION, trace? "  Logging to stasm.log": "");
-            CV_Assert(datadir && datadir[0] && STRNLEN(datadir, SLEN) < SLEN);
-            InitMods(mods_g, datadir); // init ASM model(s)
-            facedet_g.OpenFaceDetector_(datadir, detparams);
-            OpenEyeMouthDetectors(mods_g, datadir);
+            //UO
+            //CV_Assert(datadir && datadir[0] && STRNLEN(datadir, SLEN) < SLEN);
+            InitMods(mods_g/*, datadir*/); // init ASM model(s)
+            //facedet_g.OpenFaceDetector_(datadir, detparams);
+            //OpenEyeMouthDetectors(mods_g, datadir);
+            //OU
         }
         CheckStasmInit();
     }
@@ -95,27 +99,34 @@ int stasm_init_ext(        // extended version of stasm_init
     return returnval;
 }
 
+//UO
 int stasm_init(            // call once, at bootup (to read models from disk)
-    const char* datadir,   // in: directory of face detector files
+    //const char* datadir,   // in: directory of face detector files
     int         trace)     // in: 0 normal use, 1 trace to stdout and stasm.log
 {
-    return stasm_init_ext(datadir, trace, NULL);
+    return stasm_init_ext(/*datadir, */trace, NULL);
 }
+//OU
 
+//UO
 int stasm_open_image_ext(  // extended version of stasm_open_image
     const char* img,       // in: gray image data, top left corner at 0,0
     int         width,     // in: image width
     int         height,    // in: image height
-    const char* imgpath,   // in: image path, used only for err msgs and debug
+    //const char* imgpath,   // in: image path, used only for err msgs and debug
     int         multiface, // in: 0=return only one face, 1=allow multiple faces
     int         minwidth,  // in: min face width as percentage of img width
     void*       user)      // in: NULL or pointer to user abort func
+//OU
 {
     int returnval = 1;     // assume success
     CatchOpenCvErrs();
     try
     {
-        CV_Assert(imgpath && STRNLEN(imgpath, SLEN) < SLEN);
+        //UO
+        //CV_Assert(imgpath && STRNLEN(imgpath, SLEN) < SLEN);
+        //OU
+
         CV_Assert(multiface == 0 || multiface == 1);
         CV_Assert(minwidth >= 1 && minwidth <= 100);
 
@@ -127,7 +138,9 @@ int stasm_open_image_ext(  // extended version of stasm_open_image
         strcpy(imgpath_g, imgpath); // save the image path (for naming debug images)
 #endif
         // call the face detector to detect the face rectangle(s)
-        facedet_g.DetectFaces_(img_g, imgpath, multiface == 1, minwidth, user);
+        //UO
+        facedet_g.DetectFaces_(img_g/*, imgpath*/, multiface == 1, minwidth, user);
+        //OU
     }
     catch(...)
     {
@@ -137,17 +150,19 @@ int stasm_open_image_ext(  // extended version of stasm_open_image
     return returnval;
 }
 
+//UO
 int stasm_open_image(      // call once per image, detect faces
     const char* img,       // in: gray image data, top left corner at 0,0
     int         width,     // in: image width
     int         height,    // in: image height
-    const char* imgpath,   // in: image path, used only for err msgs and debug
+    //const char* imgpath,   // in: image path, used only for err msgs and debug
     int         multiface, // in: 0=return only one face, 1=allow multiple faces
     int         minwidth)  // in: min face width as percentage of img width
 {
-    return stasm_open_image_ext(img, width, height, imgpath,
+    return stasm_open_image_ext(img, width, height/*, imgpath*/,
                                 multiface, minwidth, NULL);
 }
+//OU
 
 int stasm_search_auto_ext( // extended version of stasm_search_auto
     int*   foundface,      // out: 0=no more faces, 1=found face
@@ -225,24 +240,26 @@ int stasm_search_auto( // call repeatedly to find all faces
     return stasm_search_auto_ext(foundface, landmarks, NULL);
 }
 
+//UO
 int stasm_search_single(   // wrapper for stasm_search_auto and friends
     int*        foundface, // out: 0=no face, 1=found face
     float*      landmarks, // out: x0, y0, x1, y1, ..., caller must allocate
     const char* img,       // in: gray image data, top left corner at 0,0
     int         width,     // in: image width
-    int         height,    // in: image height
+    int         height/*,    // in: image height
     const char* imgpath,   // in: image path, used only for err msgs and debug
-    const char* datadir)   // in: directory of face detector files
+    const char* datadir*/)   // in: directory of face detector files
 {
-    if (!stasm_init(datadir, 0 /*trace*/))
+    if (!stasm_init(/*datadir, */0 /*trace*/))
         return false;
 
-    if (!stasm_open_image(img, width, height, imgpath,
+    if (!stasm_open_image(img, width, height/*, imgpath*/,
                           0 /*multiface*/, 10 /*minwidth*/))
         return false;
 
     return stasm_search_auto(foundface, landmarks);
 }
+//OU
 
 int stasm_search_pinned(    // call after the user has pinned some points
     float*       landmarks, // out: x0, y0, x1, y1, ..., caller must allocate

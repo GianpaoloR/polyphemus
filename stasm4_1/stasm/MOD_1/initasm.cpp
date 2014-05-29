@@ -8,8 +8,8 @@
 namespace stasm
 {
 void InitMods(           // initialize ASM model
-    vec_Mod&    mods,    // out: ASM model (only one model in this version of Stasm)
-    const char* datadir) // in: directory of face detector files
+    vec_Mod&    mods/*,    // out: ASM model (only one model in this version of Stasm)
+    const char* datadir*/) // in: directory of face detector files
 {
     if (mods.empty())    // models not yet initialized?
     {
@@ -18,7 +18,7 @@ void InitMods(           // initialize ASM model
         static const Mod mod_yaw00( // constructor, see asm.h
             EYAW00,      // eyaw
             ESTART_EYES, // estart
-            datadir,
+            "",     //datadir,
             yaw00_meanshape,
             yaw00_eigvals,
             yaw00_eigvecs,

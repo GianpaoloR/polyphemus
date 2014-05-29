@@ -6,6 +6,7 @@ Server::Server() {
     //    token = 0;
     infoFileName = "info.info";
     snapshotType = "";
+    isBoundingBox = false;
 }
 
 bool Server::init(cgicc::Cgicc cgicc) {
@@ -19,6 +20,7 @@ bool Server::init(cgicc::Cgicc cgicc) {
     cgicc::form_iterator fiScreenHeightPixel = cgicc.getElement("screenHeightPixel");
     cgicc::form_iterator fiNumSnapshot = cgicc.getElement("numSnapshot");
     cgicc::form_iterator fiSnapshotType = cgicc.getElement("snapshotType");
+    cgicc::form_iterator fiIsBoundingBox = cgicc.getElement("isBoundingBox");
     //    cgicc::form_iterator fiSeed = cgicc.getElement("seed");
     //    cgicc::form_iterator fiToken = cgicc.getElement("token");
     //    cgicc::form_iterator fiSessionName = cgicc.getElement("sessionName");
@@ -28,6 +30,7 @@ bool Server::init(cgicc::Cgicc cgicc) {
             && ((fiScreenHeightPixel != (*cgicc).end()) && (!fiScreenHeightPixel->isEmpty()))
             && ((fiNumSnapshot != (*cgicc).end()) && (!fiNumSnapshot->isEmpty()))
             && ((fiSnapshotType != (*cgicc).end()) && (!fiSnapshotType->isEmpty()))
+            && ((fiIsBoundingBox != (*cgicc).end()) && (!fiIsBoundingBox->isEmpty()))
             //            && ((fiSeed != (*cgicc).end()) && (!fiSeed->isEmpty()))
             //            && ((fiToken != (*cgicc).end()) && (!fiToken->isEmpty()))
             //            && ((fiSessionName != (*cgicc).end()))
@@ -92,6 +95,7 @@ bool Server::init(cgicc::Cgicc cgicc) {
                 snapshotType = (**fiSnapshotType).c_str();
                 screenWidthPixel = atoi((**fiScreenWidthPixel).c_str());
                 screenHeightPixel = atoi((**fiScreenHeightPixel).c_str());
+                isBoundingBox = atoi((**fiIsBoundingBox).c_str());
                 //                seed = atoi((**fiSeed).c_str());
                 //                token = atoi((**fiSeed).c_str());
                 //                sessionName = (**fiSessionName).c_str();
@@ -557,6 +561,10 @@ int Server::getScreenHeightPixel() {
     return screenHeightPixel;
 }
 
+bool Server::getIsBoundingBox() {
+    return isBoundingBox;
+}
+
 void Server::setWatchingPoint(cv::Point watchingPoint) {
     this->watchingPoint = watchingPoint;
 }
@@ -589,6 +597,7 @@ void Server::printResponse(roiHandler* roiHandler) {
 
     //    saveCookies();
     //    std::cout << "Content-type:text/html\r\n\r\n";
+
     std::cout << "{";
     std::cout << "\"x\": " << x;
     std::cout << ", \"y\": " << y;
