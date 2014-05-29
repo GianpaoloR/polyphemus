@@ -145,7 +145,8 @@ HEADERS  += constants.h\
     stasm4_1/stasm/MOD_1/facedet.h \
     stasm4_1/stasm/MOD_1/initasm.h \
     initFlags.h \
-    pupilDetection/twinkle.h
+    pupilDetection/twinkle.h \
+    stasm4_1/stasm/polystasm.h
 
 #two configuration: release and debug
 CONFIG(release,debug|release){
@@ -153,8 +154,9 @@ CONFIG(release,debug|release){
      #DEFINES += "WITH_GUI"
      DEFINES += "TEST_MODE"
      DEFINES += "PROFILING"
-    INCLUDEPATH += /home/abuntu/build_with_Qt/release/include
-    LIBS += -L/home/abuntu/build_with_Qt/release/lib \
+
+ INCLUDEPATH += /Installs/opencv_binaries/Release/include
+    LIBS += -L/Installs/opencv_binaries/Release/lib \
     #if library name is lib[name].lib, you should write -l[name]
     -lopencv_core \
     -lopencv_highgui \
@@ -213,8 +215,9 @@ CONFIG(debug,debug|release){
      DEFINES += "WITH_GUI"
      #DEFINES += "POSIT_DEBUG"
      #DEFINES += "STASM"
-     INCLUDEPATH += /home/abuntu/build_with_Qt/debug/include
-     LIBS += -L/home/abuntu/build_with_Qt/debug/lib \
+
+ INCLUDEPATH += /Installs/opencv_binaries/Debug/include
+     LIBS += -L/Installs/opencv_binaries/Debug/lib \
     #if library name is lib[name].lib, you should write -l[name]
     -lopencv_core \
     -lopencv_highgui \

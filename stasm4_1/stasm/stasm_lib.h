@@ -89,6 +89,12 @@ int stasm_search_auto(       // call repeatedly to find all faces
     int*         foundface,  // out: 0=no more faces, 1=found face
     float*       landmarks); // out: x0, y0, x1, y1, ..., caller must allocate
 
+//NEW
+extern "C"
+void stasm_setNewFaceFlag(
+    bool        isANewFace);
+//END OF NEW
+
 extern "C"
 //UO
 int stasm_search_single(     // wrapper for stasm_search_auto and friends

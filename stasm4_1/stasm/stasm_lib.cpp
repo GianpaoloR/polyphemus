@@ -3,6 +3,7 @@
 // Copyright (C) 2005-2013, Stephen Milborrow
 
 #include "stasm.h"
+#include "polystasm.h"
 
 using namespace stasm;
 
@@ -239,6 +240,16 @@ int stasm_search_auto( // call repeatedly to find all faces
 {
     return stasm_search_auto_ext(foundface, landmarks, NULL);
 }
+
+//NEW
+void stasm_setNewFaceFlag(
+     bool isANewFace)
+{
+    newFace = isANewFace;
+    std::cout << "STASM: newFace set ("<<newFace <<")"<<std::endl;
+}
+
+//END OF NEW
 
 //UO
 int stasm_search_single(   // wrapper for stasm_search_auto and friends

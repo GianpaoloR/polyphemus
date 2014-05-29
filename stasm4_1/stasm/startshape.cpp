@@ -28,6 +28,7 @@
 // Copyright (C) 2005-2013, Stephen Milborrow
 
 #include "stasm.h"
+#include "polystasm.h"
 
 namespace stasm
 {
@@ -489,8 +490,17 @@ static void StartShapeAndRoi(  // we have the facerect, now get the rest
     FaceRoiAndDetPar(face_roi, detpar_roi,     // get ROI around face
                      img, detpar, false);
 
-    DetectEyesAndMouth(detpar_roi,             // use OpenCV eye and mouth detectors
-                       face_roi);
+    //std::cout << "STASM: newFace is " << newFace << std::endl;
+    if(false)
+    {
+        //std::cout<<"STASM: new face --> eye detection"<<std::endl;
+        DetectEyesAndMouth(detpar_roi,             // use OpenCV eye and mouth detectors
+                           face_roi);
+    }
+    else
+    {
+        //std::cout<<"STASM: not a new face --> old eye detection"<<std::endl;
+    }
 
     // Some face detectors return the face rotation, some don't (in
     // the call to NextFace_ just made via NextStartShapeAndRoi).

@@ -55,10 +55,12 @@ void DetectFaces(          // all face rects into detpars
 
     if(changedForPolyphemus)
     {
-         #ifdef WITH_GUI
+        /*
+        #ifdef WITH_GUI
         cv::namedWindow("StasmFace", CV_WINDOW_NORMAL);
         cv::imshow("StasmFace", img);//cv::Mat(img, Rect(0,0,img.cols, img.rows)));
         #endif
+        */
 
         //if (img.cols != 800 || img.rows != 600) // sanity check
         //Err("Image must be 800x600 (your image is %dx%d)", img.cols, img.rows);

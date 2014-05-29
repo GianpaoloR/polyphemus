@@ -3,6 +3,7 @@
 // Copyright (C) 2005-2013, Stephen Milborrow
 
 #include "stasm.h"
+#include "polystasm.h"
 
 namespace stasm
 {
@@ -846,13 +847,57 @@ void DetectEyesAndMouth(  // use OpenCV detectors to find the eyes and mouth
         DrawEyes(cimg,
                  leyes, reyes, ileft_best, iright_best, facerect, detpar.eyaw);
 #endif
+
         if (ileft_best >= 0) // left eye valid?
+        {
+            //NEW
+
+//            std::cout << "Facerect: x = " << facerect.x
+//                      << ", y = " << facerect.y
+//                      << ", w = " << facerect.width
+//                      << ", h = " << facerect.height << std::endl;
+
+//            std::cout << "ILEFT_BEST: x = " << leyes[ileft_best].x
+//                                << ", y = " << leyes[ileft_best].y
+//                                << ", w = " << leyes[ileft_best].width
+//                                << ", h = " << leyes[ileft_best].height << std::endl;
+
+//            //save leye data to avoid useless Haar calls
+//            lEyeToFaceXRatio = (double)(leyes[ileft_best].x) / facerect.width;
+//            lEyeToFaceYRatio = (double)(leyes[ileft_best].y) / facerect.height;
+//            lEyeToFaceWRatio = (double)(leyes[ileft_best].width) / facerect.width;
+//            lEyeToFaceHRatio = (double)(leyes[ileft_best].height) / facerect.height;
+
+//            std::cout<<"Eye ratio vs face: X = " << lEyeToFaceXRatio
+//               << ", Y = " << lEyeToFaceYRatio
+//               << ", W = " << lEyeToFaceWRatio
+//               << ", H = " << lEyeToFaceHRatio
+//               << std::endl;
+
+//            cv::namedWindow("lSquare", CV_WINDOW_NORMAL);
+//            cv::Mat localRoi;
+//            img(facerect).copyTo(localRoi);
+//            cv::rectangle(localRoi, leyes[ileft_best], cv::Scalar(255,255,255));
+//            imshow("lSquare", localRoi);
+
+//     //       cv::waitKey(0);
+
+            //END OF NEW
+
             RectToImgFrame(detpar.lex, detpar.ley,
                            leyes[ileft_best]);
+        }
 
         if (iright_best >= 0) // right eye valid?
+        {
+            //save reye data to avoid useless Haar calls -- NEW
+
+
+            //END OF NEW
+
             RectToImgFrame(detpar.rex, detpar.rey,
                            reyes[iright_best]);
+        }
     }
     // possibly get the mouth
 

@@ -90,6 +90,7 @@ void polyphemus::constructor(int params) {
     facesFound = false;
     refined = true;
     alreadyFace = false;
+    newFace = true;
 
     //HeadRotation: find the head rotations using the nose, the mouth and the ears
     headRotation = new HeadRotation();
@@ -338,7 +339,7 @@ void polyphemus::findNewFaces()
         {
             alreadyFace = true;
             newFace = true;
-            //cout<<"THIS IS A NEW FACE!!"<<endl;
+            if(findNewFacesDebug) cout<<"THIS IS A NEW FACE!!"<<endl;
         }
         else
         {
@@ -1316,6 +1317,11 @@ void polyphemus::stasm()
 
     rH->getFaceROI().copyTo(img); //face is already found, use it; stasm detect faces will simply return the whole img rectangle
 
+    //NEW
+    //cout<<"NewFace is "<<newFace<<endl;
+    //stasm_setNewFaceFlag(newFace);
+    //END OF NEW
+
     //UO
     if (!stasm_search_single(&foundface, landmarks,
             (char*)img.data, img.cols, img.rows/*, path, "../polyphemus/stasm4_1/data"*/))
@@ -1328,7 +1334,9 @@ void polyphemus::stasm()
     }
 
     if (!foundface) {
+        #ifndef WEBSERVICE
         printf("No face found in %s\n", path);
+        #endif
     }
     else
     {
