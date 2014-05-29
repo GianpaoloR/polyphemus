@@ -29,6 +29,7 @@ void haarAnalyzer::setDebugGui(guiHandler *gui)
 }
 #endif //WITH_GUI
 
+
 //LoadCascade: initializes cascade classifiers
 bool haarAnalyzer::loadCascade(cascadeType type, std::string path)
 {
@@ -157,11 +158,11 @@ bool haarAnalyzer::hasDetectFaceWithSize(cv::Mat& img, cv::Size& roundSize) {
 }
 
 //DetectFaces: looks for faces and saves data into haarAnalyzer::faces vector.
-void haarAnalyzer::detectFaces(cv::Mat& img)
+void haarAnalyzer::detectFaces(cv::Mat& img, bool facesFound)
 {
-#ifdef DETECTFACES_DEBUG
-    std::cout<<"DETECTFACES: cols = "<<img.cols<<", rows = "<<img.rows<<std::endl;
-#endif
+    //if(detectFacesDebug) std::cout<<"DETECTFACES: cols = "<<img.cols<<", rows = "<<img.rows<<std::endl;
+
+#ifdef WEBSERVICE
     face_cascade.detectMultiScale( img, faces,
                                    1.1,
                                    2,
@@ -169,7 +170,66 @@ void haarAnalyzer::detectFaces(cv::Mat& img)
                                    0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT,
                                    //0,
                                    //cv::Size(150, 150));
+                                   cv::Size(0.6 * img.cols, 0.6 * img.rows));
+
+#else //WEBSERVICE
+    if(detectFacesDebug) cout<<"DETECT FACES: detection init"<<endl;
+    if(facesFound) //there is a face from the previous frame
+    {
+        if(detectFacesDebug)
+        {
+            cout<<"DETECT FACES: detection running (already face)"<<endl;
+            namedWindow("haarExt", CV_8U);
+            imshow("haarExt", img(oldFaceExt));
+        }
+
+        face_cascade.detectMultiScale( img(oldFaceExt), faces,
+                                   1.1,
+                                   2,
+                                   //0,
+                                   0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT,
+                                   //0,
+                                   //cv::Size(150, 150));
+                                   cv::Size(0.6 * oldFaceExt.width, 0.6 * oldFaceExt.height));
+
+        if(faces.size()>0)
+        {
+            faces[0].x += oldFaceExt.x;
+            faces[0].y += oldFaceExt.y;
+        }
+
+        if(detectFacesDebug) cout<<"DETECT FACES: detection done (already face)"<<endl;
+
+    }
+    else //clear data, no previous faces
+    {
+        if(detectFacesDebug) cout<<"DETECT FACES: detection running (no previous faces)"<<endl;
+
+        face_cascade.detectMultiScale( img, faces,
+                                   1.1,
+                                   2,
+                                   //0,
+                                   0|CV_HAAR_SCALE_IMAGE|CV_HAAR_FIND_BIGGEST_OBJECT,
+                                   //0,
+                                   //cv::Size(150, 150));
                                    cv::Size(0.2 * img.cols, 0.2 * img.rows));
+        if(detectFacesDebug) cout<<"DETECT FACES: detection done (no previous faces)"<<endl;
+    }
+
+    if(faces.size()>0)
+    {
+        oldFaceExt.x = faces[0].x - faces[0].width*0.1;
+        oldFaceExt.y = faces[0].y - faces[0].height*0.1;
+        oldFaceExt.width = faces[0].width*1.2;
+        oldFaceExt.height = faces[0].height*1.2;
+        if(detectFacesDebug)
+        {
+            cout<<"DETECT FACES: Face was:\n\ttl = "<<faces[0].tl() << "; width = "<<faces[0].width<<", height = "<<faces[0].height << endl;
+            cout<<"DETECT FACES: oldFaceExt set:\n\ttl = "<< oldFaceExt.tl() << "; width = "<<oldFaceExt.width<<", height = "<<oldFaceExt.height << endl;
+            waitKey(0);
+        }
+    }
+
 
 #ifdef WITH_GUI
     if(gui!=NULL)
@@ -177,6 +237,7 @@ void haarAnalyzer::detectFaces(cv::Mat& img)
         gui->showFaces(faces);
     }
 #endif //WITH_GUI
+#endif //WEBSERVICE
 
     return;
 }

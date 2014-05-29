@@ -87,6 +87,7 @@ void polyphemus::constructor(int params) {
     leftInFaceRefined = NULL;
     rightInFaceRefined = NULL;
 
+    facesFound = false;
     refined = true;
     alreadyFace = false;
 
@@ -324,7 +325,7 @@ void polyphemus::findNewFaces()
 {
     if(findNewFacesDebug) std::cout<<"FIND_NEW_FACES: ENTERED "<<std::endl;
 
-    haar->detectFaces(rH->getGrayFrame());
+    haar->detectFaces(rH->getGrayFrame(), facesFound);
     if(findNewFacesDebug) std::cout<<"FIND_NEW_FACES: DETECTION DONE "<<std::endl;
 
     faces = haar->getFaces();
@@ -339,7 +340,10 @@ void polyphemus::findNewFaces()
             newFace = true;
             cout<<"THIS IS A NEW FACE!!"<<endl;
         }
-        else newFace = false;
+        else
+        {
+            newFace = false;
+        }
     }
     else
     {
@@ -805,8 +809,8 @@ void polyphemus::trackGaze()
         }
 
 
-        interruptChar = waitKey(1000);
-        if(interruptChar == 'c') break;
+//        interruptChar = waitKey(1000); //TODO: remove?
+//        if(interruptChar == 'c') break;
 
         fH->prepareNextReading();
 #endif

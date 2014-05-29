@@ -116,7 +116,7 @@ public:
     bool hasDetectFace(cv::Mat& img);
     void detectUpperBody(cv::Mat& img);
     bool hasDetectFaceWithSize(cv::Mat& img, cv::Size &roundSize);
-    void detectFaces(cv::Mat& img);
+    void detectFaces(cv::Mat& img, bool facesFound);
     bool redetectFace(cv::Mat& img);
     std::vector<cv::Rect> getFaces();
     std::vector<cv::Rect> getEyeZones();
@@ -139,6 +139,7 @@ private:
     //Face rectangle vector
     std::vector<cv::Rect> faces;
     std::vector<cv::Rect> upper_bodies;
+    Rect oldFaceExt;
 
 
 #ifdef WITH_GUI

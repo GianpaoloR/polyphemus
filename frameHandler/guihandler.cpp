@@ -378,14 +378,6 @@ void guiHandler::turnOnHeadZone(double X, double Y, double KX, double KY)
 }
 
 
-void guiHandler::showFinalGaze(cv::Point gazePoint)
-{
-    if(gazeFrame.empty()) return;
-    int radius = gazeFrame.cols/20;
-    cv::circle(gazeFrame, gazePoint, radius, cv::Scalar(255, 0, 0), 3, 1, 0);
-    return;
-}
-
 void guiHandler::redrawGazeFrame()
 {
     gazeFrame.release();
