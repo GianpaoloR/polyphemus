@@ -455,14 +455,14 @@ void twinkle::findLimbusContour(cv::Mat mat, Point* pupil)
     mat.at<uchar>(cursorUp) = 0;
 
     std::cout<<"limbusContourLR.size() = "<<limbusContourLR.size()<<std::endl;
-    moveCursor(cursorUp, mat, &limbusContourLR, debug, debMatLR, UP);
+    moveCursor(cursorUp, mat, &limbusContourLR, debug, debMatLR, UP_DIR);
     std::cout<<"After moveUp limbusContourLR.size() = "<<limbusContourLR.size()<<std::endl;
-    moveCursor(cursorDown, mat, &limbusContourLR, debug, debMatLR, DOWN);
+    moveCursor(cursorDown, mat, &limbusContourLR, debug, debMatLR, DOWN_DIR);
     std::cout<<"After moveDown limbusContourLR.size() = "<<limbusContourLR.size()<<std::endl;
 
-    moveCursor(cursorLeft, mat, &limbusContourUD, debug, debMatUD, LEFT);
+    moveCursor(cursorLeft, mat, &limbusContourUD, debug, debMatUD, LEFT_DIR);
     std::cout<<"After moveLeft limbusContourUD.size() = "<<limbusContourUD.size()<<std::endl;
-    moveCursor(cursorRight, mat, &limbusContourUD, debug, debMatUD, RIGHT);
+    moveCursor(cursorRight, mat, &limbusContourUD, debug, debMatUD, RIGHT_DIR);
     std::cout<<"After moveRight limbusContourUD.size() = "<<limbusContourUD.size()<<std::endl;
 }
 
@@ -470,26 +470,26 @@ void twinkle::moveCursor(Point p, Mat m, std::vector<Point> *l, bool debug, Mat 
 {
     while(m.at<uchar>(p) == 0)
     {
-        if(dir == UP || dir == DOWN)
+        if(dir == UP_DIR || dir == DOWN_DIR)
         {
             //Find left barrier
-            findBarrier(p, m, l, debug, debMat, LEFT);
+            findBarrier(p, m, l, debug, debMat, LEFT_DIR);
 
             //Find right barrier
-            findBarrier(p, m, l, debug, debMat, RIGHT);
+            findBarrier(p, m, l, debug, debMat, RIGHT_DIR);
         }
         else
         {
             //Find up barrier
-            findBarrier(p, m, l, debug, debMat, UP);
+            findBarrier(p, m, l, debug, debMat, UP_DIR);
 
             //Find down barrier
-            findBarrier(p, m, l, debug, debMat, DOWN);
+            findBarrier(p, m, l, debug, debMat, DOWN_DIR);
         }
 
         if(debug)
         {
-            if(dir == UP || dir == DOWN)
+            if(dir == UP_DIR || dir == DOWN_DIR)
             {
                 imshow("Limbus contour LR", debMat);
             }
@@ -503,22 +503,22 @@ void twinkle::moveCursor(Point p, Mat m, std::vector<Point> *l, bool debug, Mat 
         //Prepare for next iteration
         switch(dir)
         {
-        case UP:
+        case UP_DIR:
             p.y--;
             break;
-        case DOWN:
+        case DOWN_DIR:
             p.y++;
             break;
-        case LEFT:
+        case LEFT_DIR:
             p.x--;
             break;
-        case RIGHT:
+        case RIGHT_DIR:
             p.x++;
             break;
         default: break;
         }
 
-        if(dir == UP || dir == DOWN)
+        if(dir == UP_DIR || dir == DOWN_DIR)
         {
             if(p.y<0 || p.y>=m.rows) break;
         }
@@ -544,22 +544,22 @@ void twinkle::findBarrier(Point p, Mat m, std::vector<Point> *l, bool debug, Mat
     {
         switch(dir)
         {
-        case LEFT:
+        case LEFT_DIR:
             p2.x--;
             break;
-        case RIGHT:
+        case RIGHT_DIR:
             p2.x++;
             break;
-        case UP:
+        case UP_DIR:
             p2.y--;
             break;
-        case DOWN:
+        case DOWN_DIR:
             p2.y++;
             break;
         default: break;
         }
 
-        if((dir==LEFT && p2.x<0) || (dir==RIGHT && p2.x>=m.cols) || (dir==UP && p2.y<0) || (dir==DOWN && p2.y>=m.rows))
+        if((dir==LEFT_DIR && p2.x<0) || (dir==RIGHT_DIR && p2.x>=m.cols) || (dir==UP_DIR && p2.y<0) || (dir==DOWN_DIR && p2.y>=m.rows))
         {
             toAdd = false;
             break;

@@ -209,6 +209,24 @@ cv::Mat& roiHandler::getRightEmpiricReducedROI() {
     return rightEmpiricReducedFrame;
 }
 
+void roiHandler::setLeftEyeFromStasm(cv::Rect r) {
+    leftEyeStasmFrame = faceHaarFrame(r);
+}
+
+void roiHandler::setRightEyeFromStasm(cv::Rect r) {
+    rightEyeStasmFrame = faceHaarFrame(r);
+}
+
+
+cv::Mat& roiHandler::getLeftEyeFromStasm() {
+    return leftEyeStasmFrame;
+}
+
+cv::Mat& roiHandler::getRightEyeFromStasm() {
+    return rightEyeStasmFrame;
+}
+
+
 cv::Mat& roiHandler::getOldHaarNoseROI() {
     return oldNoseHaarFrame;
 }

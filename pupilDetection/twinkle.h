@@ -5,6 +5,14 @@
 #include "common/helpers.h"
 #include "common/binaryanalyzer.h"
 
+enum direction
+{
+    LEFT_DIR,
+    RIGHT_DIR,
+    UP_DIR,
+    DOWN_DIR
+};
+
 class twinkle
 {
 public:

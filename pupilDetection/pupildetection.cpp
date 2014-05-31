@@ -79,6 +79,7 @@ void pupilDetection::findPupils(cv::Mat leftROI, cv::Mat rightROI)//std::vector<
     if(findPupilsDebug)
         std::cout<<"FINDPUPILS: OK " << h++ <<": left: "<<leftROI.cols<<"x"<<leftROI.rows<<", right: "<<rightROI.cols<<"x"<<rightROI.rows<<std::endl;
 
+
     pupilrH->setLeftROI(leftROI);
     pupilrH->setRightROI(rightROI);
     if(equalizing)

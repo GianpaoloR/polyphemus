@@ -88,6 +88,8 @@ public:
     void setRightEyeROI(std::vector<cv::Rect> fVett);
     void setLeftEmpiricRotatedFrame(cv::Mat& img);
     void setRightEmpiricRotatedFrame(cv::Mat& img);
+    void setRightEyeFromStasm(cv::Rect r);
+    void setLeftEyeFromStasm(cv::Rect r);
     //Eye(s) getters
     cv::Rect& getLeftEye();
     cv::Mat& getLeftEyeROI();
@@ -100,6 +102,8 @@ public:
     std::vector<cv::Rect> getReducedEmpiricEyes();
     cv::Mat& getLeftEmpiricRotatedFrame();
     cv::Mat& getRightEmpiricRotatedFrame();
+    cv::Mat& getLeftEyeFromStasm();
+    cv::Mat& getRightEyeFromStasm();
     //Eye(s) cleaners
     void clearHaarEyes();
     //Eye(s) existance
@@ -184,6 +188,7 @@ private:
     cv::Mat leftEyeHaarFrame;
     cv::Rect leftEyeEmpiricRect;
     cv::Mat leftEyeEmpiricFrame;
+    cv::Mat leftEyeStasmFrame;
 
     //Right Eye
     bool itHasRightEyeCenterInit;
@@ -197,6 +202,8 @@ private:
     cv::Mat rightEyeHaarFrame;
     cv::Rect rightEyeEmpiricRect;
     cv::Mat rightEyeEmpiricFrame;
+    cv::Mat rightEyeStasmFrame;
+
 
     //Empiric Eyes
     float eyeTop;

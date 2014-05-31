@@ -915,78 +915,100 @@ void polyphemus::trackGaze()
 
             /***** JP PART *****/
 
-            detectEyesEmpiric();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTEYESEMPIRIC"<<std::endl;
-            #endif
-
-            reduceEmpiricEyes();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": REDUCEEMPIRICEYES"<<std::endl;
-            #endif
-
-
-            pD->findPupils(rH->getLeftEmpiricReducedROI(), rH->getRightEmpiricReducedROI());
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": FINDPUPILS"<<std::endl;
-            #endif
-
-            if(refined)
+            bool withEmpiricEyes = false;
+            if(withEmpiricEyes)
             {
-                pD->refinePupils();
+                detectEyesEmpiric();
                 #ifdef TRACKGAZE_DEBUG
-                std::cout<<"TRACKGAZE: OK "<<h++<<": REFINEMENT DONE."<<std::endl;
+                std::cout<<"TRACKGAZE: OK "<<h++<<": DETECTEYESEMPIRIC"<<std::endl;
                 #endif
-            }
 
-            setPupilData();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": PUPIL DATA SET."<<std::endl;
-            #endif
+                reduceEmpiricEyes();
+                #ifdef TRACKGAZE_DEBUG
+                std::cout<<"TRACKGAZE: OK "<<h++<<": REDUCEEMPIRICEYES"<<std::endl;
+                #endif
 
-            gE->predictHorizontalZone(G_CATCH);
-            gE->predictVerticalZone(this->newFace);
+                pD->findPupils(rH->getLeftEmpiricReducedROI(), rH->getRightEmpiricReducedROI());
+                #ifdef TRACKGAZE_DEBUG
+                std::cout<<"TRACKGAZE: OK "<<h++<<": FINDPUPILS"<<std::endl;
+                #endif
 
-            #ifndef WEBSERVICE
-            #ifdef WITH_GUI
-            pD->updateReduced();
-            #ifdef TRACKGAZE_DEBUG
-            std::cout<<"TRACKGAZE: OK "<<h++<<": PUPILS SHOWED IN REDUCED WINDOWS."<<std::endl;
-            #endif //TRACKGAZE_DEBUG
-
-            if(gui!=NULL)
-            {
-                if(pD->leftFound)
+                if(refined)
                 {
-                    gui->turnOnEyeZone(gE->getHorizontalResponse(), gE->getVerticalResponse());
-                    #ifdef GREATCATCH_TEST
-                    updateGaze();
-                    std::cout<<"Is this the correct place? [y,n,t]"<<std::endl;
-                    char userResponse = cv::waitKey(0);
-                    switch(userResponse)
-                    {
-                    case 'y':
-                        correctPlace++;
-                        break;
-                    case 'n':
-                        wrongPlace++;
-                        break;
-                    default:
-                        break;
-                    }
-                    #endif //GREATCATCH_TEST
-                }
-                else
-                {
+                    pD->refinePupils();
                     #ifdef TRACKGAZE_DEBUG
-                        #ifndef WEBSERVICE
-                        std::cout<<"NO PUPIL"<<std::endl;
-                        #endif
+                    std::cout<<"TRACKGAZE: OK "<<h++<<": REFINEMENT DONE."<<std::endl;
                     #endif
                 }
+
+                setPupilData();
+                #ifdef TRACKGAZE_DEBUG
+                std::cout<<"TRACKGAZE: OK "<<h++<<": PUPIL DATA SET."<<std::endl;
+                #endif
+
+                gE->predictHorizontalZone(G_CATCH);
+                gE->predictVerticalZone(this->newFace);
+
+                #ifndef WEBSERVICE
+                #ifdef WITH_GUI
+                pD->updateReduced();
+                #ifdef TRACKGAZE_DEBUG
+                std::cout<<"TRACKGAZE: OK "<<h++<<": PUPILS SHOWED IN REDUCED WINDOWS."<<std::endl;
+                #endif //TRACKGAZE_DEBUG
+
+                if(gui!=NULL)
+                {
+                    if(pD->leftFound)
+                    {
+                        gui->turnOnEyeZone(gE->getHorizontalResponse(), gE->getVerticalResponse());
+                        #ifdef GREATCATCH_TEST
+                        updateGaze();
+                        std::cout<<"Is this the correct place? [y,n,t]"<<std::endl;
+                        char userResponse = cv::waitKey(0);
+                        switch(userResponse)
+                        {
+                        case 'y':
+                            correctPlace++;
+                            break;
+                        case 'n':
+                            wrongPlace++;
+                            break;
+                        default:
+                            break;
+                        }
+                        #endif //GREATCATCH_TEST
+                    }
+                    else
+                    {
+                        #ifdef TRACKGAZE_DEBUG
+                            #ifndef WEBSERVICE
+                            std::cout<<"NO PUPIL"<<std::endl;
+                            #endif
+                        #endif
+                    }
+                }
+                #endif //WITH_GUI
+                #endif //WEBSERVICE
             }
-            #endif //WITH_GUI
-            #endif //WEBSERVICE
+            else
+            {
+                rH->setLeftEyeFromStasm(gE->getEyeBoundaries(LEFT));
+                rH->setRightEyeFromStasm(gE->getEyeBoundaries(RIGHT));
+
+                namedWindow("L_STASM", CV_8U);
+                namedWindow("R_STASM", CV_8U);
+                imshow("L_STASM", rH->getLeftEyeFromStasm());
+                imshow("R_STASM", rH->getRightEyeFromStasm());
+                //cv::waitKey(0);
+
+                //pD->findPupils(rH->getLeftEyeFromStasm(),rH->getRightEyeFromStasm());
+            }
+
+
+
+
+
+
 
             /***** END OF JP PART *****/
 
@@ -1369,7 +1391,11 @@ void polyphemus::stasm()
 
     #ifndef WEBSERVICE
     #ifdef WITH_GUI
-    if(this->gui != NULL) cv::imshow("stasm minimal", img);
+    if(this->gui != NULL)
+    {
+        namedWindow("stasm minimal", CV_8U);
+        cv::imshow("stasm minimal", img);
+    }
     #endif //WITH_GUI
     #endif //WEBSERVICE
 }

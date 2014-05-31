@@ -130,6 +130,27 @@ bool gazeEstimation::predictHorizontalZone(pupilType pT)
     return valid;
 }
 
+Rect gazeEstimation::getEyeBoundaries(eyes eye)
+{
+    Rect r;
+
+    if(eye == LEFT)
+    {
+        r.x = lLeft;
+        r.y = lTop;
+        r.width = lRight-lLeft+2;
+        r.height = lBottom-lTop+2;
+    }
+    else
+    {
+        r.x = rLeft;
+        r.y = rTop;
+        r.width = rRight-rLeft+2;
+        r.height = rBottom-rTop+2;
+    }
+    return r;
+}
+
 void gazeEstimation::setLM(float lm[nLM*2], Mat face)//, bool newFace)
 {
     int li=0, ri=0;
@@ -244,16 +265,18 @@ void gazeEstimation::showLandmarks(Mat face, float lp[2], float lLM[eyeLM*2], fl
 {
     namedWindow("LM", CV_WINDOW_NORMAL);
 
-    face.at<uchar>(lp[0], lp[1]) = 255;
-    face.at<uchar>(rp[0], rp[1]) = 255;
+    Mat drawingFace;
+    face.copyTo(drawingFace);
+    drawingFace.at<uchar>(lp[0], lp[1]) = 255;
+    drawingFace.at<uchar>(rp[0], rp[1]) = 255;
 
     for(int i=0; i<eyeLM*2; i+=2)
     {
-        face.at<uchar>(lLM[i], lLM[i+1]) = 255;
-        face.at<uchar>(rLM[i], rLM[i+1]) = 255;
+        drawingFace.at<uchar>(lLM[i], lLM[i+1]) = 255;
+        drawingFace.at<uchar>(rLM[i], rLM[i+1]) = 255;
     }
 
-    imshow("LM", face);
+    imshow("LM", drawingFace);
 }
 
 

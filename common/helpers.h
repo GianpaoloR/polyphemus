@@ -60,12 +60,11 @@ struct setInformation
     std::vector<Point> corners;
 };
 
-enum direction
+
+enum eyes
 {
     LEFT,
-    RIGHT,
-    UP,
-    DOWN
+    RIGHT
 };
 
 enum pupilType

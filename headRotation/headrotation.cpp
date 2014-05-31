@@ -465,7 +465,8 @@ void HeadRotation::positPoint(float* landmarks)
 {
 
     cv::Point nose, mouthL, mouthR, eyeL, eyeR, earL, earR;
-    cv::Mat img = rH->getFaceROI();
+    cv::Mat img;
+    rH->getFaceROI().copyTo(img);
 
     std::vector<CvPoint3D32f> modelPoints;
 

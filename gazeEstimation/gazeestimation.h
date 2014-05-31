@@ -27,6 +27,7 @@ public:
     void setPupils(Point* left, Point* right);
     bool predictHorizontalZone(pupilType pT);
     void predictVerticalZone(bool newFace);
+    Rect getEyeBoundaries(eyes eye);
 
 
 private:
